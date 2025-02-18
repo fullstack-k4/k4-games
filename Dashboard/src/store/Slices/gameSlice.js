@@ -249,10 +249,12 @@ const gameSlice = createSlice({
         })
         builder.addCase(uploadGame.pending, (state) => {
             state.uploading = true;
+            state.loading=true;
         });
         builder.addCase(uploadGame.fulfilled, (state, action) => {
             state.uploading = false;
             state.uploaded = true;
+            state.loading=false;
         })
         builder.addCase(getAllGames.pending, (state) => {
             state.loading = true;
