@@ -8,7 +8,6 @@ const initialState = {
     status: false,
     admin: false,
     secondaryAdmins: null,
-    deleting:false
 }
 
 export const userLogin = createAsyncThunk("login", async (data) => {
@@ -143,16 +142,13 @@ const authSlice = createSlice({
         })
         builder.addCase(deleteSecondaryAdmin.pending,(state)=>{
             state.loading=true;
-            state.deleting=true;
         })
         builder.addCase(deleteSecondaryAdmin.fulfilled,(state,action)=>{
             state.loading=false;
             state.secondaryAdmins=state.secondaryAdmins.filter((admin)=>admin?._id!==action.payload._id);
-            state.deleting=false;
         })
         builder.addCase(deleteSecondaryAdmin.rejected,(state)=>{
             state.loading=false;
-            state.deleting=false;
         })
 
     }

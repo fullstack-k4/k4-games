@@ -1,21 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Trash,Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSelector, useDispatch } from 'react-redux';
+import {  useDispatch } from 'react-redux';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { deleteSecondaryAdmin } from '@/store/Slices/authSlice';
 
 const UsersList = ({ users }) => {
     const dispatch = useDispatch();
-    const deleting = useSelector((state) => state.auth.deleting);
-
+    const [loadingId, setLoadingId] = useState(null);
     const handleDelete = async (id) => {
-        await dispatch(deleteSecondaryAdmin({ id }));
+
+        setLoadingId(id);
+       const response= await dispatch(deleteSecondaryAdmin({ id }));
+
+       if(response.meta.requestStatus === "fulfilled"){
+        setLoadingId(null);
+       }
     }
 
     
-
-
     return (
         <>
             {users && users.map((user, index) => (
@@ -27,9 +30,9 @@ const UsersList = ({ users }) => {
                             variant="destructive"
                             size="icon"
                             onClick={() => handleDelete(user?._id)}
-                            disabled={deleting}
+                            disabled={loadingId}
                         >
-                            {deleting ? (
+                            {loadingId===user?._id ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 <Trash className="w-4 h-4" />
