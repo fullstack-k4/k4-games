@@ -7,14 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@radix-ui/react-label';
 import { useDispatch, useSelector } from 'react-redux';
 import { SpecialLoadingButton } from './sub-components/SpecialLoadingButton';
-import { userLogin, getCurrentUser } from '@/store/Slices/authSlice';
 import { Container } from './sub-components/';
 import { Eye, EyeOff } from 'lucide-react';
-
-
-
-const Loginpage = () => {
-
+import { registerUser } from '@/store/Slices/authSlice';
+const CreateUserpage = () => {
   const {
     handleSubmit,
     register,
@@ -28,36 +24,24 @@ const Loginpage = () => {
 
 
   const submit = async (data) => {
-    const response = await dispatch(userLogin(data));
-    const user = await dispatch(getCurrentUser());
 
-    if (response?.type ==="login/fulfilled" ) {
-      if(user.payload.role==="admin"){
-        navigate("/")
-      }
-      else{
-        navigate("/games");
-      }
+    const response=await dispatch(registerUser(data));
+
+    if(response.meta.requestStatus === "fulfilled"){
+      navigate("/users");
     }
   }
 
   const togglePasswordVisibility = () => {
     setshowPassword((prev) => !prev);
   }
-
-
-
-
   return (
     <Container>
-      <div className="w-full lg:grid lg:min-h-[100vh] lg:grid-cols-2 xl:min-h-[100vh]">
+      <div className="w-full d lg:min-h-[100vh]  xl:min-h-[100vh]">
         <div className=" min-h-[100vh] flex items-center justify-center py-12">
           <div className="mx-auto grid w-[350px] gap-6">
             <div className="grid gap-2 text-center">
-              <h1 className="text-3xl font-bold"> Dashboard Login</h1>
-              <p className="text-balance text-muted-foreground">
-                Enter  email below to login to Dashboard
-              </p>
+              <h1 className="text-3xl font-bold"> Create User</h1>
             </div>
             <form onSubmit={handleSubmit(submit)}>
               <div className="grid gap-4">
@@ -99,23 +83,21 @@ const Loginpage = () => {
                   )}
                 </div>
                 {loading ? (
-                  <SpecialLoadingButton content={"Logging In"} />
+                  <SpecialLoadingButton content={"Creating"} />
                 ) : (
                   <Button
                     className="w-full"
                   >
-                    Login
+                    Create
                   </Button>
                 )}
               </div>
             </form>
           </div>
         </div>
-        <div className="flex justify-center items-center bg-muted">
-          <img src="/login.png" alt="login" />
-        </div>
+
       </div>
     </Container>)
 }
 
-export { Loginpage };
+export { CreateUserpage };

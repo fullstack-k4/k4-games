@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-// If you add More Categories in Future Add Here and also add in Frontend also in Add Game Page
+// If you add More Categories in Future Add Here 
 const validCategories = [
     "Puzzle", "Word", "Multiplayer", "Arcade", "Recommended",
     "Brain", "Sports", "Shooting", "Animal", "Action",
@@ -55,6 +55,10 @@ const gameSchema = new Schema({
     source:{
         type:String,
         enum:["self","link"]
+    },
+    createdBy:{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
     }
 
 }, { timestamps: true })

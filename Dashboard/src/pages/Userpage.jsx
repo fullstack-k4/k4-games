@@ -1,16 +1,71 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Link } from "react-router-dom";
+import { useDispatch ,useSelector} from "react-redux";
+import { getAllSecondaryAdmin } from "@/store/Slices/authSlice";
+import { UsersList } from "./sub-components";
+import { Loader } from "./sub-components";
+
 
 const Userpage = () => {
+  const dispatch=useDispatch();
+  const users=useSelector((state)=>state.auth.secondaryAdmins);
+  const [load,setload]=useState(true);
+
+  useEffect(()=>{
+    dispatch(getAllSecondaryAdmin()); 
+  },[]);
+
+  // custom loading
+
+  useEffect(()=>{
+    const id=setTimeout(() => {
+      setload(false);
+    }, 2000);
+
+    ()=>{
+      clearTimeout(id);
+    }
+
+  },[])
+
+
+  const handleDelete = (email) => {
+    console.log(`Delete user: ${email}`);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-      <div className="bg-gray-800 text-white rounded-2xl shadow-lg p-6 sm:p-8 md:p-12 text-center max-w-lg w-full">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">🚀 Coming Soon</h1>
-        <p className="text-gray-300 text-sm sm:text-base md:text-lg">
-          We're building something exciting! Stay tuned for updates.
-        </p>
+    <>
+    {load ? <Loader/> :(
+      <div className="p-6">
+      {/* Create User Button */}
+      <Link to="/create-user">
+        <div className="flex justify-end mb-4">
+          <Button className="bg-blue-500 hover:bg-blue-600">Create User</Button>
+        </div>
+      </Link>
+
+
+      {/* User Table */}
+      <div className="border rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <UsersList users={users}/>
+          </TableBody>
+        </Table>
       </div>
     </div>
+    )}
+    </>
   );
 };
 
-export {Userpage};
+export { Userpage };

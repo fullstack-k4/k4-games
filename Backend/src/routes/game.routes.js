@@ -12,20 +12,20 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.route("/upload").post(verifyJWT, verifyAdmin, upload.fields([
+router.route("/upload").post(verifyJWT, upload.fields([
     { name: "gameZip", maxCount: 1 },
     { name: "image", maxCount: 1 }
 ]), uploadGame);
 
-router.route("/edit/:gameId").patch(verifyJWT, verifyAdmin, upload.fields([
+router.route("/edit/:gameId").patch(verifyJWT, upload.fields([
     { name: "gameZip", maxCount: 1 },
     { name: "image", maxCount: 1 }
 ]), editGame)
 
 
-router.route("/getall").get(verifyJWT, verifyAdmin, getAllGame);
-router.route("/get/:gameId").get(verifyJWT, verifyAdmin, getGameById);
-router.route("/delete/:gameId").delete(verifyJWT, verifyAdmin, deleteGame);
+router.route("/getall").get(verifyJWT, getAllGame);
+router.route("/get/:gameId").get(verifyJWT, getGameById);
+router.route("/delete/:gameId").delete(verifyJWT, deleteGame);
 router.route("/download/:gameName").get(downloadGame);
 router.route("/increment/:gameId").post(incrementTopTenCount);
 router.route("/updateLoadingState/:gameId").put(updateLoadingState);

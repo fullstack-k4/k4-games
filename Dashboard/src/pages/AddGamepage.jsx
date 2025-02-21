@@ -46,12 +46,7 @@ const AddGamepage = () => {
     return () => {
       clearTimeout(id)
     }
-  })
-
-
-
-
-
+  },[])
 
 
   useEffect(() => {

@@ -1,19 +1,20 @@
 import { Link } from "react-router-dom"
-import { Outlet,useNavigate } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Home, Users, Gamepad2, LogIn, Menu } from "lucide-react"
-import { useDispatch } from "react-redux"
+import { useDispatch,useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
 
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const dispatch = useDispatch()
-  const navigate=useNavigate()
+  const navigate = useNavigate()
+  const admin=useSelector((state)=>state.auth.admin);
 
-  const handleLogout = async() => {
-    const response= await dispatch(userLogout())
-    if(response?.type ==="logout/fulfilled"){
+  const handleLogout = async () => {
+    const response = await dispatch(userLogout())
+    if (response?.type === "logout/fulfilled") {
       navigate("/login")
     }
   }
@@ -37,24 +38,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {/* Navigation Links */}
       <nav className="flex-1 mt-4">
         <ul className="space-y-2">
-          <li>
-            <Link
-              to="/"
-              className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
-            >
-              <Home className="w-5 h-5" />
-              {isOpen && <span>Home</span>}
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/users"
-              className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
-            >
-              <Users className="w-5 h-5" />
-              {isOpen && <span>Users</span>}
-            </Link>
-          </li>
+           
+            {admin && <>
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+                >
+                  <Home className="w-5 h-5" />
+                  {isOpen && <span>Home</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/users"
+                  className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+                >
+                  <Users className="w-5 h-5" />
+                  {isOpen && <span>Users</span>}
+                </Link>
+              </li>
+            </>}
+          
           <li>
             <Link
               to="/games"
@@ -83,32 +88,32 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 }
 
 const Layout = () => {
-    const [isOpen, setIsOpen] = useState(window.innerWidth >= 768)
-  
-    useEffect(() => {
-      const handleResize = () => setIsOpen(window.innerWidth >= 768)
-      window.addEventListener("resize", handleResize)
-      return () => window.removeEventListener("resize", handleResize)
-    }, [])
-  
-    const toggleSidebar = () => setIsOpen((prev) => !prev)
-  
-    return (
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-  
-        {/* Main Content */}
-        <main
-          className={`flex-grow p-4 bg-gray-100 overflow-auto transition-all duration-300 
+  const [isOpen, setIsOpen] = useState(window.innerWidth >= 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsOpen(window.innerWidth >= 768)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const toggleSidebar = () => setIsOpen((prev) => !prev)
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
+      <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+
+      {/* Main Content */}
+      <main
+        className={`flex-grow p-4 bg-gray-100 overflow-auto transition-all duration-300 
           ${isOpen ? "ml-64 md:ml-0" : "ml-16 md:ml-0"}`}
-        >
-          <Outlet />
-        </main>
-      </div>
-    )
-  }
-  
-  
+      >
+        <Outlet />
+      </main>
+    </div>
+  )
+}
+
+
 
 export { Layout }

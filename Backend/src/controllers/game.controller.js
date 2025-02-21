@@ -136,7 +136,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         imageUrl,
         gameUrl: finalGameUrl,
         isdownload,
-        source
+        source,
+        createdBy:req.user?._id
     };
 
     if (!isdownload) {
@@ -151,9 +152,18 @@ const uploadGame = asyncHandler(async (req, res) => {
 const getAllGame = asyncHandler(async (req, res) => {
 
     const { page = 1, limit = 10, query,category } = req.query;
-    console.log(category);
 
     const pipeline = [];
+
+    if(req.user.role!=="admin"){
+        pipeline.push({
+            $match:{createdBy:req.user?._id}
+        })
+    }
+
+   
+
+
 
     if (query) {
         pipeline.push({
@@ -209,6 +219,10 @@ const deleteGame = asyncHandler(async (req, res) => {
     }
 
     const game = await Game.findById(gameId);
+
+    if(game.createdBy!==req.user?._id && !req.user.role==="admin"){
+        throw new ApiError(403, "You are not authorized to delete this game");
+    }
 
     if (!game) {
         throw new ApiError(404, "Game Not Found");
@@ -621,11 +635,13 @@ const toggleDownloadStatus=asyncHandler(async(req,res)=>{
 
 
 
+
+
 export {
     uploadGame, getAllGame, getGameById,
     deleteGame, downloadGame, editGame,
     incrementTopTenCount, updateLoadingState,
     getNumberOfTotalGames, getNumberOfAllowedDownloadGames,
     getNumberOfSelfUploadedGames, getNumberofUploadedGamesByLink,
-    getGameCategories,toggleDownloadStatus
+    getGameCategories,toggleDownloadStatus,
 };

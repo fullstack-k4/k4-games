@@ -24,8 +24,6 @@ const initialState = {
     toggled:false,
 }
 
-
-
 export const getAllGames = createAsyncThunk(
     'getAllGames',
     async ({ page, limit, query,category }) => {
@@ -220,6 +218,9 @@ export const toggleDownloadStatus=createAsyncThunk("toggleDownloadStatus",async(
         throw error;
     }
 })
+
+
+
 
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
-import { Loginpage, Homepage, Userpage, Gamespage, AddGamepage, EditGamepage } from "./pages";
+import { Loginpage, Homepage, Userpage, Gamespage, AddGamepage, EditGamepage, CreateUserpage } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./store/Slices/authSlice";
@@ -61,6 +61,14 @@ const App = () => {
               <EditGamepage />
             </AuthLayout>
           }
+        />
+        <Route
+        path="/create-user"
+        element={
+          <AuthLayout authentication={true}>
+            <CreateUserpage/>
+          </AuthLayout>
+        }
         />
       </Routes>
       <Toaster position="top-right" richColors />

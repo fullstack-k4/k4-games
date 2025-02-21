@@ -2,6 +2,8 @@ import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse} from "../utils/ApiResponse.js";
+import { Game } from "../models/game.model.js";
+import mongoose, { isValidObjectId } from "mongoose";
 
 
 const registerUser=asyncHandler(async(req,res)=>{
@@ -85,4 +87,43 @@ const getCurrentUser=asyncHandler(async(req,res)=>{
 })
 
 
-export {loginUser,registerUser,logoutUser,getCurrentUser};
+const getAllSecondaryAdmin=asyncHandler(async(req,res)=>{
+    const secondaryAdmins=await User.find({role:"secondaryAdmin"}).select("-password");
+
+    if(!secondaryAdmins){
+        throw new ApiResponse(404,"","No Secondary Admins Found");
+    }
+
+    return res.status(200).json(new ApiResponse(200,secondaryAdmins,"Secondary Admins Fetched Succesfully"));
+
+
+})
+
+
+const deleteSecondaryAdmin = asyncHandler(async (req, res) => {
+    const { secondaryAdminsId } = req.params;
+
+    if (!isValidObjectId(secondaryAdminsId)) {
+        throw new ApiError(400, "Invalid Secondary Admin Id");
+    }
+
+    const secondaryAdmin = await User.findById(secondaryAdminsId);
+
+    if (!secondaryAdmin) {
+        throw new ApiError(404, "Secondary Admin Not Found");
+    }
+
+    await User.findByIdAndDelete(secondaryAdminsId);
+
+    // Correcting the Game update logic
+    await Game.updateMany({ createdBy: secondaryAdminsId }, { $unset: { createdBy: "" } });
+
+    return res.status(200).json(new ApiResponse(200, secondaryAdmin, "Secondary Admin Deleted Successfully"));
+});
+
+
+
+
+
+
+export {loginUser,registerUser,logoutUser,getCurrentUser,getAllSecondaryAdmin,deleteSecondaryAdmin};
