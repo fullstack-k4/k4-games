@@ -111,7 +111,7 @@ const Loginpage = () => {
             </form>
           </div>
         </div>
-        <div className="flex justify-center items-center bg-muted">
+        <div className="flex justify-center items-center ">
           <img src="/login.png" alt="login" />
         </div>
       </div>

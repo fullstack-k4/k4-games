@@ -48,7 +48,10 @@ export const getGameById = createAsyncThunk(
     'getGameById',
     async ({ gameId }) => {
         try {
-            const response = await axiosInstance.get(`/games/get/${gameId}`);
+            const url=new URL(`${BASE_URL}/games/get`)
+
+            if(gameId) url.searchParams.set("_id",gameId);
+            const response = await axiosInstance.get(url);
             return response.data.data;
 
         } catch (error) {

@@ -195,13 +195,13 @@ const getAllGame = asyncHandler(async (req, res) => {
 });
 
 const getGameById = asyncHandler(async (req, res) => {
-    const { gameId } = req.params;
+    const { _id } = req.query;
 
-    if (!isValidObjectId(gameId)) {
+    if (!isValidObjectId(_id)) {
         throw new ApiError(400, "Invalid Game Id");
     }
 
-    const game = await Game.findById(gameId);
+    const game = await Game.findById(_id);
 
     if (!game) {
         throw new ApiError(404, "Game Not Found");

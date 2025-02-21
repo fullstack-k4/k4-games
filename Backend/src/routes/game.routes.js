@@ -24,7 +24,7 @@ router.route("/edit/:gameId").patch(verifyJWT, upload.fields([
 
 
 router.route("/getall").get(verifyJWT, getAllGame);
-router.route("/get/:gameId").get(verifyJWT, getGameById);
+router.route("/get").get(verifyJWT, getGameById);
 router.route("/delete/:gameId").delete(verifyJWT, deleteGame);
 router.route("/download/:gameName").get(downloadGame);
 router.route("/increment/:gameId").post(incrementTopTenCount);
