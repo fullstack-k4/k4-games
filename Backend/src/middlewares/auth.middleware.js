@@ -38,3 +38,13 @@ export const verifyAdmin=asyncHandler(async(req,_,next)=>{
 
     next();
 })
+
+
+export const checkApiKey=asyncHandler(async(req,_,next)=>{
+    const providedApiKey=req.headers['x-api-key'];
+
+    if(providedApiKey === process.env.API_KEY){
+        return next();
+    }
+    throw new ApiError(403,"Forbidden:Invalid API Key");
+})
