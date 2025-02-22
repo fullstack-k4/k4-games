@@ -23,8 +23,8 @@ router.route("/edit/:gameId").patch(verifyJWT, upload.fields([
 ]), editGame)
 
 
-router.route("/getall").get(verifyJWT,checkApiKey,getAllGame);
-router.route("/get").get(verifyJWT,checkApiKey,getGameById);
+router.route("/getall").get(checkApiKey,getAllGame);
+router.route("/get").get(checkApiKey,getGameById);
 router.route("/delete/:gameId").delete(verifyJWT,deleteGame);
 router.route("/download/:gameName").get(downloadGame);
 router.route("/increment/:gameId").post(checkApiKey,incrementTopTenCount);
