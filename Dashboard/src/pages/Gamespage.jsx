@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loader } from "./sub-components/";
+import { Button } from "@/components/ui/button";
 
 
 
@@ -21,6 +21,10 @@ const Gamespage = () => {
   const { deleting, deleted } = useSelector((state) => state.game);
   const { toggled } = useSelector((state) => state.game);
   const { categories } = useSelector((state) => state.game);
+  const {admin}=useSelector((state)=>state.auth);
+  const userId=useSelector((state)=>state.auth.userData?._id);
+
+  const userRole=admin?"admin":"secondaryAdmin";
   const [open, setOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
@@ -73,8 +77,11 @@ const Gamespage = () => {
   // 🔹 Fetch games when `currentPage` changes
   useEffect(() => {
     dispatch(makeGamesNull()); // Clear previous page data
-    dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory }));
-  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled]);
+    if(userId && userRole){
+      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory,userRole:userRole,userId:userId }));
+    }
+    
+  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled,userId,userRole]);
 
   // 🔹 Cleanup on unmount
   useEffect(() => {

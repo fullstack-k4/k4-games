@@ -62,6 +62,10 @@ const EditGamepage = () => {
             setloader(false)
         }, 1000)
 
+        return ()=>{
+            clearTimeout(id);
+        }
+
     }, [])
 
 

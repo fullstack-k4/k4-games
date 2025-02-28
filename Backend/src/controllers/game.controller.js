@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import archiver from "archiver";
 import { fileURLToPath } from "url";
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import decompress from "decompress"
 
 
@@ -151,18 +151,15 @@ const uploadGame = asyncHandler(async (req, res) => {
 
 const getAllGame = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query,category } = req.query;
+    const { page = 1, limit = 10, query,category,userRole,userId } = req.query;
 
     const pipeline = [];
 
-    if(req.user.role!=="admin"){
+    if (userId && userRole !== "admin") {
         pipeline.push({
-            $match:{createdBy:req.user?._id}
-        })
+            $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+        });
     }
-
-   
-
 
 
     if (query) {

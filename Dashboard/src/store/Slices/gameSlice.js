@@ -26,13 +26,15 @@ const initialState = {
 
 export const getAllGames = createAsyncThunk(
     'getAllGames',
-    async ({ page, limit, query,category }) => {
+    async ({ page, limit, query,category,userId,userRole }) => {
         try {
             const url = new URL(`${BASE_URL}/games/getall`)
             if (page) url.searchParams.set("page", page);
             if (limit) url.searchParams.set("limit", limit);
             if (query) url.searchParams.set("query", query);
             if(category) url.searchParams.set("category", category);
+            if(userId) url.searchParams.set("userId",userId);
+            if(userRole) url.searchParams.set("userRole",userRole);
 
             const response = await axiosInstance.get(url);
             return response.data.data;
