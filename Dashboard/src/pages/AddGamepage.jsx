@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Container, SpecialLoadingButton, Loader } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getAllCategories } from "@/store/Slices/categorySlice";
 import { uploadGame } from "@/store/Slices/gameSlice";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,14 +17,12 @@ import { useNavigate } from "react-router-dom";
 
 
 
-// If You  Add More Categories in Future add Here Also In Backend and also in editpage
-const categories = ["Puzzle", "Word", "Multiplayer", "Arcade", "Recommended",
-  "Brain", "Sports", "Shooting", "Animal", "Action",
-  "Ball", "All-Games"];
+
 
 const AddGamepage = () => {
   const { register, handleSubmit, setValue, reset, formState: { errors }, clearErrors, unregister, watch } = useForm();
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const {categories}=useSelector((state)=>state.category);
   const [loader, setloader] = useState(true);
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.game.loading);
@@ -41,11 +40,18 @@ const AddGamepage = () => {
   useEffect(() => {
     const id = setTimeout(() => {
       setloader(false)
-    }, 1000)
+    }, 500)
 
     return () => {
       clearTimeout(id)
     }
+  },[])
+
+
+  // fetch all categories
+
+  useEffect(()=>{
+    dispatch(getAllCategories());
   },[])
 
 
@@ -122,7 +128,7 @@ const AddGamepage = () => {
 
   // Register field manually for validation
   useEffect(() => {
-    register("isdownload", {
+    register("downloadable", {
       required: "This field is required",
     });
   }, [register]);
@@ -173,9 +179,9 @@ const AddGamepage = () => {
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                  { categories && categories.map((category) => (
+                    <SelectItem key={category._id} value={category?.name}>
+                      {category?.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -278,10 +284,6 @@ const AddGamepage = () => {
                           return file
                             ? file.type === "application/zip" || file.name.endsWith(".zip") || "Only ZIP files are allowed"
                             : "Game file is required";
-                        },
-                        isUnder16MB: (fileList) => {
-                          const file = fileList?.[0];
-                          return file ? file.size <= 16 * 1024 * 1024 || "File size must be under 16MB" : true;
                         }
                       }
                     })}
@@ -307,19 +309,19 @@ const AddGamepage = () => {
               <Label>Is Downloadable?</Label>
               <Select
                 onValueChange={(value) => {
-                  setValue("isdownload", value);
-                  clearErrors("isdownload");
+                  setValue("downloadable", value);
+                  clearErrors("downloadable");
                 }}
               >
-                <SelectTrigger className={errors.isdownload ? "border-red-500" : ""}>
+                <SelectTrigger className={errors.downloadable ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select Option" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="false">Yes</SelectItem>
-                  <SelectItem value="true">No</SelectItem>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.isdownload && <p className="text-red-500 text-sm">{errors.isdownload.message}</p>}
+              {errors.downloadable && <p className="text-red-500 text-sm">{errors.downloadable.message}</p>}
             </div>
 
             {/* Orientation */}

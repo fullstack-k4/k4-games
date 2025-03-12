@@ -1,147 +1,46 @@
-import { useEffect, useState, useRef } from "react"
+import React from 'react'
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Gamepad2, DownloadCloud, UploadCloud, Link } from "lucide-react"
-import { motion } from "framer-motion"
-import { useSelector, useDispatch } from "react-redux"
-import { getTotalNumberOfGames, getTotalNumberOfAllowedDownloadGames, getNumberOfSelfUploadedGames, getNumberofUploadedGamesByLink } from "@/store/Slices/gameSlice"
-import { Loader } from "./sub-components"
+import { useSelector, useDispatch } from 'react-redux'
+import { Loader } from './sub-components'
+import { getAllDashboardData } from '@/store/Slices/dashboardSlice'
+
+
 
 const Homepage = () => {
-  const dispatch = useDispatch()
-  const games = useSelector((state) => state.game.totalGames)
-  const allowedDownloads = useSelector((state) => state.game.DownloadAllowedGames)
-  const gameUploadedByLink = useSelector((state) => state.game.NumberofUploadedGamesByLink)
-  const selfUploadedGames = useSelector((state) => state.game.NumberOfSelfUploadedGames)
+  const dispatch = useDispatch();
+  const totalGames = useSelector((state) => state.dashboard?.dashboardData?.totalGames);
+  const totalAllowedDownloads=useSelector((state)=>state.dashboard?.dashboardData?.totalAllowedDownloads);
+  const totalNumberOfSelfUploadedGames=useSelector((state)=>state.dashboard?.dashboardData?.totalNumberOfSelfUploadedGames);
+  const totalNumberofUploadedGamesByLink=useSelector((state)=>state.dashboard?.dashboardData?.totalNumberofUploadedGamesByLink)
+ 
 
-  const [animatedGames, setAnimatedGames] = useState(0)
-  const [animatedDownloads, setAnimatedDownloads] = useState(0)
-  const [animatedUploadedByLink, setAnimatedUploadedByLink] = useState(0)
-  const [animateSelfUploaded, setanimateSelfUploaded] = useState(0)
+
+
+
   const [loader, setloader] = useState(true);
 
 
 
 
-  const prevGamesRef = useRef(games)
-  const prevDownloadsRef = useRef(allowedDownloads)
-  const prevUploadedByLinkRef = useRef(gameUploadedByLink)
-  const prevSelfUploadedRef = useRef(selfUploadedGames)
-
-
-  // for custom laoder
+  // fetching dashboard data
 
   useEffect(() => {
 
-    const intervalId = setTimeout(() => {
+    dispatch(getAllDashboardData()).then(() => {
       setloader(false)
-    }, 1000)
+    });
 
-    return () => {
-      clearTimeout(intervalId)
-    }
-
-  })
-
-
-
-
-
-
-
-  // Fetch total games and allowed downloads ,selfUploaded,uploaded on link on mount
-  useEffect(() => {
-    if (!prevGamesRef.current) {
-      dispatch(getTotalNumberOfGames())
-    }
-    if (!prevDownloadsRef.current) {
-      dispatch(getTotalNumberOfAllowedDownloadGames())
-    }
-    if (!prevSelfUploadedRef.current) {
-      dispatch(getNumberOfSelfUploadedGames())
-    }
-    if (!prevUploadedByLinkRef.current) {
-      dispatch(getNumberofUploadedGamesByLink())
-    }
   }, [dispatch])
 
-  // Animate total games count
-  useEffect(() => {
-    prevGamesRef.current = games
 
-    if (games) {
-      let count = 0
-      const interval = setInterval(() => {
-        setAnimatedGames((prev) => {
-          if (prev >= games) {
-            clearInterval(interval)
-            return games
-          }
-          return prev + Math.ceil(games / 50)
-        })
-      }, 20)
-    }
-  }, [games])
-
-  // Animate total allowed downloads count
-  useEffect(() => {
-    prevDownloadsRef.current = allowedDownloads
-
-    if (allowedDownloads) {
-      let count = 0
-      const interval = setInterval(() => {
-        setAnimatedDownloads((prev) => {
-          if (prev >= allowedDownloads) {
-            clearInterval(interval)
-            return allowedDownloads
-          }
-          return prev + Math.ceil(allowedDownloads / 50)
-        })
-      }, 20)
-    }
-  }, [allowedDownloads])
-
-
-  // Animat Self Uploaded Count
-
-  useEffect(() => {
-    prevSelfUploadedRef.current = selfUploadedGames
-
-    if (selfUploadedGames) {
-      let count = 0
-      const interval = setInterval(() => {
-        setanimateSelfUploaded((prev) => {
-          if (prev >= selfUploadedGames) {
-            clearInterval(interval)
-            return selfUploadedGames
-          }
-          return prev + Math.ceil(selfUploadedGames / 50)
-        })
-      }, 20)
-    }
-  }, [selfUploadedGames])
-
-  // Animate Game Uploaded By Link
-
-  useEffect(() => {
-    prevUploadedByLinkRef.current = gameUploadedByLink
-
-    if (gameUploadedByLink) {
-      let count = 0
-      const interval = setInterval(() => {
-        setAnimatedUploadedByLink((prev) => {
-          if (prev >= gameUploadedByLink) {
-            clearInterval(interval)
-            return gameUploadedByLink
-          }
-          return prev + Math.ceil(gameUploadedByLink / 50)
-        })
-      }, 20)
-    }
-  }, [gameUploadedByLink])
-
-
-
-
+  const dashboardData = [
+    { id: 1, name: "Total Games", value: totalGames, icon: <Gamepad2 className="w-6 h-6 text-blue-500" /> },
+    { id: 2, name: "Total Allowed Downloads", value: totalAllowedDownloads, icon: <DownloadCloud className="w-6 h-6 text-blue-500" /> },
+    { id: 3, name: "Total Self Uploaded Games", value: totalNumberOfSelfUploadedGames, icon: <UploadCloud className="w-6 h-6 text-blue-500" /> },
+    { id: 4, name: "Total Game Uploaded By Link", value: totalNumberofUploadedGamesByLink, icon: <Link className="w-6 h-6 text-blue-500" /> },
+  ]
 
   return (
     loader ? <Loader /> : (
@@ -149,7 +48,7 @@ const Homepage = () => {
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-gray-900 text-white p-6 rounded-lg shadow-lg">
           <div>
-            <h1 className="text-3xl font-bold">Welcome, Admin! 🎮</h1>
+            <h1 className="text-3xl font-bold">Welcome, Admin! </h1>
             <p className="text-gray-300">Manage your dashboard with ease.</p>
           </div>
           <img
@@ -161,89 +60,30 @@ const Homepage = () => {
 
         {/* Stats Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Total Games */}
-          <Card className="bg-white dark:bg-gray-800 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Gamepad2 className="w-6 h-6 text-blue-500" />
-                <span>Total Games</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.h2
-                className="text-4xl font-bold"
-                animate={{ opacity: [0, 1], scale: [0.8, 1] }}
-                transition={{ duration: 0.5 }}
-              >
-                {animatedGames}
-              </motion.h2>
-            </CardContent>
-          </Card>
 
-          {/* Total Allowed Downloads */}
-          <Card className="bg-white dark:bg-gray-800 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <DownloadCloud className="w-6 h-6 text-green-500" />
-                <span>Total Allowed Downloads</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.h2
-                className="text-4xl font-bold"
-                animate={{ opacity: [0, 1], scale: [0.8, 1] }}
-                transition={{ duration: 0.5 }}
-              >
-                {animatedDownloads}
-              </motion.h2>
-            </CardContent>
-          </Card>
+          {dashboardData.map((data) => (
+            <Card key={data.id} className="bg-white dark:bg-gray-800 shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  {data.icon}
+                  <span>{data.name}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <span className='text-4xl font-bold'>
+                  {data.value}
+                </span>
+              </CardContent>
+            </Card>
+
+          ))}
 
 
-          {/* Self Uploaded Games */}
-          <Card className="bg-white dark:bg-gray-800 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <UploadCloud className="w-6 h-6 text-blue-500" />
-                <span>Self Uploaded Games</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.h2
-                className="text-4xl font-bold"
-                animate={{ opacity: [0, 1], scale: [0.8, 1] }}
-                transition={{ duration: 0.5 }}
-              >
-                {animateSelfUploaded}
-              </motion.h2>
-            </CardContent>
-          </Card>
 
-          {/* Game Uploaded By Link */}
-          <Card className="bg-white dark:bg-gray-800 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Link className="w-6 h-6 text-blue-500" />
-                <span>Game Uploaded By Link</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.h2
-                className="text-4xl font-bold"
-                animate={{ opacity: [0, 1], scale: [0.8, 1] }}
-                transition={{ duration: 0.5 }}
-              >
-                {animatedUploadedByLink}
-              </motion.h2>
-            </CardContent>
-          </Card>
 
         </div>
       </div>
-    )
-
-
-  )
+    ))
 }
 
 export { Homepage }

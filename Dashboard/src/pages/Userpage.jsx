@@ -14,21 +14,10 @@ const Userpage = () => {
   const [load,setload]=useState(true);
 
   useEffect(()=>{
-    dispatch(getAllSecondaryAdmin()); 
-  },[]);
-
-  // custom loading
-
-  useEffect(()=>{
-    const id=setTimeout(() => {
+    dispatch(getAllSecondaryAdmin()).then(()=>{
       setload(false);
-    }, 2000);
-
-    ()=>{
-      clearTimeout(id);
-    }
-
-  },[])
+    }); 
+  },[]);
 
 
   const handleDelete = (email) => {

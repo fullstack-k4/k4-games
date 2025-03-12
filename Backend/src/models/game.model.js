@@ -1,39 +1,35 @@
 import mongoose, { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-// If you add More Categories in Future Add Here 
-const validCategories = [
-    "Puzzle", "Word", "Multiplayer", "Arcade", "Recommended",
-    "Brain", "Sports", "Shooting", "Animal", "Action",
-    "Ball", "All-Games"
-];
-
 const gameSchema = new Schema({
     gameName: {
         type: String,
-        required: true
+        required: true,
+        trim:true,
     },
     description: {
         type: String,
-        required: true
+        required: true,
+        trim:true,
     },
     category: {
         type: [String],
-        enum:validCategories,
         required: true,
-
     },
     splashColor: {
         type: String,
-        required: true
+        required: true,
+        trim:true,
     },
     imageUrl: {
         type: String,
+        trim:true,
     },
     gameUrl: {
         type: String,
+        trim:true,
     },
-    isdownload: {
+    downloadable: {
         type: Boolean,
     },
     isloading: {
@@ -49,12 +45,18 @@ const gameSchema = new Schema({
         type: Number,
         default: 0
     },
-    gameFolder: {
+    gameZipUrl: {
         type: String,
     },
-    source:{
+    gameSource:{
         type:String,
-        enum:["self","link"]
+        enum:["self","link"],
+        default:"link"
+    },
+    thumbnailSource:{
+        type:String,
+        enum:["self","link"],
+        default:"link"
     },
     createdBy:{
         type: Schema.Types.ObjectId,

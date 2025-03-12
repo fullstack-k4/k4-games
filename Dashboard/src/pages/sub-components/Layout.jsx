@@ -2,15 +2,15 @@ import { Link } from "react-router-dom"
 import { Outlet, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Home, Users, Gamepad2, LogIn, Menu } from "lucide-react"
-import { useDispatch,useSelector } from "react-redux"
+import { Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
 
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const admin=useSelector((state)=>state.auth.admin);
+  const admin = useSelector((state) => state.auth.admin);
 
   const handleLogout = async () => {
     const response = await dispatch(userLogout())
@@ -38,28 +38,37 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {/* Navigation Links */}
       <nav className="flex-1 mt-4">
         <ul className="space-y-2">
-           
-            {admin && <>
-              <li>
-                <Link
-                  to="/"
-                  className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
-                >
-                  <Home className="w-5 h-5" />
-                  {isOpen && <span>Home</span>}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/users"
-                  className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
-                >
-                  <Users className="w-5 h-5" />
-                  {isOpen && <span>Users</span>}
-                </Link>
-              </li>
-            </>}
-          
+
+          {admin && <>
+            <li>
+              <Link
+                to="/"
+                className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+              >
+                <Home className="w-5 h-5" />
+                {isOpen && <span>Home</span>}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/users"
+                className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+              >
+                <Users className="w-5 h-5" />
+                {isOpen && <span>Users</span>}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/categories"
+                className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+              >
+                <ChartColumnStacked className="w-5 h-5" />
+                {isOpen && <span>Categories</span>}
+              </Link>
+            </li>
+          </>}
+
           <li>
             <Link
               to="/games"
@@ -69,6 +78,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               {isOpen && <span>Games</span>}
             </Link>
           </li>
+
         </ul>
       </nav>
 

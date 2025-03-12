@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
-import { Loginpage, Homepage, Userpage, Gamespage, AddGamepage, EditGamepage, CreateUserpage } from "./pages";
+import { Loginpage, Homepage, Userpage, Gamespage,
+   AddGamepage, EditGamepage, CreateUserpage,
+   Categorypage,CreateCategorypage,Uploadgamezippage } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./store/Slices/authSlice";
 import { Toaster } from "sonner";
-
-
-
 
 const App = () => {
   const dispatch = useDispatch();
@@ -18,8 +17,6 @@ const App = () => {
 
   return (
     <>
-
-
       <Routes>
         {/* Protected Routes with Sidebar (Layout) */}
         <Route
@@ -33,6 +30,7 @@ const App = () => {
           <Route index element={<Homepage />} />
           <Route path="/users" element={<Userpage />} />
           <Route path="/games" element={<Gamespage />} />
+          <Route path="/categories" element={<Categorypage/>}/> 
 
 
         </Route>
@@ -70,8 +68,24 @@ const App = () => {
           </AuthLayout>
         }
         />
+        <Route
+        path="/create-category"
+        element={
+          <AuthLayout authentication={true}>
+            <CreateCategorypage/>
+          </AuthLayout>
+        }
+        />
+        <Route
+        path="/upload-zip/:gameId"
+        element={
+          <AuthLayout authentication={true}>
+            <Uploadgamezippage/>
+          </AuthLayout>
+        }
+        />
       </Routes>
-      <Toaster position="top-right" richColors />
+      <Toaster position="bottom-right" richColors />
     </>
 
   )

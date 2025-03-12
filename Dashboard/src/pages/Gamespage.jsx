@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllGames, makeGamesNull, deleteGame, getGameCategories, toggleDownloadStatus } from "@/store/Slices/gameSlice";
+import { getAllGames, makeGamesNull, deleteGame, getGameCategories } from "@/store/Slices/gameSlice";
 import { Pencil, Trash, Plus, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
@@ -10,13 +10,13 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loader } from "./sub-components/";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
-
-
+import { denyDownload } from "@/store/Slices/gameSlice";
 
 const Gamespage = () => {
   const dispatch = useDispatch();
+  const navigate=useNavigate();
   const { games, loading } = useSelector((state) => state.game);
   const { deleting, deleted } = useSelector((state) => state.game);
   const { toggled } = useSelector((state) => state.game);
@@ -42,24 +42,6 @@ const Gamespage = () => {
 
 
 
-  // for custom loader
-
-
-  useEffect(()=>{
-    const id=setTimeout(()=>{
-      setloader(false);
-    },2000)
-
-    return ()=>{
-      clearTimeout(id)
-    }
-
-  },[])
-
-
-
-
-
   // 🔹 Sync URL with state
   useEffect(() => {
     setSearchParams({ page: currentPage, query: searchQuery });
@@ -78,7 +60,9 @@ const Gamespage = () => {
   useEffect(() => {
     dispatch(makeGamesNull()); // Clear previous page data
     if(userId && userRole){
-      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory,userRole:userRole,userId:userId }));
+      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory,userRole:userRole,userId:userId })).then(()=>{
+        setloader(false);
+      });
     }
     
   }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled,userId,userRole]);
@@ -158,14 +142,22 @@ const Gamespage = () => {
   };
 
   const handleCheckboxClick = (game) => {
+
     setSelectedGame(game);
     setOpenCheck(true);
   };
 
   const handleConfirm = () => {
-    if (selectedGame) {
-      dispatch(toggleDownloadStatus({ gameId: selectedGame._id }));
+    
+
+    if(selectedGame && !selectedGame.downloadable){
+      navigate(`/upload-zip/${selectedGame?._id}`);
     }
+
+    if(selectedGame && selectedGame.downloadable){
+      dispatch(denyDownload({gameId:selectedGame?._id}));
+    }
+
     setOpenCheck(false);
     setSelectedGame(null);
   };
@@ -273,10 +265,10 @@ const Gamespage = () => {
                     </td>
                     <td className="p-4">
                       <Badge
-                        className={`px-3 py-1 font-bold ${game.source === "self" ? "bg-green-500" : "bg-blue-500"
+                        className={`px-3 py-1 font-bold ${game.gameSource === "self" ? "bg-green-500" : "bg-blue-500"
                           }`}
                       >
-                        {game.source === "self" ? "Self" : "Link"}
+                        {game.gameSource === "self" ? "Self" : "Link"}
                       </Badge>
                     </td>
                     <td className="p-4 font-semibold ">{game.topTenCount}</td>
@@ -287,7 +279,7 @@ const Gamespage = () => {
                         <AlertDialogTrigger asChild>
                           <input
                             type="checkbox"
-                            checked={!game.isdownload}
+                            checked={game.downloadable}
                             onChange={() => handleCheckboxClick(game)}
                           />
                         </AlertDialogTrigger>

@@ -1,40 +1,24 @@
 import { Router } from "express";
-import { verifyJWT, verifyAdmin,checkApiKey } from "../middlewares/auth.middleware.js";
+import { verifyJWT,checkApiKey } from "../middlewares/auth.middleware.js";
 import {
     uploadGame, getAllGame,
-    getGameById, deleteGame, downloadGame,
+    getGameById, deleteGame,
     editGame, incrementTopTenCount, updateLoadingState,
-    getNumberOfTotalGames, getNumberOfAllowedDownloadGames,
-    getNumberOfSelfUploadedGames,getNumberofUploadedGamesByLink,
-    getGameCategories,toggleDownloadStatus
+    getGameCategories,allowDownload,denyDownload
 } from "../controllers/game.controller.js";
-import { upload } from "../middlewares/multer.middleware.js";
-
+import {gameImageUploader,gameUploader} from "../middlewares/multer.middleware.js";
+import { extractUniqueId } from "../middlewares/extractUniqueId.js";
 const router = Router();
 
-router.route("/upload").post(verifyJWT, upload.fields([
-    { name: "gameZip", maxCount: 1 },
-    { name: "image", maxCount: 1 }
-]), uploadGame);
-
-router.route("/edit/:gameId").patch(verifyJWT, upload.fields([
-    { name: "gameZip", maxCount: 1 },
-    { name: "image", maxCount: 1 }
-]), editGame)
-
-
+router.route("/upload").post(verifyJWT,gameImageUploader,uploadGame);
+router.route("/edit/:gameId").patch(verifyJWT,extractUniqueId,gameImageUploader,editGame);
 router.route("/getall").get(checkApiKey,getAllGame);
 router.route("/get").get(checkApiKey,getGameById);
 router.route("/delete/:gameId").delete(verifyJWT,deleteGame);
-router.route("/download/:gameName").get(downloadGame);
 router.route("/increment/:gameId").post(checkApiKey,incrementTopTenCount);
 router.route("/updateLoadingState/:gameId").put(checkApiKey,updateLoadingState);
-router.route("/getNumberOfTotalGames").get(verifyJWT, verifyAdmin, getNumberOfTotalGames);
-router.route("/getNumberOfAllowedDownloadGames").get(verifyJWT, verifyAdmin, getNumberOfAllowedDownloadGames)
-router.route("/getNumberOfSelfUploadedGames").get(verifyJWT,verifyAdmin,getNumberOfSelfUploadedGames)
-router.route("/getNumberofUploadedGamesByLink").get(verifyJWT,verifyAdmin,getNumberofUploadedGamesByLink);
 router.route("/getcategories").get(verifyJWT,checkApiKey,getGameCategories);
-router.route("/toggledownloadStatus/:gameId").patch(verifyJWT,checkApiKey,toggleDownloadStatus);
-
+router.route("/allowdownload/:gameId").patch(verifyJWT,extractUniqueId,gameUploader,allowDownload);
+router.route("/denydownload/:gameId").patch(verifyJWT,denyDownload);
 
 export default router;

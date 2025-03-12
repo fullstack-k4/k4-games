@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGameById, editGame, makeGameNull } from "@/store/Slices/gameSlice";
+import { getAllCategories } from "@/store/Slices/categorySlice";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
@@ -39,34 +40,15 @@ const EditGamepage = () => {
     const gameData = useSelector((state) => state.game.game);
     const editing = useSelector((state) => state.game.editing);
     const { isDirty } = useFormState({ control });
-    const categories = [
-        "Puzzle",
-        "Word",
-        "Multiplayer",
-        "Arcade",
-        "Recommended",
-        "Brain",
-        "Sports",
-        "Shooting",
-        "Animal",
-        "Action",
-        "Ball",
-        "All-Games",
-    ];
 
-    // for custom loader 
+    const {categories}=useSelector((state)=>state.category);
 
-    useEffect(() => {
 
-        const id = setTimeout(() => {
-            setloader(false)
-        }, 1000)
+    // fetch all categories
 
-        return ()=>{
-            clearTimeout(id);
-        }
-
-    }, [])
+    useEffect(()=>{
+        dispatch(getAllCategories());
+    },[])
 
 
 
@@ -74,7 +56,9 @@ const EditGamepage = () => {
 
 
     useEffect(() => {
-        dispatch(getGameById({ gameId }));
+        dispatch(getGameById({ gameId })).then(()=>{
+            setloader(false);
+        });
 
 
         return () => {
@@ -101,12 +85,16 @@ const EditGamepage = () => {
 
     const handleCategorySelect = (category) => {
         if (!selectedCategories.includes(category)) {
-            setSelectedCategories([...selectedCategories, category]);
+            const updatedCategories=[...selectedCategories,category];
+            setSelectedCategories(updatedCategories);
+            setValue("categories",updatedCategories,{shouldDirty:true}) //Update hidden field
         }
     };
 
     const removeCategory = (category) => {
-        setSelectedCategories(selectedCategories.filter((c) => c !== category));
+        const updatedCategories=selectedCategories.filter((c)=>c!==category);
+        setSelectedCategories(updatedCategories);
+        setValue("categories",updatedCategories,{shouldDirty:true})  //Update hidden field
     };
 
     const onSubmit = async (data) => {
@@ -165,9 +153,9 @@ const EditGamepage = () => {
                         </div>
 
 
+                        {/* hidden fields */}
 
-
-
+                        <input type="hidden" {...register("categories")}/>
                         {/* Category Selection  */}
                         <div>
                             <Label>Categories</Label>
@@ -176,9 +164,9 @@ const EditGamepage = () => {
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {categories.map((category) => (
-                                        <SelectItem key={category} value={category}>
-                                            {category}
+                                    {categories && categories.map((category) => (
+                                        <SelectItem key={category?._id} value={category?.name}>
+                                            {category?.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

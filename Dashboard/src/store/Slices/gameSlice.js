@@ -11,17 +11,13 @@ const initialState = {
         totalPages: 0
     },
     game: null,
-    totalGames: null,
-    DownloadAllowedGames: null,
-    NumberofUploadedGamesByLink: null,
-    NumberOfSelfUploadedGames: null,
     uploading: null,
     uploaded: null,
     deleted: false,
     deleting: false,
     editing: false,
-    categories:null,
     toggled:false,
+    categories:null,
 }
 
 export const getAllGames = createAsyncThunk(
@@ -62,6 +58,18 @@ export const getGameById = createAsyncThunk(
         }
     }
 )
+
+
+export const getGameCategories=createAsyncThunk("getGameCategories",async()=>{
+    try {
+        const response=await axiosInstance.get("games/getcategories");
+        return response.data.data;
+    } catch (error) {
+        toast.error(error?.response?.data?.error);
+        throw error;
+        
+    }
+})
 
 export const deleteGame = createAsyncThunk(
     'deleteGame',
@@ -115,31 +123,8 @@ export const editGame = createAsyncThunk(
         }
     }
 )
-export const getTotalNumberOfGames = createAsyncThunk(
-    "getTotalNumberOfGames",
-    async () => {
-        try {
-            const response = await axiosInstance.get("/games/getNumberOfTotalGames");
-            return response.data.data
 
-        } catch (error) {
-            toast.error(error?.response?.data?.error);
-            throw error;
-        }
-    }
-)
-export const getTotalNumberOfAllowedDownloadGames = createAsyncThunk(
-    "getTotalNumberOfAllowedDownloadGames",
-    async () => {
-        try {
-            const response = await axiosInstance.get("/games/getNumberOfAllowedDownloadGames")
-            return response.data.data;
-        } catch (error) {
-            toast.error(error?.response?.data?.error);
-            throw error;
-        }
-    }
-)
+
 export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     const formData = new FormData();
     const trimmedgameName=data.gameName.trim();
@@ -167,7 +152,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
         formData.append("category[]", cat);
     });
     formData.append("splashColor", data.splashColor);
-    formData.append("isdownload", data.isdownload);
+    formData.append("downloadable", data.downloadable);
     formData.append("isrotate", data.isrotate);
 
     try {
@@ -181,50 +166,37 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
 
 })
 
-export const getNumberOfSelfUploadedGames = createAsyncThunk("getNumberOfSelfUploadedGames", async () => {
-    try {
-        const response = await axiosInstance.get("games/getNumberOfSelfUploadedGames");
-        return response.data.data;
-    } catch (error) {
-        toast.error(error?.response?.data?.error);
-        throw error;
-    }
+
+export const allowDownload=createAsyncThunk("allowDownload",
+    async({data,gameId})=>{
+        try {
+            const formData=new FormData();
+            if(data.gameZip){
+                formData.append("gameZip",data.gameZip[0]);
+            }
+            const response=await axiosInstance.patch(`games/allowdownload/${gameId}`,formData);
+            toast.success("Download Status Toggled Successfully");
+            return response.data.data;
+            
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+
 })
 
-export const getNumberofUploadedGamesByLink = createAsyncThunk("getNumberofUploadedGamesByLink", async () => {
-    try {
-        const response = await axiosInstance.get("games/getNumberofUploadedGamesByLink");
-        return response.data.data;
-    } catch (error) {
-        toast.error(error?.response?.data?.error);
-        throw error;
+export const denyDownload=createAsyncThunk("denyDownload",
+    async({gameId})=>{
+        try {
+            const response=await axiosInstance.patch(`games/denydownload/${gameId}`);
+            toast.success("Download Status Toggled Successfully");
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
     }
-})
-
-
-export const getGameCategories=createAsyncThunk("getGameCategories",async()=>{
-    try {
-        const response=await axiosInstance.get("games/getcategories");
-        return response.data.data;
-    } catch (error) {
-        toast.error(error?.response?.data?.error);
-        throw error;
-        
-    }
-})
-
-export const toggleDownloadStatus=createAsyncThunk("toggleDownloadStatus",async({gameId})=>{
-    try {
-        const response=await axiosInstance.patch(`games/toggledownloadStatus/${gameId}`);
-        toast.success("Download Status Toggled Successfully");
-        return response.data.data;
-    } catch (error) {
-        toast.error(error?.response?.data?.error);
-        throw error;
-    }
-})
-
-
+)
 
 
 
@@ -247,12 +219,7 @@ const gameSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(getTotalNumberOfGames.fulfilled, (state, action) => {
-            state.totalGames = action.payload
-        })
-        builder.addCase(getTotalNumberOfAllowedDownloadGames.fulfilled, (state, action) => {
-            state.DownloadAllowedGames = action.payload;
-        })
+       
         builder.addCase(uploadGame.pending, (state) => {
             state.uploading = true;
             state.loading=true;
@@ -311,24 +278,26 @@ const gameSlice = createSlice({
         builder.addCase(editGame.rejected, (state) => {
             state.editing = false;
         })
-        builder.addCase(getNumberOfSelfUploadedGames.fulfilled, (state, action) => {
-            state.NumberOfSelfUploadedGames = action.payload;
-        })
-        builder.addCase(getNumberofUploadedGamesByLink.fulfilled, (state, action) => {
-            state.NumberofUploadedGamesByLink = action.payload;
-        })
         builder.addCase(getGameCategories.fulfilled,(state,action)=>{
             state.categories=action.payload;
         })
-        builder.addCase(toggleDownloadStatus.pending,(state)=>{
+        builder.addCase(allowDownload.pending,(state)=>{
+            state.loading=true;
+        })
+        builder.addCase(allowDownload.fulfilled,(state)=>{
+            state.loading=false;
+        })
+        builder.addCase(allowDownload.rejected,(state)=>{
+            state.loading=false;
+        })
+        builder.addCase(denyDownload.pending,(state)=>{
             state.toggled=false;
         })
-        builder.addCase(toggleDownloadStatus.fulfilled,(state)=>{
+        builder.addCase(denyDownload.fulfilled,(state)=>{
             state.toggled=true;
         })
-        builder.addCase(toggleDownloadStatus.rejected,(state)=>{
+        builder.addCase(denyDownload.rejected,(state)=>{
             state.toggled=false;
-
         })
 
     }
