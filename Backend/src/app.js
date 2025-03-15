@@ -17,8 +17,8 @@ const corsOptions = {
 
 
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true}));
 app.use(express.static("public"))
 app.use(cookieParser());
 
@@ -37,6 +37,11 @@ import userRouter from "./routes/user.routes.js"
 import gameRouter from "./routes/game.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import dashboardRouter from "./routes/dashboard.routes.js"
+import popupRouter from "./routes/popup.routes.js"
+import  moreAppRouter from "./routes/moreapp.routes.js"
+
+
+
 
 
 // route declaration
@@ -44,5 +49,8 @@ app.use("/api/v1/users",userRouter);
 app.use("/api/v1/games",gameRouter);
 app.use("/api/v1/category",categoryRouter);
 app.use("/api/v1/dashboard",dashboardRouter);
+app.use("/api/v1/popup",popupRouter);
+app.use("/api/v1/moreapp",moreAppRouter);
+
 
 export {app};

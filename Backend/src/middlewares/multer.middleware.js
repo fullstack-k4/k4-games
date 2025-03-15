@@ -52,6 +52,47 @@ export const CategoryUploader = multer({
   }),
 });
 
+
+export const PopupUploader = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl:"public-read",
+    key: function (req, file, cb) {
+      if (!req.uploadUuid) {
+        req.uploadUuid =req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+      }
+      let folder = "image";
+      const fileName = `popups/${req.uploadUuid}/${folder}/${Date.now()}=${file.originalname}`;
+      cb(null, fileName);
+    }
+  })
+})
+
+
+export const MoreAppUploader = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl:"public-read",
+    key: function (req, file, cb) {
+      if (!req.uploadUuid) {
+        req.uploadUuid =req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+      }
+      let folder = "image";
+      const fileName = `moreapps/${req.uploadUuid}/${folder}/${Date.now()}=${file.originalname}`;
+      cb(null, fileName);
+    }
+  })
+})
+
+
+
+
+
+
 export const gameImageUploader=uploader.fields([
   {name:"gameZip",maxCount:1},
   {name:"image",maxCount:1}
@@ -61,3 +102,6 @@ export const gameImageUploader=uploader.fields([
 export const gameUploader=uploader.single("gameZip");
 
 export const categoryImageUploader=CategoryUploader.single("image");
+export const popupImageUploader = PopupUploader.single("image");
+export const moreappImageUploader=MoreAppUploader.single("image");
+
