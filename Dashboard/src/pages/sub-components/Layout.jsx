@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 import { Outlet, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked } from "lucide-react"
+import { Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,MessageSquare,LayoutGrid,BookText,Bug } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
 
@@ -41,42 +41,94 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           {admin && <>
             <li>
-              <Link
+              <NavLink
                 to="/"
-                className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
               >
                 <Home className="w-5 h-5" />
                 {isOpen && <span>Home</span>}
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to="/users"
-                className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
               >
                 <Users className="w-5 h-5" />
                 {isOpen && <span>Users</span>}
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to="/categories"
-                className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
               >
                 <ChartColumnStacked className="w-5 h-5" />
                 {isOpen && <span>Categories</span>}
-              </Link>
+              </NavLink>
             </li>
           </>}
 
           <li>
-            <Link
+            <NavLink
               to="/games"
-              className="flex items-center space-x-2 p-2 rounded hover:bg-gray-800"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
             >
               <Gamepad2 className="w-5 h-5" />
               {isOpen && <span>Games</span>}
-            </Link>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/popups"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <MessageSquare className="w-5 h-5" />
+              {isOpen && <span>Popups</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/moreapps"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <LayoutGrid className="w-5 h-5" />
+              {isOpen && <span>More Apps</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/userforms"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <BookText className="w-5 h-5" />
+              {isOpen && <span>User Forms</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/reports"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <Bug className="w-5 h-5" />
+              {isOpen && <span>Reports</span>}
+            </NavLink>
           </li>
 
         </ul>

@@ -8,9 +8,17 @@ import { CreateUserpage } from "./CreateUserpage"
 import { Categorypage } from "./Categorypage"
 import { CreateCategorypage } from "./CreateCategorypage"
 import { Uploadgamezippage } from "./Uploadgamezippage"
+import { Popuppage } from "./Popuppage"
+import { CreatePopuppage } from "./CreatePopuppage"
+import { MoreApppage } from "./MoreApppage"
+import { CreateApppage } from "./CreateApppage"
+import { UserFormpage } from "./UserFormpage"
+import { Reportpage } from "./Reportpage"
 
 export {
     Loginpage, Homepage, Userpage, Gamespage,
     AddGamepage, EditGamepage, CreateUserpage,
-    Categorypage, CreateCategorypage,Uploadgamezippage
+    Categorypage, CreateCategorypage,Uploadgamezippage,
+    Popuppage,CreatePopuppage,MoreApppage,CreateApppage,UserFormpage,
+    Reportpage
 }

@@ -2,12 +2,13 @@ import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Loginpage, Homepage, Userpage, Gamespage,
    AddGamepage, EditGamepage, CreateUserpage,
-   Categorypage,CreateCategorypage,Uploadgamezippage } from "./pages";
+   Categorypage,CreateCategorypage,Uploadgamezippage,
+   Popuppage,CreatePopuppage,MoreApppage,
+   CreateApppage,UserFormpage,Reportpage } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./store/Slices/authSlice";
 import { Toaster } from "sonner";
-
 const App = () => {
   const dispatch = useDispatch();
 
@@ -31,8 +32,10 @@ const App = () => {
           <Route path="/users" element={<Userpage />} />
           <Route path="/games" element={<Gamespage />} />
           <Route path="/categories" element={<Categorypage/>}/> 
-
-
+          <Route path="/popups" element={<Popuppage/>}/>
+          <Route path="/moreapps" element={<MoreApppage/>}/>
+          <Route path="/userforms" element={<UserFormpage/>}/>
+          <Route path="/reports" element={<Reportpage/>}/>
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -81,6 +84,22 @@ const App = () => {
         element={
           <AuthLayout authentication={true}>
             <Uploadgamezippage/>
+          </AuthLayout>
+        }
+        />
+        <Route
+        path="/create-popup"
+        element={
+          <AuthLayout authentication={true}>
+            <CreatePopuppage/>
+          </AuthLayout>
+        }
+        />
+        <Route
+        path="/create-app"
+        element={
+          <AuthLayout authentication={true}>
+            <CreateApppage/>
           </AuthLayout>
         }
         />

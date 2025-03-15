@@ -88,6 +88,28 @@ export const MoreAppUploader = multer({
   })
 })
 
+export const AttachmentUploader=multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: "public-read",
+    key: function (req, file, cb) {
+
+      let uniqueId=uuidv4().replace(/-/g, "").substring(0, 8);
+      let folder = "attachment"
+      const fileName = `userattachments/${uniqueId}/${folder}/${Date.now()}-${file.originalname}`;
+      cb(null, fileName);
+    },
+  }),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // Limit file size to 10Mb
+  },
+})
+
+
+
+
 
 
 
@@ -98,10 +120,9 @@ export const gameImageUploader=uploader.fields([
   {name:"image",maxCount:1}
 ])
 
-
 export const gameUploader=uploader.single("gameZip");
-
 export const categoryImageUploader=CategoryUploader.single("image");
 export const popupImageUploader = PopupUploader.single("image");
 export const moreappImageUploader=MoreAppUploader.single("image");
+export const userAttachmentUploader=AttachmentUploader.single("attachment");
 

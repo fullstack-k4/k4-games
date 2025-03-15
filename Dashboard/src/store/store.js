@@ -3,17 +3,21 @@ import authSliceReducer from "./Slices/authSlice.js"
 import gameSliceReducer from "./Slices/gameSlice.js"
 import categorySliceReducer from "./Slices/categorySlice.js"
 import dashboardSliceReducer from "./Slices/dashboardSlice.js"
-
-
-
-
+import popupSliceReducer from "./Slices/popupSlice.js"
+import appSliceReducer from "./Slices/appSlice.js"
+import formSliceReducer from "./Slices/formSlice.js";
+import reportSliceReducer from "./Slices/reportSlice.js"
 
 const store=configureStore({
     reducer:{
         auth:authSliceReducer,
         game:gameSliceReducer,
         category:categorySliceReducer,
-        dashboard:dashboardSliceReducer
+        dashboard:dashboardSliceReducer,
+        popup:popupSliceReducer,
+        app:appSliceReducer,
+        form:formSliceReducer,
+        report:reportSliceReducer
     }
 })
 
