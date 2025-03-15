@@ -52,7 +52,7 @@ const Gamespage = () => {
 
   useEffect(() => {
     dispatch(getGameCategories());
-  }, [])
+  }, [deleted])
 
 
 

@@ -20,13 +20,17 @@ import { useNavigate } from "react-router-dom";
 
 
 const AddGamepage = () => {
-  const { register, handleSubmit, setValue, reset, formState: { errors }, clearErrors, unregister, watch } = useForm();
+  const { register, handleSubmit, setValue, reset, formState: { errors }, clearErrors, unregister, watch } = useForm({
+    defaultValues: {
+      downloadable: "", // Keep it optional
+    }
+  });
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const {categories}=useSelector((state)=>state.category);
+  const { categories } = useSelector((state) => state.category);
   const [loader, setloader] = useState(true);
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.game.loading);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const [selectedImageType, setSelectedImageType] = useState("url");
   const [selectedGameType, setSelectedGameType] = useState("url");
@@ -45,14 +49,14 @@ const AddGamepage = () => {
     return () => {
       clearTimeout(id)
     }
-  },[])
+  }, [])
 
 
   // fetch all categories
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(getAllCategories());
-  },[])
+  }, [])
 
 
   useEffect(() => {
@@ -66,6 +70,9 @@ const AddGamepage = () => {
 
 
   const onSubmit = async (data) => {
+    console.log(data)
+
+    data.downloadable=data.downloadable || "";
 
     const response = await dispatch(uploadGame(data));
     if (response.meta.requestStatus === "fulfilled") {
@@ -87,7 +94,7 @@ const AddGamepage = () => {
       setSelectedGameType("url");
 
       navigate("/games");
-      
+
     }
   };
 
@@ -126,12 +133,7 @@ const AddGamepage = () => {
     setValue("category", updatedCategories);
   };
 
-  // Register field manually for validation
-  useEffect(() => {
-    register("downloadable", {
-      required: "This field is required",
-    });
-  }, [register]);
+  
 
   return (
     loader ? <Loader /> : (
@@ -179,7 +181,7 @@ const AddGamepage = () => {
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  { categories && categories.map((category) => (
+                  {categories && categories.map((category) => (
                     <SelectItem key={category._id} value={category?.name}>
                       {category?.name}
                     </SelectItem>
@@ -305,13 +307,14 @@ const AddGamepage = () => {
             </div>
 
             {/* Is Downloadable */}
-            <div>
+            {selectedGameType !== "url" && <div>
               <Label>Is Downloadable?</Label>
               <Select
                 onValueChange={(value) => {
                   setValue("downloadable", value);
                   clearErrors("downloadable");
                 }}
+                defaultValue="" 
               >
                 <SelectTrigger className={errors.downloadable ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select Option" />
@@ -322,7 +325,7 @@ const AddGamepage = () => {
                 </SelectContent>
               </Select>
               {errors.downloadable && <p className="text-red-500 text-sm">{errors.downloadable.message}</p>}
-            </div>
+            </div>}
 
             {/* Orientation */}
             <div>

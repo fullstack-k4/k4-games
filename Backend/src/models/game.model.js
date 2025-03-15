@@ -31,6 +31,7 @@ const gameSchema = new Schema({
     },
     downloadable: {
         type: Boolean,
+        default:false,
     },
     isloading: {
         type: Boolean,

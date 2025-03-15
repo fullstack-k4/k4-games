@@ -16,11 +16,9 @@ const uploadGame = asyncHandler(async (req, res) => {
     let gameSource;
     let thumbnailSource;
     //  ensuring boolean value
-    const downloadable = req.body.downloadable === "true";
 
-    if (gameUrl && !downloadable) {
-        throw new ApiError(400, "If you provided gameUrl , you cant allow the game to be downloaded");
-    }
+
+    const downloadable = req.body.downloadable === "true";
 
     // input validation
     if ([gameName, description, splashColor, isrotate].some((field) => !field || field?.trim() === "")) {
@@ -52,14 +50,11 @@ const uploadGame = asyncHandler(async (req, res) => {
         thumbnailSource = "self";
     }
 
+
     // if download not allowed delete zip folder
-    if (!downloadable) {
+    if (!downloadable && req.body.downloadable!=="") {
         await deleteFileFromDO(uploadedGameUrl);
     }
-
-
-
-
 
     // Create game object
     let gameData = {
@@ -263,13 +258,12 @@ const deleteGame = asyncHandler(async (req, res) => {
     if (game.gameSource === "self") {
 
         // delete game folder
-        await deleteFolderFromS3(game.gameUrl);
+        await deleteFolderFromS3(game.gameUrl);        
+    }
 
-        // delete game Zip
-
-        if (game?.gameZipUrl) {
-            await deleteFileFromDO(game.gameZipUrl);
-        }
+    // delete zip file
+    if (game?.gameZipUrl) {
+        await deleteFileFromDO(game.gameZipUrl);
     }
 
     if (game.thumbnailSource === "self") {
@@ -307,11 +301,6 @@ const allowDownload = asyncHandler(async (req, res) => {
     if (!game) {
         throw new ApiError(404, "Game Not Found");
     }
-
-    if (game.gameSource === "link") {
-        throw new ApiError(400, "You Cannot Change Download Status,First upload the game folder");
-    }
-
     let uploadedGameUrl = req.file ? req.file.location : null;
 
     if (uploadedGameUrl) {
@@ -326,7 +315,6 @@ const allowDownload = asyncHandler(async (req, res) => {
 })
 
 
-
 // DENY DOWNLOAD
 const denyDownload = asyncHandler(async (req, res) => {
     const { gameId } = req.params;
@@ -339,10 +327,6 @@ const denyDownload = asyncHandler(async (req, res) => {
 
     if (!game) {
         throw new ApiError(404, "Game Not Found");
-    }
-
-    if (game.gameSource === "link") {
-        throw new ApiError(400, "You Cannot Change Download Status,FIrst upload the game folder");
     }
 
     // delete game zip
@@ -361,13 +345,13 @@ const denyDownload = asyncHandler(async (req, res) => {
 
 
 const incrementTopTenCount = asyncHandler(async (req, res) => {
-    const { gameId } = req.params;
+    const { _id } = req.query;
 
-    if (!isValidObjectId(gameId)) {
+    if (!isValidObjectId(_id)) {
         throw new ApiError(404, "Invalid Game Id");
     }
 
-    const game = await Game.findById(gameId);
+    const game = await Game.findById(_id);
 
     if (!game) {
         throw new ApiError(404, "Game Not Found");
@@ -382,10 +366,10 @@ const incrementTopTenCount = asyncHandler(async (req, res) => {
 });
 
 const updateLoadingState = asyncHandler(async (req, res) => {
-    const { gameId } = req.params;
+    const { _id } = req.query;
     const { isloading } = req.query;
 
-    if (!isValidObjectId(gameId)) {
+    if (!isValidObjectId(_id)) {
         throw new ApiError(400, "Invalid Game Id");
     }
 
@@ -393,14 +377,14 @@ const updateLoadingState = asyncHandler(async (req, res) => {
         throw new ApiError(400, "isloading is required");
     }
 
-    const game = await Game.findById(gameId);
+    const game = await Game.findById(_id);
 
     if (!game) {
         throw new ApiError(404, "Game Not Found");
     }
 
     if (typeof isloading !== 'string' || (isloading !== 'true' && isloading !== 'false')) {
-        throw new ApiError(400, "Invalid value fro isloading. It must be true or false");
+        throw new ApiError(400, "Invalid value for isloading. It must be true or false");
     }
 
     // Update the isloading value
@@ -408,14 +392,8 @@ const updateLoadingState = asyncHandler(async (req, res) => {
 
     await game.save();
 
-    return res.status(200).json(new ApiResponse(200, game, "isloaded updated Succesfully"));
+    return res.status(200).json(new ApiResponse(200, game, "is loaded updated Succesfully"));
 })
-
-
-
-
-
-
 
 
 export {

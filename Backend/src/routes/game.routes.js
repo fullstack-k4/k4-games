@@ -15,8 +15,8 @@ router.route("/edit/:gameId").patch(verifyJWT,extractUniqueId,gameImageUploader,
 router.route("/getall").get(checkApiKey,getAllGame);
 router.route("/get").get(checkApiKey,getGameById);
 router.route("/delete/:gameId").delete(verifyJWT,deleteGame);
-router.route("/increment/:gameId").post(checkApiKey,incrementTopTenCount);
-router.route("/updateLoadingState/:gameId").put(checkApiKey,updateLoadingState);
+router.route("/increment/").put(checkApiKey,incrementTopTenCount);
+router.route("/updateLoadingState/").put(checkApiKey,updateLoadingState);
 router.route("/getcategories").get(verifyJWT,checkApiKey,getGameCategories);
 router.route("/allowdownload/:gameId").patch(verifyJWT,extractUniqueId,gameUploader,allowDownload);
 router.route("/denydownload/:gameId").patch(verifyJWT,denyDownload);
