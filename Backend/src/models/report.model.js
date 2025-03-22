@@ -20,13 +20,14 @@ const reportSchema=Schema({
     },
     reportDescription:{
         type:String,
+        trim:true
     },
     reportType:{
         type:String,
         enum:["Bug","Error","Other"],
     }
 
-})
+},{ timestamps: true })
 
 reportSchema.plugin(mongooseAggregatePaginate);
 export const Report=mongoose.model("Report",reportSchema);

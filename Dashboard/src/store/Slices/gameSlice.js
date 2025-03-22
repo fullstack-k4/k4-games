@@ -261,7 +261,7 @@ const gameSlice = createSlice({
             state.deleted = !state.deleted;
             state.deleting = false;
         })
-        builder.addCase(deleteGame.rejected, (state, action) => {
+        builder.addCase(deleteGame.rejected, (state) => {
             state.deleted = false;
             state.deleting = true;
         })

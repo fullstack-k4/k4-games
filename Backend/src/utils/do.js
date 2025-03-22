@@ -8,16 +8,12 @@ import mime from "mime-types";
 const deleteFileFromDO=async(fileUrl)=>{
     try {
         const bucketName=process.env.DIGITALOCEAN_BUCKET_NAME;
-
-
-
-        const gamesIndex = fileUrl.indexOf("games/");
+        const gamesIndex = fileUrl.indexOf("files/");
         let s3Key;
-
 
         if(gamesIndex !== -1){
           // Extract the key (path after the bucket name)
-          s3Key = fileUrl.substring(fileUrl.indexOf("games/"));
+          s3Key = fileUrl.substring(fileUrl.indexOf("files/"));
           s3Key=decodeURIComponent(s3Key);
         }
         else{
@@ -64,7 +60,7 @@ const deleteFileFromDO=async(fileUrl)=>{
   const deleteFolderFromS3=async(folderS3Key)=>{
     try {
       const bucketName=process.env.DIGITALOCEAN_BUCKET_NAME;
-      folderS3Key=folderS3Key.substring(folderS3Key.indexOf("games/"))
+      folderS3Key=folderS3Key.substring(folderS3Key.indexOf("files/"))
 
       if (folderS3Key.endsWith("index.html")) {
         folderS3Key = folderS3Key.slice(0, -"index.html".length);

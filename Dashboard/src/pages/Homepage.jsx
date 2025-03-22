@@ -19,15 +19,7 @@ const Homepage = () => {
   const totalNumberofReports = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofReports);
   const totalNumberofMoreApps = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofMoreApps);
 
-
-
-
-
-
   const [loader, setloader] = useState(true);
-
-
-
 
   // fetching dashboard data
 

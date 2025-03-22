@@ -17,19 +17,47 @@ export const uploader= multer({
     acl: "public-read",
     key: function (req, file, cb) {
       if (!req.uploadUuid) {
-        req.uploadUuid =req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
-      let folder = file.mimetype.startsWith("image") ? "image" : "game";
        // Process the filename:
        let fileName = file.originalname
        .toLowerCase() // Convert to lowercase
        .replace(/\s+/g, "-") // Replace spaces with "-"
        .replace(/\.zip$/i, ""); // Remove .zip extension if present
-      const finalFileName  = `games/${req.uploadUuid}/${folder}/${Date.now()}-${fileName}`;
+      const finalFileName  = `files/${req.uploadUuid}/${fileName}-file`;
       cb(null, finalFileName );
     },
   }),
 });
+
+
+export const zipuploader= multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: function (req, file, cb) {
+      cb(null, file.mimetype); 
+    },
+    acl: "public-read",
+    key: function (req, file, cb) {
+      if (!req.uploadUuid) {
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
+      }
+       // Process the filename:
+       let fileName = file.originalname
+       .toLowerCase() // Convert to lowercase
+       .replace(/\s+/g, "-") // Replace spaces with "-"
+       .replace(/\.zip$/i, ""); // Remove .zip extension if present
+      const finalFileName  = `files/${req.uploadUuid}/${fileName}-file`;
+      cb(null, finalFileName );
+    },
+  }),
+});
+
+
+
+
+
 
 
 
@@ -107,20 +135,12 @@ export const AttachmentUploader=multer({
   },
 })
 
-
-
-
-
-
-
-
-
 export const gameImageUploader=uploader.fields([
   {name:"gameZip",maxCount:1},
   {name:"image",maxCount:1}
 ])
 
-export const gameUploader=uploader.single("gameZip");
+export const gameUploader=zipuploader.single("gameZip");
 export const categoryImageUploader=CategoryUploader.single("image");
 export const popupImageUploader = PopupUploader.single("image");
 export const moreappImageUploader=MoreAppUploader.single("image");

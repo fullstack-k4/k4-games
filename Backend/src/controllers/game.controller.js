@@ -32,7 +32,7 @@ const uploadGame = asyncHandler(async (req, res) => {
     let uploadedGameUrl = req.files["gameZip"] ? req.files["gameZip"][0].location : null;
 
     if (uploadedGameUrl) {
-        const uploadUuid = req.uploadUuid || uuidv4().replace(/-/g, "").substring(0, 8);
+        const uploadUuid = req.uploadUuid || uuidv4().replace(/-/g, "").substring(0, 5);
         const originalFileName = req.files["gameZip"][0].originalname.toLowerCase() // Convert to lowercase
             .replace(/\s+/g, "-") // Replace spaces with "-"
             .replace(/\.zip$/i, ""); // Remove .zip extension if present;

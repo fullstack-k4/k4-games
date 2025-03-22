@@ -136,7 +136,8 @@ const Reportpage = () => {
       return data.map((d) => ({
         gameName: d.gameName,
         description: d.reportDescription,
-        reportType:d.reportType
+        reportType:d.reportType,
+        gameUrl:d.gameUrl
       }));
     };
   

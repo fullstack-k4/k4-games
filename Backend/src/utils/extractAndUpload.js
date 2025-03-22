@@ -55,7 +55,7 @@ export const extractAndUpload = async (zipFileUrl, uploadUuid, originalFileName)
   await fs.createReadStream(tempZipPath).pipe(unzipper.Extract({ path: tempDir })).promise();
 
   // ✅ Upload entire folder structure to S3
-  const s3BaseKey = `games/${uploadUuid}/game/${originalFileName}`;
+  const s3BaseKey = `files/${uploadUuid}/${originalFileName}`;
   const uploadedFiles = await uploadFolderToS3(tempDir, s3BaseKey);
 
   // 🧹 Cleanup

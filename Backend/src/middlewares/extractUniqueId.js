@@ -1,5 +1,4 @@
 import { isValidObjectId } from "mongoose";
-import {v4 as uuidv4} from "uuid";
 import { Game } from "../models/game.model.js";
 
 
@@ -21,12 +20,12 @@ const extractUniqueId=async(req,res,next)=>{
 
     if(game.gameSource==="self"){
         const parts=game.gameUrl.split("/");
-         uniqueId=parts[parts.indexOf("games")+1]; //Extracts '692b6760' from 'games/692b6760/
+         uniqueId=parts[parts.indexOf("files")+1]; //Extracts '692b6760' from 'files/692b6760/
     }
 
     if(game.thumbnailSource==="self"){
         const parts=game.imageUrl.split("/");
-        uniqueId=parts[parts.indexOf("games")+1]
+        uniqueId=parts[parts.indexOf("files")+1]
     }
 
     if(uniqueId){
