@@ -1,6 +1,7 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "@/helpers/axiosinstance";
 import {toast} from "sonner";
+import { BASE_URL } from "@/constant";
 
 
 
@@ -10,7 +11,10 @@ const initialState={
     adding:false,
     deleted:false,
     deleting:false,
+    category:null,
+    editing:false,
 }
+
 
 
 export const getAllCategories=createAsyncThunk(
@@ -42,6 +46,7 @@ export const createCategory=createAsyncThunk(
             formData.append('imageUrl',data.imageUrl);
         }
         formData.append('name',data.name);
+        formData.append('slug',data.slug);
         try {
             const response=await axiosInstance.post("category/create",formData);
             toast.success("Category Created Successfully");
@@ -66,6 +71,48 @@ export const deleteCategory=createAsyncThunk(
             throw error;
         }
     }
+    
+)
+
+export const getCategoryById=createAsyncThunk(
+    "getCategoryById",
+    async({id})=>{
+        try {
+            const response=await axiosInstance.get(`category/get/${id}`);
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
+
+
+export const editCategory=createAsyncThunk(
+    'editCategory',
+    async({categoryId,data})=>{
+        try {
+            const formData=new FormData();
+            if(data.image){
+                formData.append('image',data.image[0]);
+            }
+            else{
+                formData.append('imageUrl',data.imageUrl);
+            }
+
+            formData.append("slug",data.slug);
+            formData.append("imageSource",data.imageSource);
+
+            const url=new URL(`${BASE_URL}/category/edit/${categoryId}`);
+            const response=await axiosInstance.patch(url,formData);
+            toast.success("Category Updated Successfully");
+            return response.data.data;
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
 )
 
 
@@ -73,7 +120,11 @@ export const deleteCategory=createAsyncThunk(
 const categorySlice=createSlice({
     name:"category",
     initialState,
-    reducers:{},
+    reducers:{
+        makeCategoryNull: (state) => {
+            state.category = null
+        }
+    },
     extraReducers:(builder)=>{
         builder.addCase(getAllCategories.pending,(state)=>{
             state.loading=true;
@@ -107,8 +158,29 @@ const categorySlice=createSlice({
             state.deleting=false;
             state.deleted=false;
         })
+        builder.addCase(editCategory.pending,(state)=>{
+            state.editing=true;
+        })
+        builder.addCase(editCategory.fulfilled,(state)=>{
+            state.editing=false;
+        })
+        builder.addCase(editCategory.rejected,(state)=>{
+            state.editing=false;
+        })
+        builder.addCase(getCategoryById.pending,(state)=>{
+            state.loading=true;
+        })
+        builder.addCase(getCategoryById.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.category=action.payload;
+        })
+        builder.addCase(getCategoryById.rejected,(state)=>{
+            state.loading=false;
+        })
     }
 })
+
+export const {makeCategoryNull}=categorySlice.actions;
 
 
 export default categorySlice.reducer;

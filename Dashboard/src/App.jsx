@@ -4,7 +4,7 @@ import { Loginpage, Homepage, Userpage, Gamespage,
    AddGamepage, EditGamepage, CreateUserpage,
    Categorypage,CreateCategorypage,Uploadgamezippage,
    Popuppage,CreatePopuppage,MoreApppage,
-   CreateApppage,UserFormpage,Reportpage } from "./pages";
+   CreateApppage,UserFormpage,Reportpage,EditCategorypage } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./store/Slices/authSlice";
@@ -100,6 +100,14 @@ const App = () => {
         element={
           <AuthLayout authentication={true}>
             <CreateApppage/>
+          </AuthLayout>
+        }
+        />
+        <Route
+        path="/edit-category/:id"
+        element={
+          <AuthLayout authentication={true}>
+            <EditCategorypage/>
           </AuthLayout>
         }
         />

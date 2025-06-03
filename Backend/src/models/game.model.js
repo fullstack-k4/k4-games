@@ -5,12 +5,12 @@ const gameSchema = new Schema({
     gameName: {
         type: String,
         required: true,
-        trim:true,
+        trim: true,
     },
     description: {
         type: String,
         required: true,
-        trim:true,
+        trim: true,
     },
     category: {
         type: [String],
@@ -19,28 +19,28 @@ const gameSchema = new Schema({
     splashColor: {
         type: String,
         required: true,
-        trim:true,
+        trim: true,
     },
     imageUrl: {
         type: String,
-        trim:true,
+        trim: true,
     },
     gameUrl: {
         type: String,
-        trim:true,
+        trim: true,
     },
     downloadable: {
         type: Boolean,
-        default:false,
+        default: false,
     },
     isloading: {
         type: Boolean,
-        default:false,
+        default: false,
     },
     isrotate: {
         type: Boolean,
         required: true,
-        default:false,
+        default: false,
     },
     topTenCount: {
         type: Number,
@@ -49,21 +49,24 @@ const gameSchema = new Schema({
     gameZipUrl: {
         type: String,
     },
-    gameSource:{
-        type:String,
-        enum:["self","link"],
-        default:"link"
+    gameSource: {
+        type: String,
+        enum: ["self", "link"],
+        default: "link"
     },
-    thumbnailSource:{
-        type:String,
-        enum:["self","link"],
-        default:"link"
+    thumbnailSource: {
+        type: String,
+        enum: ["self", "link"],
+        default: "link"
     },
-    createdBy:{
+    createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
+    },
+    slug: {
+        type: String,
+        unique: true
     }
-
 }, { timestamps: true })
 
 gameSchema.plugin(mongooseAggregatePaginate);

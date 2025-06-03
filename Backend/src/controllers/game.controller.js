@@ -9,7 +9,15 @@ import { deleteFileFromDO, deleteFolderFromS3 } from "../utils/do.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate } = req.body;
+    const { gameName, description, category, splashColor, isrotate,slug } = req.body;
+
+    // validating slug
+
+    const slugFound= await Game.findOne({slug});
+
+    if(slugFound){
+        throw new ApiError(400,"Slug Already Exists");
+    }
 
     let gameUrl = req.body.gameUrl || "";
     let imageUrl = req.body.imageUrl || "";
@@ -21,7 +29,7 @@ const uploadGame = asyncHandler(async (req, res) => {
     const downloadable = req.body.downloadable === "true";
 
     // input validation
-    if ([gameName, description, splashColor, isrotate].some((field) => !field || field?.trim() === "")) {
+    if ([gameName, description, splashColor, isrotate,slug].some((field) => !field || field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
     if (!category) {
@@ -52,7 +60,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 
 
     // if download not allowed delete zip folder
-    if (!downloadable && req.body.downloadable!=="") {
+    if (!downloadable && req.body.downloadable !== "") {
         await deleteFileFromDO(uploadedGameUrl);
     }
 
@@ -68,7 +76,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         downloadable,
         gameSource,
         thumbnailSource,
-        createdBy: req.user?._id
+        createdBy: req.user?._id,
+        slug
     };
 
     if (downloadable) {
@@ -80,33 +89,48 @@ const uploadGame = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, game, "Game Uploaded Succesfully"));
 });
 
-
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
     const { gameId } = req.params;
-    const { gameName, description, category, splashColor } = req.body;
+    const { gameName, description, category, splashColor,slug } = req.body;
+
+
+
+
+    
+    
+    
+    
+    
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
     let gameUrl = req.body.gameUrl || "";
-
+    
     if (!isValidObjectId(gameId)) {
         throw new ApiError(400, "Invalid gameId");
     }
-
+    
     // input validation
-    if ([gameName, description, splashColor,].some((field) => !field || field?.trim() === "")) {
+    if ([gameName, description, splashColor,slug].some((field) => !field || field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
-
+    
     if (!category) {
         throw new ApiError(400, "Category is required");
     }
-
+    
     const game = await Game.findById(gameId);
     if (!game) {
         throw new ApiError(404, "Game Not Found");
     }
+    // validating slug
+    const slugFound=await Game.findOne({slug:slug,_id: { $ne: game._id }});
+
+    if(slugFound){
+        throw new ApiError(400,"Slug Already Exists");
+    }
+
     const downloadable = game.downloadable;
 
     const previousGameUrl = game.gameUrl;
@@ -122,8 +146,8 @@ const editGame = asyncHandler(async (req, res) => {
     if (uploadedGameUrl) {
         const uploadUuid = req.uploadUuid || uuidv4().replace(/-/g, "").substring(0, 8);
         const originalFileName = req.files["gameZip"][0].originalname.toLowerCase() // Convert to lowercase
-        .replace(/\s+/g, "-") // Replace spaces with "-"
-        .replace(/\.zip$/i, ""); // Remove .zip extension if present;
+            .replace(/\s+/g, "-") // Replace spaces with "-"
+            .replace(/\.zip$/i, ""); // Remove .zip extension if present;
         extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName);
         const indexHtmlFileLink = extractedFiles.filter((file) => file.fileName === "index.html");
         let gameLink = indexHtmlFileLink[0].url;
@@ -161,10 +185,11 @@ const editGame = asyncHandler(async (req, res) => {
     game.gameUrl = gameUrl;
     game.thumbnailSource = thumbnailSource;
     game.gameSource = gameSource;
-    if (downloadable) {
+    if (downloadable && uploadedGameUrl) {
         game.gameZipUrl = uploadedGameUrl;
     }
     game.isrotate = isrotate;
+    game.slug=slug
 
 
     await game.save();
@@ -172,7 +197,6 @@ const editGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "Game Updated Succesfully"));
 
 })
-
 
 // GET:ALL GAMES
 const getAllGame = asyncHandler(async (req, res) => {
@@ -206,6 +230,8 @@ const getAllGame = asyncHandler(async (req, res) => {
             }
         })
     }
+
+    pipeline.push({$sort:{ createdAt: -1 }})
 
     const options = {
         page: parseInt(page, 10),
@@ -258,7 +284,7 @@ const deleteGame = asyncHandler(async (req, res) => {
     if (game.gameSource === "self") {
 
         // delete game folder
-        await deleteFolderFromS3(game.gameUrl);        
+        await deleteFolderFromS3(game.gameUrl);
     }
 
     // delete zip file
@@ -273,7 +299,6 @@ const deleteGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "Game Deleted Succesfully"));
 })
 
-
 // GET:GAME CATEGORIES
 const getGameCategories = asyncHandler(async (req, res) => {
 
@@ -286,7 +311,6 @@ const getGameCategories = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, categories, "Categories Fetched Succesfully"))
 
 })
-
 
 // ALLOW DOWNLOAD
 const allowDownload = asyncHandler(async (req, res) => {
@@ -313,7 +337,6 @@ const allowDownload = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "Toggle Download Status Succesfully"));
 
 })
-
 
 // DENY DOWNLOAD
 const denyDownload = asyncHandler(async (req, res) => {

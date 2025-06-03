@@ -18,6 +18,7 @@ const Gamespage = () => {
   const dispatch = useDispatch();
   const navigate=useNavigate();
   const { games, loading } = useSelector((state) => state.game);
+  const totalGames=useSelector((state)=>state.game.games?.totalGames);
   const { deleting, deleted } = useSelector((state) => state.game);
   const { toggled } = useSelector((state) => state.game);
   const { categories } = useSelector((state) => state.game);
@@ -196,9 +197,6 @@ const Gamespage = () => {
         </div>
 
 
-
-
-
         {/* Category Dropdown */}
         <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
           <SelectTrigger className="w-[200px]">
@@ -240,7 +238,7 @@ const Gamespage = () => {
                 games.docs.map((game, index) => (
                   <tr key={game._id} className="border-b dark:border-gray-700">
                     <td className="p-4 font-medium">
-                      {(currentPage - 1) * gamesPerPage + index + 1}
+                       {totalGames - ((currentPage - 1) * gamesPerPage + index)}
                     </td>
                     <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
                       {game.gameName}

@@ -14,11 +14,12 @@ import { MoreApppage } from "./MoreApppage"
 import { CreateApppage } from "./CreateApppage"
 import { UserFormpage } from "./UserFormpage"
 import { Reportpage } from "./Reportpage"
+import { EditCategorypage } from "./EditCategorypage"
 
 export {
     Loginpage, Homepage, Userpage, Gamespage,
     AddGamepage, EditGamepage, CreateUserpage,
-    Categorypage, CreateCategorypage,Uploadgamezippage,
-    Popuppage,CreatePopuppage,MoreApppage,CreateApppage,UserFormpage,
-    Reportpage
+    Categorypage, CreateCategorypage, Uploadgamezippage,
+    Popuppage, CreatePopuppage, MoreApppage, CreateApppage, UserFormpage,
+    Reportpage,EditCategorypage
 }

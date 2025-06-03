@@ -8,7 +8,8 @@ const initialState = {
     games: {
         docs: [],
         hasNextPage: false,
-        totalPages: 0
+        totalPages: 0,
+        totalGames:0,
     },
     game: null,
     uploading: null,
@@ -98,6 +99,7 @@ export const editGame = createAsyncThunk(
             formData.append("description", trimmedgameDescription);
             formData.append("splashColor", data.splashColor);
             formData.append("isrotate", data.isrotate);
+            formData.append("slug",data.slug);
 
             if (data.image) {  
                 formData.append("image", data.image[0]);
@@ -154,12 +156,14 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("splashColor", data.splashColor);
     formData.append("downloadable", data.downloadable);
     formData.append("isrotate", data.isrotate);
+    formData.append("slug",data.slug);
 
     try {
         const response = await axiosInstance.post("games/upload", formData);
         toast.success("Game Uploaded Succesfully");
         return response.data.data;
     } catch (error) {
+        console.log(error);
         toast.error(error?.response?.data?.error);
         throw error;
     }
@@ -229,6 +233,10 @@ const gameSlice = createSlice({
             state.uploaded = true;
             state.loading=false;
         })
+        builder.addCase(uploadGame.rejected,(state)=>{
+            state.uploading=false;
+            state.loading=false;
+        })
         builder.addCase(getAllGames.pending, (state) => {
             state.loading = true;
         })
@@ -237,6 +245,7 @@ const gameSlice = createSlice({
             state.games.docs = [...state.games.docs, ...action.payload.docs];
             state.games.hasNextPage = action.payload.hasNextPage;
             state.games.totalPages = action.payload.totalPages;
+            state.games.totalGames=action.payload.totalDocs;
         })
         builder.addCase(getAllGames.rejected, (state) => {
             state.loading = false;

@@ -41,14 +41,14 @@ const EditGamepage = () => {
     const editing = useSelector((state) => state.game.editing);
     const { isDirty } = useFormState({ control });
 
-    const {categories}=useSelector((state)=>state.category);
+    const { categories } = useSelector((state) => state.category);
 
 
     // fetch all categories
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(getAllCategories());
-    },[])
+    }, [])
 
 
 
@@ -56,7 +56,7 @@ const EditGamepage = () => {
 
 
     useEffect(() => {
-        dispatch(getGameById({ gameId })).then(()=>{
+        dispatch(getGameById({ gameId })).then(() => {
             setloader(false);
         });
 
@@ -77,6 +77,7 @@ const EditGamepage = () => {
             setValue("splashColor", gameData.splashColor);
             setValue("isdownload", String(gameData.isdownload));
             setValue("isrotate", String(gameData.isrotate));
+            setValue("slug", gameData.slug);
             setSelectedCategories(gameData.category || []);
             setImageType(gameData.imageUrl ? "url" : "image");
             setGameType(gameData.gameUrl ? "url" : "gameZip");
@@ -85,16 +86,16 @@ const EditGamepage = () => {
 
     const handleCategorySelect = (category) => {
         if (!selectedCategories.includes(category)) {
-            const updatedCategories=[...selectedCategories,category];
+            const updatedCategories = [...selectedCategories, category];
             setSelectedCategories(updatedCategories);
-            setValue("categories",updatedCategories,{shouldDirty:true}) //Update hidden field
+            setValue("categories", updatedCategories, { shouldDirty: true }) //Update hidden field
         }
     };
 
     const removeCategory = (category) => {
-        const updatedCategories=selectedCategories.filter((c)=>c!==category);
+        const updatedCategories = selectedCategories.filter((c) => c !== category);
         setSelectedCategories(updatedCategories);
-        setValue("categories",updatedCategories,{shouldDirty:true})  //Update hidden field
+        setValue("categories", updatedCategories, { shouldDirty: true })  //Update hidden field
     };
 
     const onSubmit = async (data) => {
@@ -139,6 +140,18 @@ const EditGamepage = () => {
                                 <p className="text-red-500 text-sm">{errors.gameName.message}</p>
                             )}
                         </div>
+
+                        {/* Slug Input */}
+                        <div>
+                            <Label>Slug</Label>
+                            <Input
+                                {...register("slug", { required: "Slug is required" })}
+                                placeholder="Enter slug"
+                            />
+                            {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+                        </div>
+
+
                         {/* Description */}
                         <div>
                             <Label>Description</Label>
@@ -155,7 +168,7 @@ const EditGamepage = () => {
 
                         {/* hidden fields */}
 
-                        <input type="hidden" {...register("categories")}/>
+                        <input type="hidden" {...register("categories")} />
                         {/* Category Selection  */}
                         <div>
                             <Label>Categories</Label>
@@ -224,12 +237,15 @@ const EditGamepage = () => {
                                             validate: {
                                                 isImageFile: (fileList) =>
                                                     fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
-                                                isUnder4MB: (fileList) =>
-                                                    fileList?.[0]?.size <= 4 * 1024 * 1024 || "File size must be under 4MB"
+                                                isUnder1MB: (fileList) =>
+                                                    fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
                                             }
                                         })}
                                     />
                                 )}
+
+                                {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
+                                {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
                             </div>
                         </div>
 

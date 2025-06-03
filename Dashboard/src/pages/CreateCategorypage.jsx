@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { generateSlug } from "@/utils/generateSlug";
 
 
 
@@ -24,6 +25,16 @@ const CreateCategorypage = () => {
   const [selectedimageType, setSelectedimageType] = useState("url");
 
   const imageType = watch("imageType", "url"); // Watch the selected image type
+  const name = watch("name") //wath the name field
+
+
+  // Update slug whenever the name changes
+  useEffect(() => {
+    if (name) {
+      setValue("slug", generateSlug(name), { shouldValidate: true });
+    }
+  }, [name, setValue]);
+
 
 
 
@@ -100,8 +111,8 @@ const CreateCategorypage = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-          {/* Name Field */}
-          <div>
+            {/* Name Field */}
+            <div>
               <Label>Name</Label>
               <Input
                 {...register("name", { required: "Name is required" })}
@@ -110,8 +121,15 @@ const CreateCategorypage = () => {
               {errors.link && <p className="text-red-500 text-sm">{errors.link.message}</p>}
             </div>
 
-
-
+            {/* Slug */}
+            <div>
+              <Label>Slug</Label>
+              <Input
+                {...register("slug", { required: "Slug is required" })}
+                placeholder="Enter slug"
+              />
+              {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+            </div>
 
 
             {/* Image Selection */}
@@ -142,6 +160,8 @@ const CreateCategorypage = () => {
                       validate: {
                         isImageFile: (fileList) =>
                           fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
+                        isUnder1MB: (fileList) =>
+                          fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
                       },
                     })}
                   />

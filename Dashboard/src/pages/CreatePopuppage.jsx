@@ -121,6 +121,8 @@ const CreatePopuppage = () => {
                       validate: {
                         isImageFile: (fileList) =>
                           fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
+                        isUnder1MB: (fileList) =>
+                          fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
                       },
                     })}
                   />

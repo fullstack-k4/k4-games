@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { generateSlug } from "@/utils/generateSlug";
+import { toast } from "sonner";
 
 
 
@@ -37,6 +39,16 @@ const AddGamepage = () => {
 
   const imageType = watch("imageType", "url"); // Watch the selected image type
   const gameType = watch("gameType", "url"); // Watch the selected game type
+
+  const gameName = watch("gameName") //watch the gamename field
+
+
+  // Update slug whenever the gameName changes
+  useEffect(() => {
+    if (gameName) {
+      setValue("slug", generateSlug(gameName), { shouldValidate: true });
+    }
+  }, [gameName, setValue]);
 
 
   // for custom loader
@@ -70,9 +82,8 @@ const AddGamepage = () => {
 
 
   const onSubmit = async (data) => {
-    console.log(data)
 
-    data.downloadable=data.downloadable || "";
+    data.downloadable = data.downloadable || "";
 
     const response = await dispatch(uploadGame(data));
     if (response.meta.requestStatus === "fulfilled") {
@@ -133,7 +144,7 @@ const AddGamepage = () => {
     setValue("category", updatedCategories);
   };
 
-  
+
 
   return (
     loader ? <Loader /> : (
@@ -158,6 +169,16 @@ const AddGamepage = () => {
               <Label>Game Name</Label>
               <Input {...register("gameName", { required: "Game name is required" })} />
               {errors.gameName && <p className="text-red-500 text-sm">{errors.gameName.message}</p>}
+            </div>
+
+            {/* Slug */}
+            <div>
+              <Label>Slug</Label>
+              <Input
+                {...register("slug", { required: "Slug is required" })}
+                placeholder="Enter slug"
+              />
+              {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
             </div>
 
             {/* Description */}
@@ -235,8 +256,8 @@ const AddGamepage = () => {
                       validate: {
                         isImageFile: (fileList) =>
                           fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
-                        isUnder4MB: (fileList) =>
-                          fileList?.[0]?.size <= 4 * 1024 * 1024 || "File size must be under 4MB"
+                        isUnder1MB: (fileList) =>
+                          fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
                       }
                     })}
                   />
@@ -314,7 +335,7 @@ const AddGamepage = () => {
                   setValue("downloadable", value);
                   clearErrors("downloadable");
                 }}
-                defaultValue="" 
+                defaultValue=""
               >
                 <SelectTrigger className={errors.downloadable ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select Option" />

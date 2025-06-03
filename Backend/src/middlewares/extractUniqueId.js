@@ -1,5 +1,9 @@
 import { isValidObjectId } from "mongoose";
 import { Game } from "../models/game.model.js";
+import { Category } from "../models/category.model.js";
+import {v4 as uuidv4} from "uuid";
+
+
 
 
 
@@ -35,5 +39,37 @@ const extractUniqueId=async(req,res,next)=>{
 }
 
 
+const extractCategoryUniqueId=async(req,res,next)=>{
+    const {categoryId}=req.params;
+    if(!isValidObjectId(categoryId)){
+        return res.status(400).json({message:"Invalid Category Id"});
+    }
+    const category=await Category.findById(categoryId);
 
-export {extractUniqueId};
+
+    if(!category){
+        return res.status(404).json({message:"Category Not Found"})
+    }
+
+    // Extract unique Id
+    let uniqueId;
+
+    if(category.imageSource === "self"){
+        const parts=category.imageUrl.split("/");
+        uniqueId=parts[parts.indexOf("gamecategory") +1]
+    }
+    else{
+        uniqueId=uuidv4().replace(/-/g, "").substring(0, 8)
+    }
+
+    if(uniqueId){
+        req.existingUniqueId=uniqueId; //Attach to request Object
+    }
+
+    req.category=category;
+    next();
+
+}
+
+
+export {extractUniqueId,extractCategoryUniqueId};

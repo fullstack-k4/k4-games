@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCategories,deleteCategory } from "@/store/Slices/categorySlice";
+import { getAllCategories, deleteCategory } from "@/store/Slices/categorySlice";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Loader } from "./sub-components";
 import { Link } from "react-router-dom";
+import { Pencil, Trash } from "lucide-react";
 
 
 const Categorypage = () => {
     const dispatch = useDispatch();
-    const { categories, deleted, deleting,adding } = useSelector(state => state.category);
+    const { categories, deleted, deleting, adding } = useSelector(state => state.category);
     const [open, setOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [loader, setloader] = useState(true);
@@ -21,7 +22,7 @@ const Categorypage = () => {
         });
     }, [dispatch, deleted]);
 
-   const handleDeleteButttonClick = (category) => {
+    const handleDeleteButttonClick = (category) => {
         setOpen(true);
         setSelectedCategory(category);
 
@@ -48,7 +49,7 @@ const Categorypage = () => {
                         <Link to="/create-category">
                             <Button>Create Category</Button>
                         </Link>
-                        
+
                     </div>
                     <Table>
                         <TableHeader>
@@ -60,7 +61,7 @@ const Categorypage = () => {
                         </TableHeader>
                         <TableBody>
                             {
-                               categories && categories.map((category) => (
+                                categories && categories.map((category) => (
                                     <TableRow key={category._id}>
                                         <TableCell>
                                             {category.name}
@@ -68,13 +69,17 @@ const Categorypage = () => {
                                         <TableCell>
                                             <img src={category.imageUrl} alt="Category" className="w-16 h-16 object-cover" />
                                         </TableCell>
-                                        <TableCell>
-
+                                        <TableCell className="p-4 space-x-3">
+                                            <Link to={`/edit-category/${category?._id}`}>
+                                                <button className="text-blue-500 hover:scale-110 transition cursor-pointer">
+                                                    <Pencil size={20} />
+                                                </button>
+                                            </Link>
                                             <AlertDialog open={open} onOpenChange={setOpen} >
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" onClick={() => handleDeleteButttonClick(category)} >
-                                                        Delete
-                                                    </Button>
+                                                    <button className="text-red-500 hover:scale-110 cursor-pointer transition" onClick={() => handleDeleteButttonClick(category)}>
+                                                        <Trash size={20} />
+                                                    </button>
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
