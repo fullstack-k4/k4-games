@@ -240,10 +240,6 @@ const AddGamepage = () => {
                   <Input
                     {...register("imageUrl", {
                       required: "Image URL is required",
-                      pattern: {
-                        value: /^(https?:\/\/.*\.(jpg|jpeg|png|webp))$/,
-                        message: "Enter a valid image URL (jpg, jpeg, png, webp)"
-                      }
                     })}
                     placeholder="Enter Image URL"
                   />
