@@ -4,9 +4,12 @@ import {
     uploadGame, getAllGame,
     getGameById, deleteGame,
     editGame, incrementTopTenCount, updateLoadingState,
-    getGameCategories,allowDownload,denyDownload
+    getGameCategories,allowDownload,denyDownload,
+    getTop10Games,getFeaturedGames,allowFeatured,
+    denyFeatured,getRecommendedGames,allowRecommended,
+    denyRecommended
 } from "../controllers/game.controller.js";
-import {gameImageUploader,gameUploader} from "../middlewares/multer.middleware.js";
+import {gameImageUploader,gameUploader,featuredImageVideoUploader,recommendedImageUploader} from "../middlewares/multer.middleware.js";
 import { extractUniqueId } from "../middlewares/extractUniqueId.js";
 const router = Router();
 
@@ -20,5 +23,14 @@ router.route("/updateLoadingState/").put(checkApiKey,updateLoadingState);
 router.route("/getcategories").get(verifyJWT,checkApiKey,getGameCategories);
 router.route("/allowdownload/:gameId").patch(verifyJWT,extractUniqueId,gameUploader,allowDownload);
 router.route("/denydownload/:gameId").patch(verifyJWT,denyDownload);
+router.route("/gettop10games").get(checkApiKey,getTop10Games);
+router.route("/getfeaturedgames").get(checkApiKey,getFeaturedGames);
+router.route("/getrecommendedgames").get(checkApiKey,getRecommendedGames);
+router.route("/allowfeatured/:gameId").patch(verifyJWT,extractUniqueId,featuredImageVideoUploader,allowFeatured);
+router.route("/denyfeatured/:gameId").patch(verifyJWT,denyFeatured);
+router.route("/allowrecommended/:gameId").patch(verifyJWT,extractUniqueId,recommendedImageUploader,allowRecommended);
+router.route("/denyrecommended/:gameId").patch(verifyJWT,denyRecommended);
+
+
 
 export default router;

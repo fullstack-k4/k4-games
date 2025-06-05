@@ -33,6 +33,26 @@ const gameSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    isFeatured: {
+        type: Boolean,
+        default: false,
+    },
+    isRecommended: {
+        type:Boolean,
+        default:false,
+    },
+    recommendedImageUrl:{
+        type:String,
+        default:null,
+    },
+    featuredImageUrl: {
+        type: String,
+        default: null,
+    },
+    featuredVideoUrl: {
+        type: String,
+        default: null,
+    },
     isloading: {
         type: Boolean,
         default: false,

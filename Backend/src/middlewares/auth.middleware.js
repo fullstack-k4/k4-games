@@ -1,50 +1,50 @@
-import {ApiError} from "../utils/ApiError.js";
-import {asyncHandler} from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
-import {User} from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 
 
-export const verifyJWT=asyncHandler(async(req,_,next)=>{
+export const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
-        const token=req.cookies?.jwtToken || req.header("Authorization")?.replace("Bearer","");
-        if(!token){
-            throw new ApiError(401,"Unauthorized request");
+        const token = req.cookies?.jwtToken || req.header("Authorization")?.replace("Bearer", "");
+        if (!token) {
+            throw new ApiError(401, "Unauthorized request");
         }
 
         const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
         const user = await User.findById(decodedToken?._id);
-    
+
         if (!user) {
-          throw new ApiError(401, "Invalid Acess Token");
+            throw new ApiError(401, "Invalid Acess Token");
         }
-    
+
         req.user = user;
-    
+
         next();
-        
+
     } catch (error) {
-        throw new ApiError(401,error?.message || "Invalid JWT Token")
-        
+        throw new ApiError(401, error?.message || "Invalid JWT Token")
+
     }
 
 })
 
 
-export const verifyAdmin=asyncHandler(async(req,_,next)=>{
-    if(req.user.role!=="admin"){
-        throw new ApiError(403,"Forbidden:Admins only");
+export const verifyAdmin = asyncHandler(async (req, _, next) => {
+    if (req.user.role !== "admin") {
+        throw new ApiError(403, "Forbidden:Admins only");
     }
 
     next();
 })
 
 
-export const checkApiKey=asyncHandler(async(req,_,next)=>{
-    const providedApiKey=req.headers['x-api-key'];
+export const checkApiKey = asyncHandler(async (req, _, next) => {
+    const providedApiKey = req.headers['x-api-key'];
 
-    if(providedApiKey === process.env.API_KEY){
+    if (providedApiKey === process.env.API_KEY) {
         return next();
     }
-    throw new ApiError(403,"Forbidden:Invalid API Key");
+    throw new ApiError(403, "Forbidden:Invalid API Key");
 })

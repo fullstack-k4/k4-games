@@ -13,19 +13,21 @@ import { Loader } from "./sub-components/";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { denyDownload } from "@/store/Slices/gameSlice";
+import { denyFeatured } from "@/store/Slices/gameSlice";
+import { denyRecommended } from "@/store/Slices/gameSlice";
 
 const Gamespage = () => {
   const dispatch = useDispatch();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const { games, loading } = useSelector((state) => state.game);
-  const totalGames=useSelector((state)=>state.game.games?.totalGames);
+  const totalGames = useSelector((state) => state.game.games?.totalGames);
   const { deleting, deleted } = useSelector((state) => state.game);
   const { toggled } = useSelector((state) => state.game);
   const { categories } = useSelector((state) => state.game);
-  const {admin}=useSelector((state)=>state.auth);
-  const userId=useSelector((state)=>state.auth.userData?._id);
+  const { admin } = useSelector((state) => state.auth);
+  const userId = useSelector((state) => state.auth.userData?._id);
 
-  const userRole=admin?"admin":"secondaryAdmin";
+  const userRole = admin ? "admin" : "secondaryAdmin";
   const [open, setOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
@@ -33,9 +35,9 @@ const Gamespage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedGame, setSelectedGame] = useState(null);
   const [openCheck, setOpenCheck] = useState(false);
+  const [openFeaturedCheck, setOpenFeaturedCheck] = useState(false);
+  const [openRecommendedCheck, setOpenRecommendedCheck] = useState(false);
   const [loader, setloader] = useState(true);
-
-
   const debouncedQuery = useDebounce(searchQuery, 500); // Delay API calls
   const gamesPerPage = 10;
 
@@ -60,13 +62,13 @@ const Gamespage = () => {
   // 🔹 Fetch games when `currentPage` changes
   useEffect(() => {
     dispatch(makeGamesNull()); // Clear previous page data
-    if(userId && userRole){
-      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory,userRole:userRole,userId:userId })).then(()=>{
+    if (userId && userRole) {
+      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory, userRole: userRole, userId: userId })).then(() => {
         setloader(false);
       });
     }
-    
-  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled,userId,userRole]);
+
+  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled, userId, userRole]);
 
   // 🔹 Cleanup on unmount
   useEffect(() => {
@@ -100,13 +102,7 @@ const Gamespage = () => {
       if (response?.type === "deleteGame/fulfilled") {
         setOpen(false);
       }
-
-
     }
-
-
-
-
   };
 
   // Pagination Logic
@@ -143,26 +139,54 @@ const Gamespage = () => {
   };
 
   const handleCheckboxClick = (game) => {
-
     setSelectedGame(game);
     setOpenCheck(true);
   };
 
-  const handleConfirm = () => {
-    
+  const handleFeaturedCheckboxClick = (game) => {
+    setSelectedGame(game);
+    setOpenFeaturedCheck(true);
+  }
+  const handleRecommendedCheckboxClick = (game) => {
+    setSelectedGame(game);
+    setOpenRecommendedCheck(true);
+  }
 
-    if(selectedGame && !selectedGame.downloadable){
+  const handleConfirm = () => {
+    if (selectedGame && !selectedGame.downloadable) {
       navigate(`/upload-zip/${selectedGame?._id}`);
     }
-
-    if(selectedGame && selectedGame.downloadable){
-      dispatch(denyDownload({gameId:selectedGame?._id}));
+    if (selectedGame && selectedGame.downloadable) {
+      dispatch(denyDownload({ gameId: selectedGame?._id }));
     }
-
     setOpenCheck(false);
     setSelectedGame(null);
   };
 
+  const handleFeatureConfirm = () => {
+    if (selectedGame && !selectedGame?.isFeatured) {
+      navigate(`/allow-featured/${selectedGame?._id}`);
+    }
+
+    if (selectedGame && selectedGame?.isFeatured) {
+      dispatch(denyFeatured({ gameId: selectedGame?._id }));
+    }
+    setOpenCheck(false);
+    setSelectedGame(null);
+  }
+
+  const handleRecommendedConfirm = () => {
+    if (selectedGame && !selectedGame?.isRecommended) {
+      navigate(`/allow-recommended/${selectedGame?._id}`);
+    }
+
+    if (selectedGame && selectedGame?.isRecommended) {
+      dispatch(denyRecommended({ gameId: selectedGame?._id }));
+    }
+
+    setOpenCheck(false);
+    setSelectedGame(null);
+  }
 
 
 
@@ -226,6 +250,8 @@ const Gamespage = () => {
                 <th className="p-4 text-left text-lg font-semibold">Source</th>
                 <th className="p-4  text-lg font-semibold text-left">Top 10 Count</th>
                 <th className="p-4 text-left text-lg font-semibold">Download Allowed</th>
+                <th className="p-4 text-left text-lg font-semibold">Featured</th>
+                <th className="p-4 text-left text-lg font-semibold">Recommended</th>
                 <th className="p-4 text-left text-lg font-semibold">Actions</th>
               </tr>
             </thead>
@@ -238,19 +264,27 @@ const Gamespage = () => {
                 games.docs.map((game, index) => (
                   <tr key={game._id} className="border-b dark:border-gray-700">
                     <td className="p-4 font-medium">
-                       {totalGames - ((currentPage - 1) * gamesPerPage + index)}
+                      {totalGames - ((currentPage - 1) * gamesPerPage + index)}
                     </td>
+
+                    {/* Game Name */}
                     <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
                       {game.gameName}
                     </td>
+
+                    {/* Game Description */}
                     <td className="p-4 text-gray-700 dark:text-gray-300">
                       {game.description.split(" ").slice(0, 4).join(" ")}...
                     </td>
+
+                    {/* Game Category */}
                     <td className="p-4 font-semibold">
                       {game.category?.join(", ").split(" ").length > 4
                         ? game.category.join(", ").split(" ").slice(0, 2).join(" ") + "..."
                         : game.category.join(", ")}
                     </td>
+
+                    {/* Game Image */}
 
                     <td className="p-4">
                       <motion.img
@@ -261,6 +295,8 @@ const Gamespage = () => {
                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                       />
                     </td>
+
+                    {/* Game Source */}
                     <td className="p-4">
                       <Badge
                         className={`px-3 py-1 font-bold ${game.gameSource === "self" ? "bg-green-500" : "bg-blue-500"
@@ -269,16 +305,20 @@ const Gamespage = () => {
                         {game.gameSource === "self" ? "Self" : "Link"}
                       </Badge>
                     </td>
+
+                    {/* Top 10 Count */}
                     <td className="p-4 font-semibold ">{game.topTenCount}</td>
 
 
+                    {/* Download Allowed */}
                     <td className=" p-4 font-semibold">
                       <AlertDialog open={openCheck} onOpenChange={setOpenCheck}>
                         <AlertDialogTrigger asChild>
                           <input
                             type="checkbox"
                             checked={game.downloadable}
-                            onChange={() => handleCheckboxClick(game)}
+                            onChange={() => handleFeaturedCheckboxClick(game)}
+                            className="cursor-pointer"
                           />
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -291,6 +331,59 @@ const Gamespage = () => {
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction onClick={handleConfirm} >OK</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </td>
+
+                    {/* Featured Checkbox */}
+                    <td className=" p-4 font-semibold ">
+                      <AlertDialog open={openFeaturedCheck} onOpenChange={setOpenFeaturedCheck} >
+                        <AlertDialogTrigger asChild>
+                          <input
+                            type="checkbox"
+                            checked={game?.isFeatured}
+                            onChange={() => handleFeaturedCheckboxClick(game)}
+                            className="cursor-pointer"
+                          />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to update the Featured status?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleFeatureConfirm} >OK</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </td>
+
+
+                    {/* Recommended Checkbox */}
+                    <td className=" p-4 font-semibold ">
+                      <AlertDialog open={openRecommendedCheck} onOpenChange={setOpenRecommendedCheck} >
+                        <AlertDialogTrigger asChild>
+                          <input
+                            type="checkbox"
+                            checked={game?.isRecommended}
+                            onChange={() => handleRecommendedCheckboxClick(game)}
+                            className="cursor-pointer"
+                          />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to update the Recommended status?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleRecommendedConfirm} >OK</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>

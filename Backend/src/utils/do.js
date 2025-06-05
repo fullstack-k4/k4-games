@@ -33,8 +33,25 @@ const deleteFileFromDO=async(fileUrl)=>{
     } catch (error) {
         console.log("Error deleting file:",error);
         throw new Error("Failed to delete file");
-        
     }
+}
+
+const deleteFileFromDOS3key=async(s3Key)=>{
+  try {
+    
+    console.log("Deleting file:",s3Key);
+
+    const deleteParams={
+      Bucket:process.env.DIGITALOCEAN_BUCKET_NAME,
+      Key:s3Key,
+    }
+    await s3.send(new DeleteObjectCommand(deleteParams));
+    console.log(`File deleted: ${s3Key}`);
+    return {success:true,message:"File deleted successfully"};
+  } catch (error) {
+    console.log("Error deleting file:",error);
+    throw new Error("Failed to delete file")
+  }
 }
 
  const uploadFileToS3 = async (filePath, s3Key) => {
@@ -102,4 +119,4 @@ const deleteFileFromDO=async(fileUrl)=>{
 
 
 
-export {deleteFileFromDO,uploadFileToS3,deleteFolderFromS3};
+export {deleteFileFromDO,uploadFileToS3,deleteFolderFromS3,deleteFileFromDOS3key};

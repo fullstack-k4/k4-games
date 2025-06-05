@@ -15,11 +15,13 @@ import { CreateApppage } from "./CreateApppage"
 import { UserFormpage } from "./UserFormpage"
 import { Reportpage } from "./Reportpage"
 import { EditCategorypage } from "./EditCategorypage"
+import { AllowFeaturedpage } from "./AllowFeaturedpage"
+import { AllowRecommendedpage } from "./AllowRecommendedpage"
 
 export {
     Loginpage, Homepage, Userpage, Gamespage,
     AddGamepage, EditGamepage, CreateUserpage,
     Categorypage, CreateCategorypage, Uploadgamezippage,
     Popuppage, CreatePopuppage, MoreApppage, CreateApppage, UserFormpage,
-    Reportpage,EditCategorypage
+    Reportpage, EditCategorypage, AllowFeaturedpage, AllowRecommendedpage
 }

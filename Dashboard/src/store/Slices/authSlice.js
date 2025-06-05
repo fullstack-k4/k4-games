@@ -82,7 +82,9 @@ export const deleteSecondaryAdmin = createAsyncThunk("deleteSecondaryAdmin", asy
 const authSlice = createSlice({
     name: "auth",
     initialState,
-    reducers: {},
+    reducers: {
+     
+    },
     extraReducers: (builder) => {
         builder.addCase(userLogin.pending, (state) => {
             state.loading = true;
@@ -140,19 +142,21 @@ const authSlice = createSlice({
         builder.addCase(getAllSecondaryAdmin.rejected, (state) => {
             state.loading = false;
         })
-        builder.addCase(deleteSecondaryAdmin.pending,(state)=>{
-            state.loading=true;
+        builder.addCase(deleteSecondaryAdmin.pending, (state) => {
+            state.loading = true;
         })
-        builder.addCase(deleteSecondaryAdmin.fulfilled,(state,action)=>{
-            state.loading=false;
-            state.secondaryAdmins=state.secondaryAdmins.filter((admin)=>admin?._id!==action.payload._id);
+        builder.addCase(deleteSecondaryAdmin.fulfilled, (state, action) => {
+            state.loading = false;
+            state.secondaryAdmins = state.secondaryAdmins.filter((admin) => admin?._id !== action.payload._id);
         })
-        builder.addCase(deleteSecondaryAdmin.rejected,(state)=>{
-            state.loading=false;
+        builder.addCase(deleteSecondaryAdmin.rejected, (state) => {
+            state.loading = false;
         })
 
     }
 })
+
+
 
 
 export default authSlice.reducer;

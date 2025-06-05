@@ -6,7 +6,6 @@ import { Category } from "../models/category.model.js"
 import { deleteFileFromDO } from "../utils/do.js"
 
 
-
 const createCategory = asyncHandler(async (req, res) => {
     const { name, slug } = req.body;
 
@@ -35,12 +34,10 @@ const createCategory = asyncHandler(async (req, res) => {
 
 })
 
-
 const getAllCategory = asyncHandler(async (req, res) => {
     const categories = await Category.find({}).select("-__v -imageSource");
     return res.status(200).json(new ApiResponse(200, categories, "All Categories Fetched Successfully"));
 })
-
 
 const deleteCategory = asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -65,13 +62,11 @@ const deleteCategory = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, category, "Category Deleted Successfully"));
 })
 
-
 const getById = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const category = await Category.findById(id);
     return res.status(200).json(new ApiResponse(200, category, "Category Fetched Successfully"))
 })
-
 
 const editCategory = asyncHandler(async (req, res) => {
     const { slug } = req.body;
@@ -92,18 +87,18 @@ const editCategory = asyncHandler(async (req, res) => {
         await deleteFileFromDO(categoryimageUrl);
     }
 
-    if(uploadedImageUrl){
-        imageUrl=uploadedImageUrl;
-        imageSource="self"
+    if (uploadedImageUrl) {
+        imageUrl = uploadedImageUrl;
+        imageSource = "self"
     }
-    category.slug=slug;
-    category.imageUrl=imageUrl;
-    category.imageSource=imageSource;
+    category.slug = slug;
+    category.imageUrl = imageUrl;
+    category.imageSource = imageSource;
     await category.save();
 
-    return res.status(200).json(new ApiResponse(200,category,"Category Updated Successfully"));
+    return res.status(200).json(new ApiResponse(200, category, "Category Updated Successfully"));
 })
 
 
 
-export { createCategory, getAllCategory, deleteCategory, getById,editCategory };
+export { createCategory, getAllCategory, deleteCategory, getById, editCategory };

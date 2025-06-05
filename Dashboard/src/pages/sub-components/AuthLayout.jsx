@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { Loginpage } from "../Loginpage"
 
+
+
+
 const AuthLayout = ({ children, authentication = true }) => {
   const status = useSelector((state) => state.auth.status)
   const [isAuthenticated, setIsAuthenticated] = useState(null)

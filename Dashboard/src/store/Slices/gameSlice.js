@@ -33,6 +33,9 @@ export const getAllGames = createAsyncThunk(
             if(userId) url.searchParams.set("userId",userId);
             if(userRole) url.searchParams.set("userRole",userRole);
 
+            // manually adding sortBy equals to newest 
+            url.searchParams.set("sortBy","newest");
+
             const response = await axiosInstance.get(url);
             return response.data.data;
         } catch (error) {
@@ -203,9 +206,71 @@ export const denyDownload=createAsyncThunk("denyDownload",
 )
 
 
+export const allowFeatured=createAsyncThunk("allowFeatured",
+    async({data,gameId})=>{
+        try {
+            const formData=new FormData();
+            if(data.imageFile){
+                formData.append("imageFile",data.imageFile[0]);
+            }
+            if(data.videoFile){
+                formData.append("videoFile",data.videoFile[0]);
+            }
+            const response=await axiosInstance.patch(`games/allowfeatured/${gameId}`,formData);
+            toast.success("Featured Status Toggled Successfully");
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
+
+export const allowRecommended=createAsyncThunk("allowRecommended",
+    async({data,gameId})=>{
+        try {
+            const formData=new FormData();
+            if(data.image){
+                formData.append("image",data.image[0]);
+            }
+            const response=await axiosInstance.patch(`games/allowrecommended/${gameId}`,formData);
+            toast.success("Recommended Status Toggled Successfully");
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
 
 
+export const denyFeatured=createAsyncThunk(
+    "denyFeatured",
+    async({gameId})=>{
+        try {
+            const response=await axiosInstance.patch(`games/denyFeatured/${gameId}`);
+            toast.success("Featured Status Toggled Successfully");
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
 
+export const denyRecommended=createAsyncThunk(
+    "denyRecommended",
+    async({gameId})=>{
+        try {
+            const response=await axiosInstance.patch(`games/denyrecommended/${gameId}`);
+            toast.success("Recommended Status Toggled Successfully");
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
 
 const gameSlice = createSlice({
     name: "game",
@@ -308,7 +373,42 @@ const gameSlice = createSlice({
         builder.addCase(denyDownload.rejected,(state)=>{
             state.toggled=false;
         })
-
+        builder.addCase(allowFeatured.pending,(state)=>{
+            state.loading=true;
+        })
+        builder.addCase(allowFeatured.fulfilled,(state)=>{
+            state.loading=false;
+        })
+        builder.addCase(allowFeatured.rejected,(state)=>{
+            state.loading=false;
+        })
+        builder.addCase(denyFeatured.pending,(state)=>{
+            state.toggled=false;
+        })
+        builder.addCase(denyFeatured.fulfilled,(state)=>{
+            state.toggled=true;
+        })
+        builder.addCase(denyFeatured.rejected,(state)=>{
+            state.toggled=false;
+        })
+        builder.addCase(allowRecommended.pending,(state)=>{
+            state.loading=true;
+        })
+        builder.addCase(allowRecommended.fulfilled,(state)=>{
+            state.loading=false;
+        })
+        builder.addCase(allowRecommended.rejected,(state)=>{
+            state.loading=false;
+        })
+        builder.addCase(denyRecommended.pending,(state)=>{
+            state.toggled=false;
+        })
+        builder.addCase(denyRecommended.fulfilled,(state)=>{
+            state.toggled=true;
+        })
+        builder.addCase(denyRecommended.rejected,(state)=>{
+            state.toggled=false;
+        })
     }
 })
 
