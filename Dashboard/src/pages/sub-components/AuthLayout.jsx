@@ -23,13 +23,15 @@ const AuthLayout = ({ children, authentication = true, admin }) => {
     }
   }, [status, location.pathname])
 
-  if (isAuthenticated === null) return null // Prevent flicker before state is set
+  if (isAuthenticated === null) return null 
 
-  if (!isAuthenticated && authentication) {
-    return <Loginpage />
-  }
+    if (!isAuthenticated && authentication) {
+      return <Loginpage />
+    }
 
   return children
 }
 
 export { AuthLayout }
+
+

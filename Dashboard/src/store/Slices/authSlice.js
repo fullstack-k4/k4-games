@@ -83,7 +83,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-     
+
     },
     extraReducers: (builder) => {
         builder.addCase(userLogin.pending, (state) => {
@@ -117,6 +117,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.userData = action.payload;
             state.admin = action.payload.role === "admin" ? true : false;
+            sessionStorage.setItem("isAuthenticated", "true");
         })
         builder.addCase(getCurrentUser.rejected, (state) => {
             state.userData = null;
