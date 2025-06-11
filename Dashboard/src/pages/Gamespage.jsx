@@ -242,17 +242,18 @@ const Gamespage = () => {
           <table className="min-w-full">
             <thead className="bg-gray-900 text-white">
               <tr>
-                <th className="p-4 text-left text-lg font-semibold">#</th>
-                <th className="p-4 text-left text-lg font-semibold">Game Name</th>
-                <th className="p-4 text-left text-lg font-semibold">Description</th>
-                <th className="p-4 text-left text-lg font-semibold">Category</th>
-                <th className="p-4 text-left text-lg font-semibold">Image</th>
-                <th className="p-4 text-left text-lg font-semibold">Source</th>
-                <th className="p-4  text-lg font-semibold text-left">Top 10 Count</th>
-                <th className="p-4 text-left text-lg font-semibold">Download Allowed</th>
-                <th className="p-4 text-left text-lg font-semibold">Featured</th>
-                <th className="p-4 text-left text-lg font-semibold">Recommended</th>
-                <th className="p-4 text-left text-lg font-semibold">Actions</th>
+                <th className="p-4 text-left text-md font-semibold">#</th>
+                <th className="p-4 text-left text-md font-semibold">Game Name</th>
+                <th className="p-4 text-left text-md font-semibold">Description</th>
+                <th className="p-4 text-left text-md font-semibold">Category</th>
+                <th className="p-4 text-left text-md font-semibold">Image</th>
+                <th className="p-4 text-left text-md font-semibold">Source</th>
+                <th className="p-4  text-md font-semibold text-center">Top 10 Count</th>
+                <th className="p-4 text-center text-md font-semibold">Download Allowed</th>
+                <th className="p-4  text-center text-md font-semibold">Featured</th>
+                <th className="p-4  text-center text-md font-semibold">Recommended</th>
+                <th className="p-4 text-left text-md font-semibold">Actions</th>
+
               </tr>
             </thead>
             <tbody>
@@ -279,9 +280,7 @@ const Gamespage = () => {
 
                     {/* Game Category */}
                     <td className="p-4 font-semibold">
-                      {game.category?.join(", ").split(" ").length > 4
-                        ? game.category.join(", ").split(" ").slice(0, 2).join(" ") + "..."
-                        : game.category.join(", ")}
+                      {game?.category[0] + "..."}
                     </td>
 
                     {/* Game Image */}
@@ -307,11 +306,11 @@ const Gamespage = () => {
                     </td>
 
                     {/* Top 10 Count */}
-                    <td className="p-4 font-semibold ">{game.topTenCount}</td>
+                    <td className=" font-semibold text-center  ">{game.topTenCount}</td>
 
 
                     {/* Download Allowed */}
-                    <td className=" p-4 font-semibold">
+                    <td className=" text-center font-semibold">
                       <AlertDialog open={openCheck} onOpenChange={setOpenCheck}>
                         <AlertDialogTrigger asChild>
                           <input
@@ -337,7 +336,7 @@ const Gamespage = () => {
                     </td>
 
                     {/* Featured Checkbox */}
-                    <td className=" p-4 font-semibold ">
+                    <td className=" text-center font-semibold ">
                       <AlertDialog open={openFeaturedCheck} onOpenChange={setOpenFeaturedCheck} >
                         <AlertDialogTrigger asChild>
                           <input
@@ -364,7 +363,7 @@ const Gamespage = () => {
 
 
                     {/* Recommended Checkbox */}
-                    <td className=" p-4 font-semibold ">
+                    <td className=" text-center font-semibold ">
                       <AlertDialog open={openRecommendedCheck} onOpenChange={setOpenRecommendedCheck} >
                         <AlertDialogTrigger asChild>
                           <input

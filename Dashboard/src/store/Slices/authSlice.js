@@ -77,8 +77,6 @@ export const deleteSecondaryAdmin = createAsyncThunk("deleteSecondaryAdmin", asy
 })
 
 
-
-
 const authSlice = createSlice({
     name: "auth",
     initialState,
