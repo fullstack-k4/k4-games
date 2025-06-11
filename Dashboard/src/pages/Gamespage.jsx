@@ -253,7 +253,6 @@ const Gamespage = () => {
                 <th className="p-4  text-center text-md font-semibold">Featured</th>
                 <th className="p-4  text-center text-md font-semibold">Recommended</th>
                 <th className="p-4 text-left text-md font-semibold">Actions</th>
-
               </tr>
             </thead>
             <tbody>
@@ -336,7 +335,7 @@ const Gamespage = () => {
                     </td>
 
                     {/* Featured Checkbox */}
-                    <td className=" text-center font-semibold ">
+                    <td className=" text-center font-semibold">
                       <AlertDialog open={openFeaturedCheck} onOpenChange={setOpenFeaturedCheck} >
                         <AlertDialogTrigger asChild>
                           <input

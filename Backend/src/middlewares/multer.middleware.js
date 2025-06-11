@@ -149,7 +149,7 @@ export const featureduploader = multer({
     acl: "public-read",
     key: function (req, file, cb) {
       if (!req.uploadUuid) {
-        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
 
       // Get first 10 characters of originalname
@@ -177,7 +177,7 @@ export const recommendeduploader = multer({
     acl: "public-read",
     key: function (req, file, cb) {
       if (!req.uploadUuid) {
-        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
 
       // Get first 10 characters of originalname

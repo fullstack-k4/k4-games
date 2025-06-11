@@ -32,6 +32,21 @@ const extractUniqueId = async (req, res, next) => {
         uniqueId = parts[parts.indexOf("files") + 1]
     }
 
+    if(game.recommendedImageUrl){
+        const parts = game.recommendedImageUrl.split("/");
+        uniqueId = parts[parts.indexOf("files") + 1]
+    }
+
+    if(game.featuredVideoUrl){
+        const parts = game.featuredVideoUrl.split("/");
+        uniqueId = parts[parts.indexOf("files") + 1]
+    }
+
+    if(game.featuredImageUrl){
+        const parts = game.featuredImageUrl.split("/");
+        uniqueId = parts[parts.indexOf("files") + 1]
+    }
+
     if (uniqueId) {
         req.existingUniqueId = uniqueId; //Attach to request Object
     }
