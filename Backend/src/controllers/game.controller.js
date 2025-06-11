@@ -316,8 +316,8 @@ const deleteGame = asyncHandler(async (req, res) => {
         await deleteFileFromDOS3key(videoS3Key);
     }
 
-    if(game?.recommendedImageUrl){
-        let imageS3Key=game.recommendedImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
+    if (game?.recommendedImageUrl) {
+        let imageS3Key = game.recommendedImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
         await deleteFileFromDOS3key(imageS3Key);
     }
 
@@ -442,7 +442,6 @@ const denyFeatured = asyncHandler(async (req, res) => {
 })
 
 // ALLOW RECOMMENDED
-
 const allowRecommended = asyncHandler(async (req, res) => {
     let game = req.game;
 
@@ -480,7 +479,7 @@ const denyRecommended = asyncHandler(async (req, res) => {
         game.recommendedImageUrl = null;
     }
 
-    game.isRecommended=false;
+    game.isRecommended = false;
 
     await game.save();
 

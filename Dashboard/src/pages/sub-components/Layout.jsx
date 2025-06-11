@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom"
 import { Outlet, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,MessageSquare,LayoutGrid,BookText,Bug } from "lucide-react"
+import { Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked, MessageSquare, LayoutGrid, BookText, Bug } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
 
@@ -73,7 +73,54 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 {isOpen && <span>Categories</span>}
               </NavLink>
             </li>
+            <li>
+              <NavLink
+                to="/popups"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <MessageSquare className="w-5 h-5" />
+                {isOpen && <span>Popups</span>}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/moreapps"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <LayoutGrid className="w-5 h-5" />
+                {isOpen && <span>More Apps</span>}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/userforms"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <BookText className="w-5 h-5" />
+                {isOpen && <span>User Forms</span>}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/reports"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <Bug className="w-5 h-5" />
+                {isOpen && <span>Reports</span>}
+              </NavLink>
+            </li>
           </>}
+
+
+          {/* -------------------- */}
 
           <li>
             <NavLink
@@ -86,50 +133,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               {isOpen && <span>Games</span>}
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/popups"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-              }
-            >
-              <MessageSquare className="w-5 h-5" />
-              {isOpen && <span>Popups</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/moreapps"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-              }
-            >
-              <LayoutGrid className="w-5 h-5" />
-              {isOpen && <span>More Apps</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/userforms"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-              }
-            >
-              <BookText className="w-5 h-5" />
-              {isOpen && <span>User Forms</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/reports"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-              }
-            >
-              <Bug className="w-5 h-5" />
-              {isOpen && <span>Reports</span>}
-            </NavLink>
-          </li>
+
 
         </ul>
       </nav>

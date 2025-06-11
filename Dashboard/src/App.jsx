@@ -26,7 +26,7 @@ const App = () => {
         <Route
           path="/"
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication={true} admin={true}>
               <Layout />
             </AuthLayout>
           }
@@ -69,7 +69,7 @@ const App = () => {
         <Route
           path="/create-user"
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication={true} admin={true}>
               <CreateUserpage />
             </AuthLayout>
           }
@@ -77,7 +77,7 @@ const App = () => {
         <Route
           path="/create-category"
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication={true} admin={true}>
               <CreateCategorypage />
             </AuthLayout>
           }
@@ -93,7 +93,7 @@ const App = () => {
         <Route
           path="/create-popup"
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication={true} admin={true}>
               <CreatePopuppage />
             </AuthLayout>
           }
@@ -101,7 +101,7 @@ const App = () => {
         <Route
           path="/create-app"
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication={true} admin={true}>
               <CreateApppage />
             </AuthLayout>
           }
@@ -109,7 +109,7 @@ const App = () => {
         <Route
           path="/edit-category/:id"
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication={true} admin={true}>
               <EditCategorypage />
             </AuthLayout>
           }

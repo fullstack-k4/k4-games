@@ -317,7 +317,7 @@ const Gamespage = () => {
                           <input
                             type="checkbox"
                             checked={game.downloadable}
-                            onChange={() => handleFeaturedCheckboxClick(game)}
+                            onChange={() => handleCheckboxClick(game)}
                             className="cursor-pointer"
                           />
                         </AlertDialogTrigger>
