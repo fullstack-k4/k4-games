@@ -9,8 +9,8 @@ import { useLocation, useNavigate } from "react-router-dom"
 const AuthLayout = ({ children, authentication = true, admin }) => {
   const status = useSelector((state) => state.auth.status)
   const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const role=useSelector((state)=>state.auth.userData?.role);
-  const isAdmin=role === "admin"
+  const role = useSelector((state) => state.auth.userData?.role);
+  const isAdmin = role === "admin"
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const AuthLayout = ({ children, authentication = true, admin }) => {
     if (!location.pathname.startsWith("/games") && admin && !isAdmin) {
       navigate("/games")
     }
-  }, [status,location.pathname])
+  }, [status, location.pathname])
 
   if (isAuthenticated === null) return null // Prevent flicker before state is set
 

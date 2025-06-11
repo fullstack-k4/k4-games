@@ -39,29 +39,32 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <nav className="flex-1 mt-4">
         <ul className="space-y-2">
 
-          {admin && <>
-            <li>
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-                }
-              >
-                <Home className="w-5 h-5" />
-                {isOpen && <span>Home</span>}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/users"
-                className={({ isActive }) =>
-                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-                }
-              >
-                <Users className="w-5 h-5" />
-                {isOpen && <span>Users</span>}
-              </NavLink>
-            </li>
+
+          {admin && <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <Home className="w-5 h-5" />
+              {isOpen && <span>Home</span>}
+            </NavLink>
+          </li>}
+
+          {admin && <li>
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <Users className="w-5 h-5" />
+              {isOpen && <span>Users</span>}
+            </NavLink>
+          </li>}
+
+          {admin &&
             <li>
               <NavLink
                 to="/categories"
@@ -72,7 +75,24 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <ChartColumnStacked className="w-5 h-5" />
                 {isOpen && <span>Categories</span>}
               </NavLink>
-            </li>
+            </li>}
+
+            
+          <li>
+            <NavLink
+              to="/games"
+              className={({ isActive }) =>
+                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+              }
+            >
+              <Gamepad2 className="w-5 h-5" />
+              {isOpen && <span>Games</span>}
+            </NavLink>
+          </li>
+
+
+
+          {admin && <>
             <li>
               <NavLink
                 to="/popups"
@@ -118,23 +138,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </NavLink>
             </li>
           </>}
-
-
-          {/* -------------------- */}
-
-          <li>
-            <NavLink
-              to="/games"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-              }
-            >
-              <Gamepad2 className="w-5 h-5" />
-              {isOpen && <span>Games</span>}
-            </NavLink>
-          </li>
-
-
         </ul>
       </nav>
 
