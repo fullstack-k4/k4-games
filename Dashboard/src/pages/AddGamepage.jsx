@@ -83,6 +83,11 @@ const AddGamepage = () => {
 
   const onSubmit = async (data) => {
 
+    if(!data.primaryCategory){
+      toast.error("Primary Category is required");
+      return;
+    }
+
     data.downloadable = data.downloadable || "";
 
     const response = await dispatch(uploadGame(data));
@@ -137,6 +142,10 @@ const AddGamepage = () => {
       setValue("category", [...selectedCategories, category]);
     }
   };
+
+  const handlePrimaryCategorySelect = (category) => {
+    setValue("primaryCategory", category);
+  }
 
   const removeCategory = (category) => {
     const updatedCategories = selectedCategories.filter((c) => c !== category);
@@ -216,6 +225,23 @@ const AddGamepage = () => {
                   </Badge>
                 ))}
               </div>
+            </div>
+
+            {/* Primary Category Selection */}
+            <div>
+              <Label> Primary Category</Label>
+              <Select onValueChange={handlePrimaryCategorySelect}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories && categories.map((category) => (
+                    <SelectItem key={category._id} value={category?.name}>
+                      {category?.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
 

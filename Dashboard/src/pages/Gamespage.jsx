@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllGames, makeGamesNull, deleteGame, getGameCategories } from "@/store/Slices/gameSlice";
-import { Pencil, Trash, Plus, Search } from "lucide-react";
+import { Pencil, Trash, Plus, Search, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { denyDownload } from "@/store/Slices/gameSlice";
 import { denyFeatured } from "@/store/Slices/gameSlice";
 import { denyRecommended } from "@/store/Slices/gameSlice";
+import { sendGameNotificationtoAllUsers } from "@/store/Slices/authSlice";
 
 const Gamespage = () => {
   const dispatch = useDispatch();
@@ -38,6 +39,8 @@ const Gamespage = () => {
   const [openFeaturedCheck, setOpenFeaturedCheck] = useState(false);
   const [openRecommendedCheck, setOpenRecommendedCheck] = useState(false);
   const [loader, setloader] = useState(true);
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+  const [selectedGameForNotification, setSelectedGameForNotification] = useState(null);
   const debouncedQuery = useDebounce(searchQuery, 500); // Delay API calls
   const gamesPerPage = 10;
 
@@ -190,6 +193,57 @@ const Gamespage = () => {
 
 
 
+  // notification handler
+  const notifyUsers = async (type) => {
+    const game = selectedGameForNotification;
+    const maxLength = 100;
+    const trimmedDescription =
+      game?.description?.length > maxLength
+        ? game?.description.slice(0, maxLength) + "..."
+        : game?.description || "Tap To View";
+
+    const data = {
+      title: game?.gameName || "New Game Check it Out",
+      body: trimmedDescription,
+      imageUrl: game?.imageUrl,
+      mediaData: {
+        _id: game?._id,
+        gameName: game?.gameName,
+        description: game?.description,
+        category: game?.category,
+        splashColor: game?.splashColor,
+        imageUrl: game?.imageUrl,
+        gameUrl: game?.gameUrl,
+        downloadable: game?.downloadable,
+        isloading: game?.isloading,
+        isrotate: game?.isrotate,
+        topTenCount: game?.topTenCount,
+        gameSource: game?.gameSource,
+        thumbnailSource: game?.thumbnailSource,
+        createdBy: game?.createdBy,
+        createdAt: game?.createdAt,
+        updatedAt: game?.updatedAt,
+        slug: game?.slug,
+        isFeatured: game?.isFeatured,
+        isRecommended: game?.isRecommended,
+        recommendedImageUrl: game?.recommendedImageUrl,
+        primaryCategory: game?.primaryCategory
+      }
+    }
+
+    if (type === "all") {
+      const response = await dispatch(sendGameNotificationtoAllUsers({ data }));
+      if (response.meta.requestStatus === "fulfilled") {
+        setNotificationModalOpen(false)
+      }
+    }
+
+  };
+
+
+
+
+
 
 
 
@@ -252,6 +306,7 @@ const Gamespage = () => {
                 <th className="p-4 text-center text-md font-semibold">Download Allowed</th>
                 <th className="p-4  text-center text-md font-semibold">Featured</th>
                 <th className="p-4  text-center text-md font-semibold">Recommended</th>
+                <th className="p-4  text-center text-md font-semibold">Notify</th>
                 <th className="p-4 text-left text-md font-semibold">Actions</th>
               </tr>
             </thead>
@@ -387,6 +442,15 @@ const Gamespage = () => {
                       </AlertDialog>
                     </td>
 
+                    {/* notify */}
+                    <td className="p-4 font-bold text-gray-900 dark:text-gray-100 ">
+                      <Bell className="ml-4 cursor-pointer" size={20} onClick={() => {
+                        setSelectedGameForNotification(game);
+                        setNotificationModalOpen(true);
+                      }} />
+                    </td>
+
+
 
 
                     {/* Actions */}
@@ -452,6 +516,27 @@ const Gamespage = () => {
             )
           )}
         </div>
+
+        {/* notification dialog */}
+        <AlertDialog open={notificationModalOpen} onOpenChange={setNotificationModalOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Send Notification</AlertDialogTitle>
+              <AlertDialogDescription>
+                Choose who to notify for <strong>{selectedGameForNotification?.gameName}</strong>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex flex-col gap-4 mt-4">
+              <Button onClick={() => notifyUsers('all')} className="w-full cursor-pointer">
+                Notify All Users
+              </Button>
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border-none cursor-pointer" onClick={() => setNotificationModalOpen(false)}>Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
       </div >
     )
 

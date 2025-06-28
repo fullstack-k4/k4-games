@@ -2,7 +2,10 @@ import { NavLink } from "react-router-dom"
 import { Outlet, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked, MessageSquare, LayoutGrid, BookText, Bug } from "lucide-react"
+import {
+  Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,
+  MessageSquare, LayoutGrid, BookText, Bug, Bell
+} from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
 
@@ -36,7 +39,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 mt-4">
+      <nav className="flex-1 mt-4 overflow-y-scroll scrollbar-hide mb-5">
         <ul className="space-y-2">
 
 
@@ -77,7 +80,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </NavLink>
             </li>}
 
-            
+
           <li>
             <NavLink
               to="/games"
@@ -135,6 +138,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               >
                 <Bug className="w-5 h-5" />
                 {isOpen && <span>Reports</span>}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/notification/choose"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <Bell className="w-5 h-5" />
+                {isOpen && <span>Send Notification</span>}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/advertisement/notification/choose"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <Bell className="w-5 h-5" />
+                {isOpen && <span>Ad Notification</span>}
               </NavLink>
             </li>
           </>}

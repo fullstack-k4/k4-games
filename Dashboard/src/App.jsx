@@ -6,12 +6,14 @@ import {
   Categorypage, CreateCategorypage, Uploadgamezippage,
   Popuppage, CreatePopuppage, MoreApppage,
   CreateApppage, UserFormpage, Reportpage, EditCategorypage,
-  AllowFeaturedpage, AllowRecommendedpage
+  AllowFeaturedpage, AllowRecommendedpage, Chooseadnotificationpage,
+  Choosenotificationpage, NotifyAllpage, NotifyAdAllpage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./store/Slices/authSlice";
 import { Toaster } from "sonner";
+
 const App = () => {
   const dispatch = useDispatch();
 
@@ -39,6 +41,10 @@ const App = () => {
           <Route path="/moreapps" element={<MoreApppage />} />
           <Route path="/userforms" element={<UserFormpage />} />
           <Route path="/reports" element={<Reportpage />} />
+          <Route path="/notification/choose" element={<Choosenotificationpage />} />
+          <Route path="/advertisement/notification/choose" element={<Chooseadnotificationpage />} />
+          <Route path="/notification/all" element={<NotifyAllpage />} />
+          <Route path="/advertisement/notification/all" element={<NotifyAdAllpage />} />
         </Route>
 
         {/* Route (No Sidebar) */}

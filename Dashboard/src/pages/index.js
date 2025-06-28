@@ -17,11 +17,18 @@ import { Reportpage } from "./Reportpage"
 import { EditCategorypage } from "./EditCategorypage"
 import { AllowFeaturedpage } from "./AllowFeaturedpage"
 import { AllowRecommendedpage } from "./AllowRecommendedpage"
+import { Chooseadnotificationpage } from "./Chooseadnotificationpage"
+import { Choosenotificationpage } from "./Choosenotificationpage"
+import { NotifyAdAllpage } from "./NotifyAdAllpage"
+import { NotifyAllpage } from "./NotifyAllpage"
+
 
 export {
     Loginpage, Homepage, Userpage, Gamespage,
     AddGamepage, EditGamepage, CreateUserpage,
     Categorypage, CreateCategorypage, Uploadgamezippage,
     Popuppage, CreatePopuppage, MoreApppage, CreateApppage, UserFormpage,
-    Reportpage, EditCategorypage, AllowFeaturedpage, AllowRecommendedpage
+    Reportpage, EditCategorypage, AllowFeaturedpage, AllowRecommendedpage,
+    Chooseadnotificationpage, Choosenotificationpage, NotifyAdAllpage,
+    NotifyAllpage
 }

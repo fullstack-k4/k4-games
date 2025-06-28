@@ -9,7 +9,7 @@ const initialState = {
         docs: [],
         hasNextPage: false,
         totalPages: 0,
-        totalGames:0,
+        totalGames: 0,
     },
     game: null,
     uploading: null,
@@ -17,24 +17,24 @@ const initialState = {
     deleted: false,
     deleting: false,
     editing: false,
-    toggled:false,
-    categories:null,
+    toggled: false,
+    categories: null,
 }
 
 export const getAllGames = createAsyncThunk(
     'getAllGames',
-    async ({ page, limit, query,category,userId,userRole }) => {
+    async ({ page, limit, query, category, userId, userRole }) => {
         try {
             const url = new URL(`${BASE_URL}/games/getall`)
             if (page) url.searchParams.set("page", page);
             if (limit) url.searchParams.set("limit", limit);
             if (query) url.searchParams.set("query", query);
-            if(category) url.searchParams.set("category", category);
-            if(userId) url.searchParams.set("userId",userId);
-            if(userRole) url.searchParams.set("userRole",userRole);
+            if (category) url.searchParams.set("category", category);
+            if (userId) url.searchParams.set("userId", userId);
+            if (userRole) url.searchParams.set("userRole", userRole);
 
             // manually adding sortBy equals to newest 
-            url.searchParams.set("sortBy","newest");
+            url.searchParams.set("sortBy", "newest");
 
             const response = await axiosInstance.get(url);
             return response.data.data;
@@ -50,9 +50,9 @@ export const getGameById = createAsyncThunk(
     'getGameById',
     async ({ gameId }) => {
         try {
-            const url=new URL(`${BASE_URL}/games/get`)
+            const url = new URL(`${BASE_URL}/games/get`)
 
-            if(gameId) url.searchParams.set("_id",gameId);
+            if (gameId) url.searchParams.set("_id", gameId);
             const response = await axiosInstance.get(url);
             return response.data.data;
 
@@ -64,14 +64,14 @@ export const getGameById = createAsyncThunk(
 )
 
 
-export const getGameCategories=createAsyncThunk("getGameCategories",async()=>{
+export const getGameCategories = createAsyncThunk("getGameCategories", async () => {
     try {
-        const response=await axiosInstance.get("games/getcategories");
+        const response = await axiosInstance.get("games/getcategories");
         return response.data.data;
     } catch (error) {
         toast.error(error?.response?.data?.error);
         throw error;
-        
+
     }
 })
 
@@ -96,25 +96,26 @@ export const editGame = createAsyncThunk(
         try {
 
             const formData = new FormData();
-            const trimmedgameName=data.gameName?.trim();
-            const trimmedgameDescription=data.description?.trim();
+            const trimmedgameName = data.gameName?.trim();
+            const trimmedgameDescription = data.description?.trim();
             formData.append("gameName", trimmedgameName);
             formData.append("description", trimmedgameDescription);
             formData.append("splashColor", data.splashColor);
             formData.append("isrotate", data.isrotate);
-            formData.append("slug",data.slug);
+            formData.append("slug", data.slug);
+            formData.append("primaryCategory",data.primaryCategory);
 
-            if (data.image) {  
+            if (data.image) {
                 formData.append("image", data.image[0]);
             }
-            if(data.gameZip){
+            if (data.gameZip) {
                 formData.append("gameZip", data.gameZip[0]);
             }
-            if(data.imageUrl){
-                formData.append("imageUrl",data.imageUrl);
+            if (data.imageUrl) {
+                formData.append("imageUrl", data.imageUrl);
             }
-            if(data.gameUrl){
-                formData.append("gameUrl",data.gameUrl);
+            if (data.gameUrl) {
+                formData.append("gameUrl", data.gameUrl);
             }
             data.category.forEach((cat) => {
                 formData.append("category[]", cat);
@@ -132,8 +133,8 @@ export const editGame = createAsyncThunk(
 
 export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     const formData = new FormData();
-    const trimmedgameName=data.gameName.trim();
-    const trimmedgameDescription=data.description.trim();
+    const trimmedgameName = data.gameName.trim();
+    const trimmedgameDescription = data.description.trim();
     formData.append("gameName", trimmedgameName);
     formData.append("description", trimmedgameDescription);
 
@@ -142,7 +143,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
         formData.append("image", data.image[0]);
     }
     else {
-        const trimmedgameImageUrl=data.imageUrl?.trim();
+        const trimmedgameImageUrl = data.imageUrl?.trim();
         formData.append("imageUrl", trimmedgameImageUrl)
     }
 
@@ -159,7 +160,8 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("splashColor", data.splashColor);
     formData.append("downloadable", data.downloadable);
     formData.append("isrotate", data.isrotate);
-    formData.append("slug",data.slug);
+    formData.append("slug", data.slug);
+    formData.append("primaryCategory", data.primaryCategory);
 
     try {
         const response = await axiosInstance.post("games/upload", formData);
@@ -174,28 +176,28 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
 })
 
 
-export const allowDownload=createAsyncThunk("allowDownload",
-    async({data,gameId})=>{
+export const allowDownload = createAsyncThunk("allowDownload",
+    async ({ data, gameId }) => {
         try {
-            const formData=new FormData();
-            if(data.gameZip){
-                formData.append("gameZip",data.gameZip[0]);
+            const formData = new FormData();
+            if (data.gameZip) {
+                formData.append("gameZip", data.gameZip[0]);
             }
-            const response=await axiosInstance.patch(`games/allowdownload/${gameId}`,formData);
+            const response = await axiosInstance.patch(`games/allowdownload/${gameId}`, formData);
             toast.success("Download Status Toggled Successfully");
             return response.data.data;
-            
+
         } catch (error) {
             toast.error(error?.response?.data?.error);
             throw error;
         }
 
-})
+    })
 
-export const denyDownload=createAsyncThunk("denyDownload",
-    async({gameId})=>{
+export const denyDownload = createAsyncThunk("denyDownload",
+    async ({ gameId }) => {
         try {
-            const response=await axiosInstance.patch(`games/denydownload/${gameId}`);
+            const response = await axiosInstance.patch(`games/denydownload/${gameId}`);
             toast.success("Download Status Toggled Successfully");
             return response.data.data;
         } catch (error) {
@@ -206,17 +208,17 @@ export const denyDownload=createAsyncThunk("denyDownload",
 )
 
 
-export const allowFeatured=createAsyncThunk("allowFeatured",
-    async({data,gameId})=>{
+export const allowFeatured = createAsyncThunk("allowFeatured",
+    async ({ data, gameId }) => {
         try {
-            const formData=new FormData();
-            if(data.imageFile){
-                formData.append("imageFile",data.imageFile[0]);
+            const formData = new FormData();
+            if (data.imageFile) {
+                formData.append("imageFile", data.imageFile[0]);
             }
-            if(data.videoFile){
-                formData.append("videoFile",data.videoFile[0]);
+            if (data.videoFile) {
+                formData.append("videoFile", data.videoFile[0]);
             }
-            const response=await axiosInstance.patch(`games/allowfeatured/${gameId}`,formData);
+            const response = await axiosInstance.patch(`games/allowfeatured/${gameId}`, formData);
             toast.success("Featured Status Toggled Successfully");
             return response.data.data;
         } catch (error) {
@@ -226,14 +228,14 @@ export const allowFeatured=createAsyncThunk("allowFeatured",
     }
 )
 
-export const allowRecommended=createAsyncThunk("allowRecommended",
-    async({data,gameId})=>{
+export const allowRecommended = createAsyncThunk("allowRecommended",
+    async ({ data, gameId }) => {
         try {
-            const formData=new FormData();
-            if(data.image){
-                formData.append("image",data.image[0]);
+            const formData = new FormData();
+            if (data.image) {
+                formData.append("image", data.image[0]);
             }
-            const response=await axiosInstance.patch(`games/allowrecommended/${gameId}`,formData);
+            const response = await axiosInstance.patch(`games/allowrecommended/${gameId}`, formData);
             toast.success("Recommended Status Toggled Successfully");
             return response.data.data;
         } catch (error) {
@@ -244,11 +246,11 @@ export const allowRecommended=createAsyncThunk("allowRecommended",
 )
 
 
-export const denyFeatured=createAsyncThunk(
+export const denyFeatured = createAsyncThunk(
     "denyFeatured",
-    async({gameId})=>{
+    async ({ gameId }) => {
         try {
-            const response=await axiosInstance.patch(`games/denyFeatured/${gameId}`);
+            const response = await axiosInstance.patch(`games/denyFeatured/${gameId}`);
             toast.success("Featured Status Toggled Successfully");
             return response.data.data;
         } catch (error) {
@@ -258,11 +260,11 @@ export const denyFeatured=createAsyncThunk(
     }
 )
 
-export const denyRecommended=createAsyncThunk(
+export const denyRecommended = createAsyncThunk(
     "denyRecommended",
-    async({gameId})=>{
+    async ({ gameId }) => {
         try {
-            const response=await axiosInstance.patch(`games/denyrecommended/${gameId}`);
+            const response = await axiosInstance.patch(`games/denyrecommended/${gameId}`);
             toast.success("Recommended Status Toggled Successfully");
             return response.data.data;
         } catch (error) {
@@ -288,19 +290,19 @@ const gameSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-       
+
         builder.addCase(uploadGame.pending, (state) => {
             state.uploading = true;
-            state.loading=true;
+            state.loading = true;
         });
         builder.addCase(uploadGame.fulfilled, (state, action) => {
             state.uploading = false;
             state.uploaded = true;
-            state.loading=false;
+            state.loading = false;
         })
-        builder.addCase(uploadGame.rejected,(state)=>{
-            state.uploading=false;
-            state.loading=false;
+        builder.addCase(uploadGame.rejected, (state) => {
+            state.uploading = false;
+            state.loading = false;
         })
         builder.addCase(getAllGames.pending, (state) => {
             state.loading = true;
@@ -310,7 +312,7 @@ const gameSlice = createSlice({
             state.games.docs = [...state.games.docs, ...action.payload.docs];
             state.games.hasNextPage = action.payload.hasNextPage;
             state.games.totalPages = action.payload.totalPages;
-            state.games.totalGames=action.payload.totalDocs;
+            state.games.totalGames = action.payload.totalDocs;
         })
         builder.addCase(getAllGames.rejected, (state) => {
             state.loading = false;
@@ -352,62 +354,62 @@ const gameSlice = createSlice({
         builder.addCase(editGame.rejected, (state) => {
             state.editing = false;
         })
-        builder.addCase(getGameCategories.fulfilled,(state,action)=>{
-            state.categories=action.payload;
+        builder.addCase(getGameCategories.fulfilled, (state, action) => {
+            state.categories = action.payload;
         })
-        builder.addCase(allowDownload.pending,(state)=>{
-            state.loading=true;
+        builder.addCase(allowDownload.pending, (state) => {
+            state.loading = true;
         })
-        builder.addCase(allowDownload.fulfilled,(state)=>{
-            state.loading=false;
+        builder.addCase(allowDownload.fulfilled, (state) => {
+            state.loading = false;
         })
-        builder.addCase(allowDownload.rejected,(state)=>{
-            state.loading=false;
+        builder.addCase(allowDownload.rejected, (state) => {
+            state.loading = false;
         })
-        builder.addCase(denyDownload.pending,(state)=>{
-            state.toggled=false;
+        builder.addCase(denyDownload.pending, (state) => {
+            state.toggled = false;
         })
-        builder.addCase(denyDownload.fulfilled,(state)=>{
-            state.toggled=true;
+        builder.addCase(denyDownload.fulfilled, (state) => {
+            state.toggled = true;
         })
-        builder.addCase(denyDownload.rejected,(state)=>{
-            state.toggled=false;
+        builder.addCase(denyDownload.rejected, (state) => {
+            state.toggled = false;
         })
-        builder.addCase(allowFeatured.pending,(state)=>{
-            state.loading=true;
+        builder.addCase(allowFeatured.pending, (state) => {
+            state.loading = true;
         })
-        builder.addCase(allowFeatured.fulfilled,(state)=>{
-            state.loading=false;
+        builder.addCase(allowFeatured.fulfilled, (state) => {
+            state.loading = false;
         })
-        builder.addCase(allowFeatured.rejected,(state)=>{
-            state.loading=false;
+        builder.addCase(allowFeatured.rejected, (state) => {
+            state.loading = false;
         })
-        builder.addCase(denyFeatured.pending,(state)=>{
-            state.toggled=false;
+        builder.addCase(denyFeatured.pending, (state) => {
+            state.toggled = false;
         })
-        builder.addCase(denyFeatured.fulfilled,(state)=>{
-            state.toggled=true;
+        builder.addCase(denyFeatured.fulfilled, (state) => {
+            state.toggled = true;
         })
-        builder.addCase(denyFeatured.rejected,(state)=>{
-            state.toggled=false;
+        builder.addCase(denyFeatured.rejected, (state) => {
+            state.toggled = false;
         })
-        builder.addCase(allowRecommended.pending,(state)=>{
-            state.loading=true;
+        builder.addCase(allowRecommended.pending, (state) => {
+            state.loading = true;
         })
-        builder.addCase(allowRecommended.fulfilled,(state)=>{
-            state.loading=false;
+        builder.addCase(allowRecommended.fulfilled, (state) => {
+            state.loading = false;
         })
-        builder.addCase(allowRecommended.rejected,(state)=>{
-            state.loading=false;
+        builder.addCase(allowRecommended.rejected, (state) => {
+            state.loading = false;
         })
-        builder.addCase(denyRecommended.pending,(state)=>{
-            state.toggled=false;
+        builder.addCase(denyRecommended.pending, (state) => {
+            state.toggled = false;
         })
-        builder.addCase(denyRecommended.fulfilled,(state)=>{
-            state.toggled=true;
+        builder.addCase(denyRecommended.fulfilled, (state) => {
+            state.toggled = true;
         })
-        builder.addCase(denyRecommended.rejected,(state)=>{
-            state.toggled=false;
+        builder.addCase(denyRecommended.rejected, (state) => {
+            state.toggled = false;
         })
     }
 })

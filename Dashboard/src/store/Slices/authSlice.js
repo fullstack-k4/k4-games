@@ -73,8 +73,52 @@ export const deleteSecondaryAdmin = createAsyncThunk("deleteSecondaryAdmin", asy
         toast.error(error?.response?.data?.error);
         throw error;
     }
-
 })
+
+export const sendNotificationToAllUsers = createAsyncThunk(
+    'sendNotificationToAllUsers',
+    async ({ data }) => {
+        try {
+            const response = await axiosInstance.post(`/users/sendnotification/all`, data);
+            toast.success('Notification Sent Successfully');
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
+
+export const sendAdvertisementNotificationToAllUsers = createAsyncThunk(
+    'sendAdvertisementNotificationToAllUsers',
+    async ({ data }) => {
+        try {
+            const response = await axiosInstance.post(`/users/sendadvertisementnotification/all`, data);
+            toast.success("Notification Sent Successfully");
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
+
+export const sendGameNotificationtoAllUsers = createAsyncThunk(
+    'sendGameNotificationtoAllUsers',
+    async ({ data }) => {
+        try {
+            const response = await axiosInstance.post(`/users/sendgamenotification/all`, data);
+            toast.success("Notification Sent Successfully");
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+
+)
+
+
 
 
 const authSlice = createSlice({
@@ -151,7 +195,33 @@ const authSlice = createSlice({
         builder.addCase(deleteSecondaryAdmin.rejected, (state) => {
             state.loading = false;
         })
-
+        builder.addCase(sendNotificationToAllUsers.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(sendNotificationToAllUsers.fulfilled, (state) => {
+            state.loading = false;
+        })
+        builder.addCase(sendNotificationToAllUsers.rejected, (state) => {
+            state.loading = false;
+        })
+        builder.addCase(sendAdvertisementNotificationToAllUsers.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(sendAdvertisementNotificationToAllUsers.fulfilled, (state) => {
+            state.loading = false;
+        })
+        builder.addCase(sendAdvertisementNotificationToAllUsers.rejected, (state) => {
+            state.loading = false;
+        })
+        builder.addCase(sendGameNotificationtoAllUsers.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(sendGameNotificationtoAllUsers.fulfilled, (state) => {
+            state.loading = false;
+        })
+        builder.addCase(sendGameNotificationtoAllUsers.rejected, (state) => {
+            state.loading = false;
+        })
     }
 })
 

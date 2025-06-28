@@ -18,7 +18,7 @@ const AuthLayout = ({ children, authentication = true, admin }) => {
     const storedAuth = sessionStorage.getItem("isAuthenticated")
     setIsAuthenticated(storedAuth === "true" || status)
 
-    if (!location.pathname.startsWith("/games") && admin && !isAdmin) {
+    if (role && !location.pathname.startsWith("/games") && admin && !isAdmin) {
       navigate("/games")
     }
   }, [status, location.pathname])

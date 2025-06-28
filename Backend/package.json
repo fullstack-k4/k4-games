@@ -20,6 +20,7 @@
     "decompress": "^4.2.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "firebase-admin": "^13.4.0",
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^2.1.35",
     "mongoose": "^8.10.0",

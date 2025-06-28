@@ -5,11 +5,12 @@ import { Game } from "../models/game.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import { extractAndUpload } from "../utils/extractAndUpload.js";
 import { deleteFileFromDO, deleteFolderFromS3, deleteFileFromDOS3key } from "../utils/do.js";
+import { Category } from "../models/category.model.js";
 
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory } = req.body;
 
     // validating slug
 
@@ -29,7 +30,7 @@ const uploadGame = asyncHandler(async (req, res) => {
     const downloadable = req.body.downloadable === "true";
 
     // input validation
-    if ([gameName, description, splashColor, isrotate, slug].some((field) => !field || field?.trim() === "")) {
+    if ([gameName, description, splashColor, isrotate, slug, primaryCategory].some((field) => !field || field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
     if (!category) {
@@ -77,7 +78,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         gameSource,
         thumbnailSource,
         createdBy: req.user?._id,
-        slug
+        slug,
+        primaryCategory
     };
 
     if (downloadable) {
@@ -92,7 +94,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug } = req.body;
+    const { gameName, description, category, splashColor, slug,primaryCategory } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -177,6 +179,7 @@ const editGame = asyncHandler(async (req, res) => {
     }
     game.isrotate = isrotate;
     game.slug = slug
+    game.primaryCategory=primaryCategory
 
 
     await game.save();
@@ -234,6 +237,56 @@ const getAllGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "All Games Fetched Successfully"));
 });
 
+// GET:All GAMES WEB (FOR WEBSITE)
+const getAllGameWeb = asyncHandler(async (req, res) => {
+
+    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
+
+    const pipeline = [];
+
+    if (userId && userRole !== "admin") {
+        pipeline.push({
+            $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+        });
+    }
+
+    if (query) {
+        pipeline.push({
+            $match: {
+                $or: [
+                    { gameName: { $regex: query, $options: "i" } },
+                    { description: { $regex: query, $options: "i" } }
+                ]
+            }
+        });
+    }
+
+    if (category) {
+        const foundCategory = await Category.findOne({ slug: category }).select("name");
+        pipeline.push({
+            $match: {
+                category: { $in: [foundCategory?.name] }
+            }
+        })
+    }
+
+    if (sortBy === "newest") {
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
+    else if (sortBy === "oldest") {
+        pipeline.push({ $sort: { createdAt: 1 } });
+    }
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+    };
+
+    const game = await Game.aggregatePaginate(Game.aggregate(pipeline), options);
+
+    return res.status(200).json(new ApiResponse(200, game, "All Games Fetched Successfully"));
+});
+
 // GET:TOP 10 GAMES
 const getTop10Games = asyncHandler(async (_, res) => {
     const top10games = await Game.find({}).sort({ topTenCount: -1 }).limit(10);
@@ -268,6 +321,19 @@ const getGameById = asyncHandler(async (req, res) => {
     }
     return res.status(200).json(new ApiResponse(200, game, "Game Fetched Successfully"));
 
+})
+
+// GET:BY SLUG
+
+const getGameBySlug = asyncHandler(async (req, res) => {
+    const { slug } = req.query;
+    const game = await Game.findOne({ slug });
+
+    if (!game) {
+        throw new ApiError(404, "Game Not Found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, game, "Game Fetched Successfully"));
 })
 
 // DELETE:GAME
@@ -441,8 +507,6 @@ const denyFeatured = asyncHandler(async (req, res) => {
 
 })
 
-
-
 // ALLOW RECOMMENDED
 const allowRecommended = asyncHandler(async (req, res) => {
     let game = req.game;
@@ -549,5 +613,5 @@ export {
     updateLoadingState, getGameCategories, allowDownload,
     denyDownload, getTop10Games, allowFeatured, denyFeatured,
     getFeaturedGames, allowRecommended, denyRecommended,
-    getRecommendedGames
+    getRecommendedGames, getGameBySlug, getAllGameWeb
 };

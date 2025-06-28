@@ -16,6 +16,10 @@ const gameSchema = new Schema({
         type: [String],
         required: true,
     },
+    primaryCategory: {
+        type: String,
+        required: true,
+    },
     splashColor: {
         type: String,
         required: true,
@@ -38,12 +42,12 @@ const gameSchema = new Schema({
         default: false,
     },
     isRecommended: {
-        type:Boolean,
-        default:false,
+        type: Boolean,
+        default: false,
     },
-    recommendedImageUrl:{
-        type:String,
-        default:null,
+    recommendedImageUrl: {
+        type: String,
+        default: null,
     },
     featuredImageUrl: {
         type: String,

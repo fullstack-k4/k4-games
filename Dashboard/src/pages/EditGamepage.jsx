@@ -81,6 +81,7 @@ const EditGamepage = () => {
             setSelectedCategories(gameData.category || []);
             setImageType(gameData.imageUrl ? "url" : "image");
             setGameType(gameData.gameUrl ? "url" : "gameZip");
+            setValue("primaryCategory", gameData.primaryCategory);
         }
     }, [gameData, setValue]);
 
@@ -191,6 +192,34 @@ const EditGamepage = () => {
                                     </Badge>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* Primary Category Selection */}
+                        <div className="w-full">
+                            <Label className="mb-2 ">Primary Category</Label>
+
+                            <Controller
+                                name="primaryCategory"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        value={field.value || ""}
+                                        onValueChange={(value) => {
+                                            field.onChange(value);
+                                            setValue("primaryCategory", value, { shouldDirty: true });
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {categories.map((category) => (
+                                                <SelectItem key={category?._id} value={category?.name}>{category?.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            />
                         </div>
 
 
