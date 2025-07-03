@@ -10,7 +10,7 @@ import { Category } from "../models/category.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo } = req.body;
 
     // validating slug
 
@@ -79,7 +79,9 @@ const uploadGame = asyncHandler(async (req, res) => {
         thumbnailSource,
         createdBy: req.user?._id,
         slug,
-        primaryCategory
+        primaryCategory,
+        instruction,
+        gamePlayVideo
     };
 
     if (downloadable) {
@@ -94,7 +96,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug,primaryCategory } = req.body;
+    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -179,7 +181,9 @@ const editGame = asyncHandler(async (req, res) => {
     }
     game.isrotate = isrotate;
     game.slug = slug
-    game.primaryCategory=primaryCategory
+    game.primaryCategory = primaryCategory
+    game.instruction = instruction
+    game.gamePlayVideo = gamePlayVideo
 
 
     await game.save();
@@ -240,9 +244,10 @@ const getAllGame = asyncHandler(async (req, res) => {
 // GET:All GAMES WEB (FOR WEBSITE)
 const getAllGameWeb = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
+    const { page = 1, limit=10, query, category, userRole, userId, sortBy } = req.query;
 
     const pipeline = [];
+    let foundCategory = null;
 
     if (userId && userRole !== "admin") {
         pipeline.push({
@@ -262,7 +267,7 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
     }
 
     if (category) {
-        const foundCategory = await Category.findOne({ slug: category }).select("name");
+        foundCategory = await Category.findOne({ slug: category });
         pipeline.push({
             $match: {
                 category: { $in: [foundCategory?.name] }
@@ -284,7 +289,7 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
 
     const game = await Game.aggregatePaginate(Game.aggregate(pipeline), options);
 
-    return res.status(200).json(new ApiResponse(200, game, "All Games Fetched Successfully"));
+    return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl }, "All Games Fetched Successfully"));
 });
 
 // GET:TOP 10 GAMES

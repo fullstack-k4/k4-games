@@ -48,7 +48,7 @@ import popupRouter from "./routes/popup.routes.js"
 import moreAppRouter from "./routes/moreapp.routes.js"
 import formRouter from "./routes/form.routes.js"
 import reportRouter from "./routes/report.routes.js"
-
+import pageRouter from "./routes/page.routes.js"
 
 
 
@@ -62,6 +62,7 @@ app.use("/api/v1/popup", popupRouter);
 app.use("/api/v1/moreapp", moreAppRouter);
 app.use("/api/v1/form", formRouter);
 app.use("/api/v1/report", reportRouter);
+app.use("/api/v1/pages", pageRouter);
 
 
 

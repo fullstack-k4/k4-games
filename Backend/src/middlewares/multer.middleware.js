@@ -76,7 +76,7 @@ export const CategoryUploader = multer({
       if (!req.uploadUuid) {
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
       }
-      let folder = "image"
+      let folder = file.mimetype === "image/svg+xml" || file.originalname.endsWith(".svg") ? "icon" : "image"
       const fileName = `gamecategory/${req.uploadUuid}/${folder}/${Date.now()}-${file.originalname}`;
       cb(null, fileName);
     },
@@ -209,11 +209,14 @@ export const featuredImageVideoUploader = featureduploader.fields([
   { name: "videoFile", maxCount: 1 },
   { name: "imageFile", maxCount: 1 }
 ])
+export const categoryImageUploader = CategoryUploader.fields([
+  { name: "image", maxCount: 1 },
+  { name: "icon", maxCount: 1 }
+]);
 
 export const gameUploader = zipuploader.single("gameZip");
-export const categoryImageUploader = CategoryUploader.single("image");
 export const popupImageUploader = PopupUploader.single("image");
 export const moreappImageUploader = MoreAppUploader.single("image");
 export const userAttachmentUploader = AttachmentUploader.single("attachment");
-export const recommendedImageUploader=recommendeduploader.single("image");
+export const recommendedImageUploader = recommendeduploader.single("image");
 

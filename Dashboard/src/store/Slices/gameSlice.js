@@ -103,7 +103,9 @@ export const editGame = createAsyncThunk(
             formData.append("splashColor", data.splashColor);
             formData.append("isrotate", data.isrotate);
             formData.append("slug", data.slug);
-            formData.append("primaryCategory",data.primaryCategory);
+            formData.append("primaryCategory", data.primaryCategory);
+            formData.append("instruction", data.instruction);
+            formData.append("gamePlayVideo", data.gamePlayVideo);
 
             if (data.image) {
                 formData.append("image", data.image[0]);
@@ -162,6 +164,9 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("isrotate", data.isrotate);
     formData.append("slug", data.slug);
     formData.append("primaryCategory", data.primaryCategory);
+    formData.append("instruction", data.instruction);
+    formData.append("gamePlayVideo", data.gamePlayVideo);
+
 
     try {
         const response = await axiosInstance.post("games/upload", formData);

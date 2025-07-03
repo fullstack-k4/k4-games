@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCategories, deleteCategory } from "@/store/Slices/categorySlice";
+import { getAllPages, deletePage } from "@/store/Slices/pageSlice";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "@/components/ui/alert-dialog";
@@ -9,29 +9,28 @@ import { Link } from "react-router-dom";
 import { Pencil, Trash } from "lucide-react";
 
 
-const Categorypage = () => {
+const Pages = () => {
     const dispatch = useDispatch();
-    const { categories, deleted, deleting} = useSelector(state => state.category);
+    const { pages, deleted, deleting } = useSelector(state => state.page);
     const [open, setOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedPage, setSelectedPage] = useState("");
     const [loader, setloader] = useState(true);
 
     useEffect(() => {
-        dispatch(getAllCategories()).then(() => {
+        dispatch(getAllPages()).then(() => {
             setloader(false);
         });
     }, [dispatch, deleted]);
 
-    const handleDeleteButttonClick = (category) => {
+    const handleDeleteButttonClick = (page) => {
         setOpen(true);
-        setSelectedCategory(category);
-
+        setSelectedPage(page);
     }
 
 
-    const handleDelete = async (category) => {
-        if (selectedCategory) {
-            let response = await dispatch(deleteCategory({ id: selectedCategory?._id }));
+    const handleDelete = async () => {
+        if (selectedPage) {
+            let response = await dispatch(deletePage({ id: selectedPage?._id }));
 
             if (response.meta.requestStatus === "fulfilled") {
                 setOpen(false);
@@ -45,9 +44,9 @@ const Categorypage = () => {
             <div className="p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Categories</h2>
-                        <Link to="/create-category">
-                            <Button>Create Category</Button>
+                        <h2 className="text-xl font-semibold">Pages</h2>
+                        <Link to="/create-page">
+                            <Button>Create Page</Button>
                         </Link>
 
                     </div>
@@ -55,29 +54,29 @@ const Categorypage = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Image</TableHead>
+                                <TableHead>Slug</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {
-                                categories && categories.map((category) => (
-                                    <TableRow key={category._id}>
+                                pages && pages.map((page) => (
+                                    <TableRow key={page._id}>
                                         <TableCell>
-                                            {category.name}
+                                            {page.name}
                                         </TableCell>
                                         <TableCell>
-                                            <img src={category.imageUrl} alt="Category" className="w-16 h-16 object-cover" />
+                                            {page.slug}
                                         </TableCell>
                                         <TableCell className="p-4 space-x-3">
-                                            <Link to={`/edit-category/${category?._id}`}>
+                                            <Link to={`/edit-page/${page?.slug}`}>
                                                 <button className="text-blue-500 hover:scale-110 transition cursor-pointer">
                                                     <Pencil size={20} />
                                                 </button>
                                             </Link>
                                             <AlertDialog open={open} onOpenChange={setOpen} >
                                                 <AlertDialogTrigger asChild>
-                                                    <button className="text-red-500 hover:scale-110 cursor-pointer transition" onClick={() => handleDeleteButttonClick(category)}>
+                                                    <button className="text-red-500 hover:scale-110 cursor-pointer transition" onClick={() => handleDeleteButttonClick(page)}>
                                                         <Trash size={20} />
                                                     </button>
                                                 </AlertDialogTrigger>
@@ -88,7 +87,7 @@ const Categorypage = () => {
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel onClick={() => setOpen(false)}>Cancel</AlertDialogCancel>
-                                                        <Button variant="destructive" onClick={() => handleDelete(category)} disabled={deleting}>
+                                                        <Button variant="destructive" onClick={() => handleDelete(page)} disabled={deleting}>
                                                             {deleting ? "Deleting..." : "Delete"}
                                                         </Button>
                                                     </AlertDialogFooter>
@@ -107,4 +106,4 @@ const Categorypage = () => {
     );
 }
 
-export { Categorypage }
+export { Pages }

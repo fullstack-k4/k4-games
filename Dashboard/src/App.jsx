@@ -7,7 +7,8 @@ import {
   Popuppage, CreatePopuppage, MoreApppage,
   CreateApppage, UserFormpage, Reportpage, EditCategorypage,
   AllowFeaturedpage, AllowRecommendedpage, Chooseadnotificationpage,
-  Choosenotificationpage, NotifyAllpage, NotifyAdAllpage
+  Choosenotificationpage, NotifyAllpage, NotifyAdAllpage, Pages,
+  CreatePage, Editpage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
@@ -45,6 +46,8 @@ const App = () => {
           <Route path="/advertisement/notification/choose" element={<Chooseadnotificationpage />} />
           <Route path="/notification/all" element={<NotifyAllpage />} />
           <Route path="/advertisement/notification/all" element={<NotifyAdAllpage />} />
+          <Route path="/pages" element={<Pages />} />
+          <Route path="/create-page" element={<CreatePage />} />
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -134,6 +137,15 @@ const App = () => {
             <AuthLayout authentication={true}>
               <AllowRecommendedpage />
             </AuthLayout>
+          }
+        />
+        <Route
+          path="/edit-page/:slug"
+          element={
+            <AuthLayout authentication={true}>
+              <Editpage />
+            </AuthLayout>
+
           }
         />
       </Routes>

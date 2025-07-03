@@ -8,6 +8,8 @@ import { Report } from "../models/report.model.js";
 const createReport = asyncHandler(async (req, res) => {
   const { gameId, gameName, imageUrl, gameUrl, reportDescription, reportType } = req.body;
 
+  console.log(req.body);
+
   if ([gameId, gameName, imageUrl, gameUrl,reportType].some(
     (field) => typeof field === "string" && field.trim() === "" || field == null
   )) {

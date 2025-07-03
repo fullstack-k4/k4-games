@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Container, SpecialLoadingButton, Loader } from "./sub-components/";
+import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -82,6 +82,8 @@ const EditGamepage = () => {
             setImageType(gameData.imageUrl ? "url" : "image");
             setGameType(gameData.gameUrl ? "url" : "gameZip");
             setValue("primaryCategory", gameData.primaryCategory);
+            setValue("instruction", gameData.instruction);
+            setValue("gamePlayVideo", gameData.gamePlayVideo);
         }
     }, [gameData, setValue]);
 
@@ -101,7 +103,7 @@ const EditGamepage = () => {
 
     const onSubmit = async (data) => {
         const updatedGame = { ...data, category: selectedCategories };
-        console.log(updatedGame);
+
         const response = await dispatch(editGame({ gameId, data: updatedGame }));
 
         if (response.meta.requestStatus === "fulfilled") {
@@ -343,7 +345,7 @@ const EditGamepage = () => {
                             <Input type="color" className="w-12 h-10 p-1" {...register("splashColor")} />
                         </div>
 
-
+                        {/* orientation */}
                         <div>
                             <Label>Orientation</Label>
                             <Controller
@@ -369,18 +371,30 @@ const EditGamepage = () => {
                             />
                         </div>
 
+                        {/* Game Play Video */}
 
+                        <div>
+                            <Label>Game Play Video</Label>
+                            <Input
+                                {...register("gamePlayVideo")}
+                            />
+                        </div>
+
+                        {/* Instructions */}
+                        <div>
+                            <Label htmlFor="instruction">Instruction</Label>
+                            <MyEditor
+                                value={watch("instruction")}
+                                onChange={(content) => setValue("instruction", content, { shouldValidate: true, shouldDirty: true })}
+                            />
+                            {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
+                        </div>
 
                         {editing ? (<SpecialLoadingButton content={"Editing"} />) : (
                             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty}>
                                 Update Game
                             </Button>
                         )}
-
-
-
-
-
                     </form>
                 </div>
             </Container>

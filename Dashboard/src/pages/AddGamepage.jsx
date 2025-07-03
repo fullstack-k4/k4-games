@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Container, SpecialLoadingButton, Loader } from "./sub-components/"
+import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAllCategories } from "@/store/Slices/categorySlice";
 import { uploadGame } from "@/store/Slices/gameSlice";
@@ -21,10 +21,12 @@ import { toast } from "sonner";
 
 
 
+
 const AddGamepage = () => {
   const { register, handleSubmit, setValue, reset, formState: { errors }, clearErrors, unregister, watch } = useForm({
     defaultValues: {
-      downloadable: "", // Keep it optional
+      downloadable: "",
+      instruction: "",
     }
   });
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -83,7 +85,7 @@ const AddGamepage = () => {
 
   const onSubmit = async (data) => {
 
-    if(!data.primaryCategory){
+    if (!data.primaryCategory) {
       toast.error("Primary Category is required");
       return;
     }
@@ -383,6 +385,23 @@ const AddGamepage = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* GamePlay Video */}
+            <div>
+              <Label>Game Play Video</Label>
+              <Input {...register("gamePlayVideo")} />
+            </div>
+
+            {/* Instructions */}
+            <div>
+              <Label htmlFor="instruction">Instruction</Label>
+              <MyEditor
+                value={watch("instruction")}
+                onChange={(content) => setValue("instruction", content, { shouldValidate: true })}
+              />
+              {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
+            </div>
+
 
             {/* Submit Button */}
             {loading ? (

@@ -21,6 +21,9 @@ import { Chooseadnotificationpage } from "./Chooseadnotificationpage"
 import { Choosenotificationpage } from "./Choosenotificationpage"
 import { NotifyAdAllpage } from "./NotifyAdAllpage"
 import { NotifyAllpage } from "./NotifyAllpage"
+import { Pages } from "./Pages"
+import { CreatePage } from "./CreatePage"
+import { Editpage } from "./Editpage"
 
 
 export {
@@ -30,5 +33,5 @@ export {
     Popuppage, CreatePopuppage, MoreApppage, CreateApppage, UserFormpage,
     Reportpage, EditCategorypage, AllowFeaturedpage, AllowRecommendedpage,
     Chooseadnotificationpage, Choosenotificationpage, NotifyAdAllpage,
-    NotifyAllpage
+    NotifyAllpage, Pages, CreatePage,Editpage
 }

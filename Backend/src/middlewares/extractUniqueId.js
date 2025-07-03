@@ -32,17 +32,17 @@ const extractUniqueId = async (req, res, next) => {
         uniqueId = parts[parts.indexOf("files") + 1]
     }
 
-    if(game.recommendedImageUrl){
+    if (game.recommendedImageUrl) {
         const parts = game.recommendedImageUrl.split("/");
         uniqueId = parts[parts.indexOf("files") + 1]
     }
 
-    if(game.featuredVideoUrl){
+    if (game.featuredVideoUrl) {
         const parts = game.featuredVideoUrl.split("/");
         uniqueId = parts[parts.indexOf("files") + 1]
     }
 
-    if(game.featuredImageUrl){
+    if (game.featuredImageUrl) {
         const parts = game.featuredImageUrl.split("/");
         uniqueId = parts[parts.indexOf("files") + 1]
     }
@@ -55,7 +55,6 @@ const extractUniqueId = async (req, res, next) => {
 
     next(); //Continue to Multer and controller
 }
-
 
 const extractCategoryUniqueId = async (req, res, next) => {
     const { categoryId } = req.params;
@@ -74,6 +73,10 @@ const extractCategoryUniqueId = async (req, res, next) => {
 
     if (category.imageSource === "self") {
         const parts = category.imageUrl.split("/");
+        uniqueId = parts[parts.indexOf("gamecategory") + 1]
+    }
+    else if (category.iconSource === "self") {
+        const parts = category.iconUrl.split("/");
         uniqueId = parts[parts.indexOf("gamecategory") + 1]
     }
     else {

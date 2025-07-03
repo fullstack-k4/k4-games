@@ -23,8 +23,10 @@ const CreateCategorypage = () => {
   const navigate = useNavigate();
 
   const [selectedimageType, setSelectedimageType] = useState("url");
+  const [selectediconType, setSelectediconType] = useState("url");
 
   const imageType = watch("imageType", "url"); // Watch the selected image type
+  const iconType = watch("iconType", "url"); // Watch the selected icon type
   const name = watch("name") //wath the name field
 
 
@@ -56,24 +58,16 @@ const CreateCategorypage = () => {
     setSelectedimageType(imageType);
   }, [imageType]);
 
+  useEffect(() => {
+    setSelectediconType(iconType)
+  }, [iconType])
+
 
   const onSubmit = async (data) => {
-
-
-
     const response = await dispatch(createCategory(data));
     if (response.meta.requestStatus === "fulfilled") {
       reset();
-
-      setValue("image", null);
-      setValue("imageUrl", "");
-
-      setValue("imageType", "url");
-
-      setSelectedimageType("url");
-
       navigate("/categories");
-
     }
   };
 
@@ -89,11 +83,15 @@ const CreateCategorypage = () => {
   }, [imageType, unregister, setValue]);
 
 
-
-
-
-
-
+  useEffect(() => {
+    if (iconType === "url") {
+      unregister("icon");
+      setValue("icon", null);
+    } else {
+      unregister("iconUrl");
+      setValue("iconUrl", "");
+    }
+  }, [iconType, unregister, setValue]);
 
   return (
     loader ? <Loader /> : (
@@ -169,6 +167,48 @@ const CreateCategorypage = () => {
 
                 {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
                 {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+              </div>
+            </div>
+
+
+            {/* Icon Selection */}
+            <div>
+              <Label>Icon</Label>
+              <Select value={selectediconType || undefined} onValueChange={(value) => setValue("iconType", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Icon Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="url">Icon URL</SelectItem>
+                  <SelectItem value="image">Upload Icon</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="mt-2">
+                {selectediconType === "url" ? (
+                  <Input
+                    {...register("iconUrl", { required: "Icon URL is required" })}
+                    placeholder="Enter Icon URL"
+                  />
+                ) : (
+                  <Input
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml"
+                    {...register("icon", {
+                      required: "Icon is required",
+                      validate: {
+                        isImageFile: (fileList) =>
+                          fileList?.[0]?.type.startsWith("image/") || fileList?.[0]?.type === "image/svg+xml" || "Only image files are allowed",
+                        isUnder1MB: (fileList) =>
+                          fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB",
+                      },
+                    })}
+                  />
+
+                )}
+
+                {errors.iconUrl && <p className="text-red-500 text-sm">{errors.iconUrl.message}</p>}
+                {errors.icon && <p className="text-red-500 text-sm">{errors.icon.message}</p>}
               </div>
             </div>
 

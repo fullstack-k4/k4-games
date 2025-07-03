@@ -12,10 +12,18 @@ const categorySchema = Schema({
     imageUrl: {
         type: String,
     },
+    iconUrl: {
+        type: String
+    },
     imageSource: {
         type: String,
         enum: ["self", "link"],
         default: "link"
+    },
+    iconSource:{
+        type:String,
+        enum:["self","link"],
+        default:"link"
     },
     slug: {
         type: String,

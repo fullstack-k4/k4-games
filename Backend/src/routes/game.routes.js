@@ -22,7 +22,7 @@ router.route("/getbyslug").get(checkApiKey, getGameBySlug);
 router.route("/delete/:gameId").delete(verifyJWT, deleteGame);
 router.route("/increment/").put(checkApiKey, incrementTopTenCount);
 router.route("/updateLoadingState/").put(checkApiKey, updateLoadingState);
-router.route("/getcategories").get(verifyJWT, checkApiKey, getGameCategories);
+router.route("/getcategories").get(checkApiKey, getGameCategories);
 router.route("/allowdownload/:gameId").patch(verifyJWT, extractUniqueId, gameUploader, allowDownload);
 router.route("/denydownload/:gameId").patch(verifyJWT, denyDownload);
 router.route("/gettop10games").get(checkApiKey, getTop10Games);

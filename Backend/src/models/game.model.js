@@ -90,6 +90,14 @@ const gameSchema = new Schema({
     slug: {
         type: String,
         unique: true
+    },
+    instruction: {
+        type: String,
+        default: "",
+    },
+    gamePlayVideo: {
+        type: String,
+        default: ""
     }
 }, { timestamps: true })
 
