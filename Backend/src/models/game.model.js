@@ -98,6 +98,14 @@ const gameSchema = new Schema({
     gamePlayVideo: {
         type: String,
         default: ""
+    },
+    likesCount: {
+        type: Number,
+        default: 0
+    },
+    dislikesCount: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true })
 

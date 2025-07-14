@@ -6,6 +6,7 @@ import mongoose, { isValidObjectId } from "mongoose";
 import { extractAndUpload } from "../utils/extractAndUpload.js";
 import { deleteFileFromDO, deleteFolderFromS3, deleteFileFromDOS3key } from "../utils/do.js";
 import { Category } from "../models/category.model.js";
+import { Vote } from "../models/vote.model.js";
 
 
 // UPLOAD GAME
@@ -244,7 +245,7 @@ const getAllGame = asyncHandler(async (req, res) => {
 // GET:All GAMES WEB (FOR WEBSITE)
 const getAllGameWeb = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit=10, query, category, userRole, userId, sortBy } = req.query;
+    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
 
     const pipeline = [];
     let foundCategory = null;
@@ -289,7 +290,7 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
 
     const game = await Game.aggregatePaginate(Game.aggregate(pipeline), options);
 
-    return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl }, "All Games Fetched Successfully"));
+    return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl, searchedcategoryicon: foundCategory?.iconUrl }, "All Games Fetched Successfully"));
 });
 
 // GET:TOP 10 GAMES
@@ -332,13 +333,39 @@ const getGameById = asyncHandler(async (req, res) => {
 
 const getGameBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.query;
+    let ip = req.ip;
+    if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+    if (ip === "::1") ip = "127.0.0.1";
+
     const game = await Game.findOne({ slug });
 
     if (!game) {
         throw new ApiError(404, "Game Not Found");
     }
 
-    return res.status(200).json(new ApiResponse(200, game, "Game Fetched Successfully"));
+
+    // check if this ip has liked or disliked
+    const vote = await Vote.findOne({ gameId: game?._id, ip });
+
+    // Calculating   total votes
+    const totalVotes = await Vote.find({ gameId: game?._id }).countDocuments();
+
+    const primaryCategory = await Category.findOne({ name: game?.primaryCategory }).select('iconUrl');
+    const { iconUrl } = primaryCategory;
+
+    // Checking liked or disliked by particular ip
+    const isLiked = vote?.type === 'like';
+    const isDisliked = vote?.type === 'dislike';
+
+    // Calulating rating
+    const likes = game?.likesCount || 0;
+    const dislikes = game?.dislikesCount || 0;
+    const total = likes + dislikes;
+
+    const rating = total > 0 ? (likes / total) * 10 : 0;
+
+
+    return res.status(200).json(new ApiResponse(200, { ...game.toObject(), isLiked, isDisliked, rating, totalVotes, primaryCategoryIcon: iconUrl }, "Game Fetched Successfully"));
 })
 
 // DELETE:GAME
