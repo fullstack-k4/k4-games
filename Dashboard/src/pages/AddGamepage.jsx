@@ -38,9 +38,12 @@ const AddGamepage = () => {
 
   const [selectedImageType, setSelectedImageType] = useState("url");
   const [selectedGameType, setSelectedGameType] = useState("url");
+  const [selectedVideoType, setSelectedVideoType] = useState("url");
+
 
   const imageType = watch("imageType", "url"); // Watch the selected image type
   const gameType = watch("gameType", "url"); // Watch the selected game type
+  const videoType = watch("videoType", "url"); // Watch the selected video type
 
   const gameName = watch("gameName") //watch the gamename field
 
@@ -81,6 +84,10 @@ const AddGamepage = () => {
     setSelectedGameType(gameType);
   }, [gameType]);
 
+  useEffect(() => {
+    setSelectedVideoType(videoType);
+  }, [videoType])
+
 
 
   const onSubmit = async (data) => {
@@ -94,25 +101,7 @@ const AddGamepage = () => {
 
     const response = await dispatch(uploadGame(data));
     if (response.meta.requestStatus === "fulfilled") {
-      reset(); // Clear the form fields
-      setSelectedCategories([]); // Reset category selection
-
-      // Reset form fields related to image and game selection
-      setValue("image", null);
-      setValue("imageUrl", "");
-      setValue("gameZip", null);
-      setValue("gameUrl", "");
-
-      // Reset dropdown selections properly
-      setValue("imageType", "url");
-      setValue("gameType", "url");
-
-      // Ensure state updates correctly after form reset
-      setSelectedImageType("url");
-      setSelectedGameType("url");
-
       navigate("/games");
-
     }
   };
 
@@ -137,6 +126,22 @@ const AddGamepage = () => {
       setValue("gameUrl", ""); // Ensure it's reset
     }
   }, [gameType, unregister, setValue]);
+
+
+  useEffect(() => {
+    if (videoType === "url") {
+      unregister("video"); // Remove video if URL is selected
+      setValue("video", null); // Ensure it's reset
+    } else {
+      unregister("videoUrl"); // Remove videoUrl if video is selected
+      setValue("videoUrl", ""); // Ensure it's reset
+    }
+
+  }, [videoType, unregister, setValue]);
+
+
+
+
 
   const handleCategorySelect = (category) => {
     if (!selectedCategories.includes(category)) {
@@ -339,6 +344,37 @@ const AddGamepage = () => {
 
                 {errors.gameUrl && <p className="text-red-500 text-sm">{errors.gameUrl.message}</p>}
                 {errors.gameZip && <p className="text-red-500 text-sm">{errors.gameZip.message}</p>}
+              </div>
+            </div>
+
+
+
+            {/* Background Video */}
+            <div>
+              <Label>Background Video</Label>
+              <Select value={selectedVideoType || undefined} onValueChange={(value) => setValue("videoType", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Background Video Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="url">Background Video URL</SelectItem>
+                  <SelectItem value="image">Upload Background Video</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="mt-2">
+                {selectedVideoType === "url" ? (
+                  <Input
+                    {...register("videoUrl")}
+                    placeholder="Enter Background Video URL"
+                  />
+                ) : (
+                  <Input
+                    type="file"
+                    accept="video/mp4, video/webm, video/ogg"
+                    {...register("video")}
+                  />
+                )}
               </div>
             </div>
 

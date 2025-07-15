@@ -14,7 +14,6 @@ const uploadGame = asyncHandler(async (req, res) => {
     const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo } = req.body;
 
     // validating slug
-
     const slugFound = await Game.findOne({ slug });
 
     if (slugFound) {
@@ -23,11 +22,12 @@ const uploadGame = asyncHandler(async (req, res) => {
 
     let gameUrl = req.body.gameUrl || "";
     let imageUrl = req.body.imageUrl || "";
+    let backgroundVideoUrl = req.body.backgroundVideoUrl || "";
+
     let gameSource;
     let thumbnailSource;
+    let backgroundVideoSource;
     //  ensuring boolean value
-
-
     const downloadable = req.body.downloadable === "true";
 
     // input validation
@@ -60,6 +60,13 @@ const uploadGame = asyncHandler(async (req, res) => {
         thumbnailSource = "self";
     }
 
+    let uploadedVideoUrl = req.files["video"] ? req.files["video"][0].location : null;
+
+    if (uploadedVideoUrl) {
+        backgroundVideoUrl = uploadedVideoUrl;
+        backgroundVideoSource = "self"
+    }
+
 
     // if download not allowed delete zip folder
     if (!downloadable && req.body.downloadable !== "") {
@@ -82,7 +89,9 @@ const uploadGame = asyncHandler(async (req, res) => {
         slug,
         primaryCategory,
         instruction,
-        gamePlayVideo
+        gamePlayVideo,
+        backgroundVideoUrl,
+        backgroundVideoSource,
     };
 
     if (downloadable) {
@@ -102,6 +111,7 @@ const editGame = asyncHandler(async (req, res) => {
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
     let gameUrl = req.body.gameUrl || "";
+    let backgroundVideoUrl = req.body.backgroundVideoUrl || "";
 
 
 
@@ -127,9 +137,11 @@ const editGame = asyncHandler(async (req, res) => {
 
     const previousGameUrl = game.gameUrl;
     const previousImageUrl = game.imageUrl;
+    const previousBackgroundVideoUrl = game?.backgroundVideoUrl;
 
     let thumbnailSource = game.thumbnailSource;
     let gameSource = game.gameSource;
+    let backgroundVideoSource = game?.backgroundVideoSource;
 
 
     let extractedFiles = [];
@@ -161,8 +173,29 @@ const editGame = asyncHandler(async (req, res) => {
         thumbnailSource = "self";
 
         // Delete previous image
-        await deleteFileFromDO(previousImageUrl);
+
+        if (game.thumbnailSource === "self") {
+            await deleteFileFromDO(previousImageUrl);
+        }
     }
+
+    let uploadedVideoUrl = req.files["video"] ? req.files["video"][0].location : null;
+
+    if (uploadedVideoUrl) {
+        backgroundVideoUrl = uploadedVideoUrl;
+        backgroundVideoSource = "self";
+
+        // Delete previous video
+
+        if (game?.backgroundVideoSource === "self") {
+            await deleteFileFromDO(previousBackgroundVideoUrl);
+        }
+
+    }
+
+
+
+
 
     if (uploadedGameUrl && !downloadable) {
         // if the game is not downloadable , delete the uploaded game zip
@@ -180,6 +213,8 @@ const editGame = asyncHandler(async (req, res) => {
     if (downloadable && uploadedGameUrl) {
         game.gameZipUrl = uploadedGameUrl;
     }
+    game.backgroundVideoUrl = backgroundVideoUrl;
+    game.backgroundVideoSource = backgroundVideoSource;
     game.isrotate = isrotate;
     game.slug = slug
     game.primaryCategory = primaryCategory
@@ -299,6 +334,14 @@ const getTop10Games = asyncHandler(async (_, res) => {
     return res.status(200).json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
 })
 
+
+// GET: Popular Games
+const getPopularGames = asyncHandler(async (_, res) => {
+    const getPopularGames = await Game.find({}).select("gameName _id slug imageUrl").sort({ topTenCount: -1 }).limit(36);
+    return res.status(200).json(new ApiResponse(200, getPopularGames, "Popular Games Fetched Successfully"));
+})
+
+
 // GET:FEATURED GAMES
 const getFeaturedGames = asyncHandler(async (_, res) => {
     const featuredGames = await Game.find({ isFeatured: true }).limit(5);
@@ -364,6 +407,10 @@ const getGameBySlug = asyncHandler(async (req, res) => {
 
     const rating = total > 0 ? (likes / total) * 10 : 0;
 
+    // Increment Top 10 Count
+
+    game.topTenCount += 1;
+    await game.save();
 
     return res.status(200).json(new ApiResponse(200, { ...game.toObject(), isLiked, isDisliked, rating, totalVotes, primaryCategoryIcon: iconUrl }, "Game Fetched Successfully"));
 })
@@ -389,7 +436,7 @@ const deleteGame = asyncHandler(async (req, res) => {
 
     await Game.findByIdAndDelete(gameId);
 
-    if (game.gameSource === "self") {
+    if (game?.gameSource === "self") {
         // delete game folder
         await deleteFolderFromS3(game.gameUrl);
     }
@@ -399,9 +446,14 @@ const deleteGame = asyncHandler(async (req, res) => {
         await deleteFileFromDO(game.gameZipUrl);
     }
 
-    if (game.thumbnailSource === "self") {
+    if (game?.thumbnailSource === "self") {
         // delete thumbnail
         await deleteFileFromDO(game.imageUrl);
+    }
+
+    if (game?.backgroundVideoSource === "self") {
+        // delete background video
+        await deleteFileFromDO(game.backgroundVideoUrl);
     }
 
     if (game?.featuredImageUrl) {
@@ -645,5 +697,6 @@ export {
     updateLoadingState, getGameCategories, allowDownload,
     denyDownload, getTop10Games, allowFeatured, denyFeatured,
     getFeaturedGames, allowRecommended, denyRecommended,
-    getRecommendedGames, getGameBySlug, getAllGameWeb
+    getRecommendedGames, getGameBySlug, getAllGameWeb,
+    getPopularGames
 };

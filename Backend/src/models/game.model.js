@@ -57,6 +57,10 @@ const gameSchema = new Schema({
         type: String,
         default: null,
     },
+    backgroundVideoUrl: {
+        type: String,
+        default: null
+    },
     isloading: {
         type: Boolean,
         default: false,
@@ -79,6 +83,11 @@ const gameSchema = new Schema({
         default: "link"
     },
     thumbnailSource: {
+        type: String,
+        enum: ["self", "link"],
+        default: "link"
+    },
+    backgroundVideoSource: {
         type: String,
         enum: ["self", "link"],
         default: "link"

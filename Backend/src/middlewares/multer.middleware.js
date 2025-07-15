@@ -32,7 +32,6 @@ export const uploader = multer({
       } else {
         finalFileName = `files/${req.uploadUuid}/${fileName}`;
       }
-      console.log(finalFileName);
       cb(null, finalFileName);
     },
   }),
@@ -202,7 +201,8 @@ export const recommendeduploader = multer({
 
 export const gameImageUploader = uploader.fields([
   { name: "gameZip", maxCount: 1 },
-  { name: "image", maxCount: 1 }
+  { name: "image", maxCount: 1 },
+  { name: "video", maxCount: 1 }
 ])
 
 export const featuredImageVideoUploader = featureduploader.fields([

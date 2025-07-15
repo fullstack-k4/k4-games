@@ -35,12 +35,12 @@ const EditGamepage = () => {
     } = useForm();
     const [imageType, setImageType] = useState("url");
     const [gameType, setGameType] = useState("url");
+    const [videoType, setVideoType] = useState("url");
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loader, setloader] = useState(true);
     const gameData = useSelector((state) => state.game.game);
     const editing = useSelector((state) => state.game.editing);
     const { isDirty } = useFormState({ control });
-
     const { categories } = useSelector((state) => state.category);
 
 
@@ -84,6 +84,7 @@ const EditGamepage = () => {
             setValue("primaryCategory", gameData.primaryCategory);
             setValue("instruction", gameData.instruction);
             setValue("gamePlayVideo", gameData.gamePlayVideo);
+            setValue("videoUrl", gameData?.backgroundVideoUrl);
         }
     }, [gameData, setValue]);
 
@@ -331,6 +332,44 @@ const EditGamepage = () => {
                                                 }
                                             }
                                         })}
+                                    />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Background Video Selection */}
+                        <div>
+                            <Label>Background Video</Label>
+                            <Select
+                                onValueChange={(value) => {
+                                    setVideoType(value);
+                                    if (value === "video") {
+                                        setValue("videoUrl", ""); // Clear Video URL
+                                    } else {
+                                        setValue("video", null); // Clear Video File
+                                    }
+                                }}
+                                value={videoType}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Background Video Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="url">Background Video  URL</SelectItem>
+                                    <SelectItem value="video">Upload Background Video</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <div className="mt-2">
+                                {videoType === "url" ? (
+                                    <Input
+                                        {...register("videoUrl")}
+                                        placeholder="Enter Background Video URL"
+                                    />
+                                ) : (
+                                    <Input
+                                        type="file"
+                                        accept="video/mp4, video/webm, video/ogg"
+                                        {...register("video")}
                                     />
                                 )}
                             </div>

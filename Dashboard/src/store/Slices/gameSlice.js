@@ -119,6 +119,12 @@ export const editGame = createAsyncThunk(
             if (data.gameUrl) {
                 formData.append("gameUrl", data.gameUrl);
             }
+            if (data.video) {
+                formData.append("video", data.video[0]);
+            }
+            if (data.videoUrl) {
+                formData.append("backgroundVideoUrl", data.videoUrl);
+            }
             data.category.forEach((cat) => {
                 formData.append("category[]", cat);
             });
@@ -154,6 +160,12 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     }
     else {
         formData.append("gameUrl", data.gameUrl)
+    }
+    if (data.video) {
+        formData.append("video", data.video[0]);
+    }
+    else {
+        formData.append("backgroundVideoUrl", data.videoUrl)
     }
 
     data.category.forEach((cat) => {
