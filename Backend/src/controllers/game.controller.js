@@ -525,17 +525,26 @@ const denyDownload = asyncHandler(async (req, res) => {
 // ALLOW FEATURED
 const allowFeatured = asyncHandler(async (req, res) => {
     let game = req.game;
+    let featuredVideoUrl = req.body.featuredVideoUrl || "";
+    let featuredImageUrl = req.body.featuredImageUrl || "";
 
     let uploadedImageUrl = req.files["imageFile"] ? req.files["imageFile"][0].location : null;
     let uploadedVideoUrl = req.files["videoFile"] ? req.files["videoFile"][0].location : null;
+
+    if (uploadedImageUrl) {
+        featuredImageUrl = uploadedImageUrl;
+    }
+    if (uploadedVideoUrl) {
+        featuredVideoUrl = uploadedVideoUrl;
+    }
 
     // change the value of isFeatured to true
 
     game.isFeatured = true;
 
     // add the uploaded image and video to the game
-    game.featuredVideoUrl = uploadedVideoUrl;
-    game.featuredImageUrl = uploadedImageUrl;
+    game.featuredVideoUrl = featuredVideoUrl;
+    game.featuredImageUrl = featuredImageUrl;
 
     await game.save();
 
@@ -557,17 +566,15 @@ const denyFeatured = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Game Not Found")
     }
 
-
-
     // delete video and image
 
-    if (game?.featuredVideoUrl) {
+    if (game?.featuredVideoUrl && game?.featuredVideoUrl.includes("/feat/")) {
         let videoS3Key = game.featuredVideoUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
         await deleteFileFromDOS3key(videoS3Key);
         game.featuredVideoUrl = null;
     }
 
-    if (game?.featuredImageUrl) {
+    if (game?.featuredImageUrl && game.featuredImageUrl.includes("/feat/")) {
         let imageS3Key = game.featuredImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
         await deleteFileFromDOS3key(imageS3Key);
         game.featuredImageUrl = null;
@@ -587,13 +594,20 @@ const denyFeatured = asyncHandler(async (req, res) => {
 const allowRecommended = asyncHandler(async (req, res) => {
     let game = req.game;
 
+    let recommendedImageUrl = req.body.recommendedImageUrl || "";
+
     let uploadedImageUrl = req.file ? req.file.location : null;
+
+    if (uploadedImageUrl) {
+        recommendedImageUrl = uploadedImageUrl;
+    }
+
 
     // change the value of isRecommended to true;
 
     game.isRecommended = true;
 
-    game.recommendedImageUrl = uploadedImageUrl;
+    game.recommendedImageUrl = recommendedImageUrl;
 
     await game.save();
 
@@ -615,7 +629,7 @@ const denyRecommended = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Game Not Found");
     }
 
-    if (game?.recommendedImageUrl) {
+    if (game?.recommendedImageUrl && game.recommendedImageUrl.includes("/recd/")) {
         let imageS3Key = game.recommendedImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
         await deleteFileFromDOS3key(imageS3Key);
         game.recommendedImageUrl = null;

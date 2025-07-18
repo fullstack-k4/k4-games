@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Container, SpecialLoadingButton, Loader } from "./sub-components/"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -15,12 +16,17 @@ import { Label } from "@/components/ui/label";
 
 
 const AllowRecommendedpage = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, watch, unregister, setValue } = useForm();
     const [loader, setloader] = useState(true);
+    const [selectedImageType, setSelectedImageType] = useState("url");
     const dispatch = useDispatch();
     const loading = useSelector((state) => state.game.loading);
     const navigate = useNavigate();
     const { gameId } = useParams();
+
+
+    const imageType = watch("imageType", "url") //Watch the selected image type
+
 
 
     // for custom loader
@@ -33,6 +39,21 @@ const AllowRecommendedpage = () => {
             clearTimeout(id)
         }
     }, [])
+
+    useEffect(() => {
+        setSelectedImageType(imageType)
+    }, [imageType])
+
+    useEffect(() => {
+        if (imageType === "url") {
+            unregister("image"); //Remove image field if "url" is selected
+            setValue("image", null); //Ensure it's reset
+        } else {
+            unregister("imageUrl"); //Remove imageUrl field if image is selected
+            setValue("imageUrl", ""); //Ensure it's reset
+        }
+
+    }, [imageType, unregister, setValue])
 
 
     const onSubmit = async (data) => {
@@ -58,22 +79,47 @@ const AllowRecommendedpage = () => {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
+
                         <div>
-                            <Label>Recommended Image</Label>
-                            <Input
-                                type="file"
-                                accept="image/png, image/jpeg, image/jpg, image/webp"
-                                {...register("image", {
-                                    required: "Image file is required",
-                                    validate: {
-                                        isImageFile: (fileList) =>
-                                            fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
-                                        isUnder1MB: (fileList) =>
-                                            fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
-                                    }
-                                })}
-                            />
-                            {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+                            {/* Image Selection */}
+                            <Label >Recommended Image</Label>
+                            <Select value={selectedImageType || undefined} onValueChange={(value) => setValue("imageType", value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Image Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="url">Image URL</SelectItem>
+                                    <SelectItem value="image">Upload Image</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <div className="mt-2">
+                                {selectedImageType === "url" ? (
+                                    <Input
+                                        {...register("imageUrl", {
+                                            required: "Image URL is required",
+                                        })}
+                                        placeholder="Enter Image URL"
+                                    />
+                                ) : (
+                                    <Input
+                                        type="file"
+                                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                                        {...register("image", {
+                                            required: "Image file is required",
+                                            validate: {
+                                                isImageFile: (fileList) =>
+                                                    fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
+                                                isUnder1MB: (fileList) =>
+                                                    fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
+                                            }
+                                        })}
+                                    />
+                                )}
+
+                                {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
+                                {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+                            </div>
                         </div>
                         {/* Submit Button */}
                         {loading ? (

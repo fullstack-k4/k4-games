@@ -229,11 +229,17 @@ export const allowFeatured = createAsyncThunk("allowFeatured",
     async ({ data, gameId }) => {
         try {
             const formData = new FormData();
-            if (data.imageFile) {
-                formData.append("imageFile", data.imageFile[0]);
+            if (data.image) {
+                formData.append("imageFile", data.image[0]);
             }
-            if (data.videoFile) {
-                formData.append("videoFile", data.videoFile[0]);
+            if (data.video) {
+                formData.append("videoFile", data.video[0]);
+            }
+            if (data.imageUrl) {
+                formData.append("featuredImageUrl", data.imageUrl);
+            }
+            if (data.videoUrl) {
+                formData.append("featuredVideoUrl", data.videoUrl);
             }
             const response = await axiosInstance.patch(`games/allowfeatured/${gameId}`, formData);
             toast.success("Featured Status Toggled Successfully");
@@ -251,6 +257,9 @@ export const allowRecommended = createAsyncThunk("allowRecommended",
             const formData = new FormData();
             if (data.image) {
                 formData.append("image", data.image[0]);
+            }
+            if (data.imageUrl) {
+                formData.append("recommendedImageUrl", data.imageUrl);
             }
             const response = await axiosInstance.patch(`games/allowrecommended/${gameId}`, formData);
             toast.success("Recommended Status Toggled Successfully");

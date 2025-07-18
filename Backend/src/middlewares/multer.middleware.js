@@ -29,6 +29,9 @@ export const uploader = multer({
 
       if (file.mimetype === "application/zip" || file.mimetype === "application/x-zip-compressed") {
         finalFileName = `files/${req.uploadUuid}/${fileName}.zip`;
+      } else if (file.mimetype.startsWith("video/")) {
+        finalFileName = `files/${req.uploadUuid}/bgiv/${fileName}`
+
       } else {
         finalFileName = `files/${req.uploadUuid}/${fileName}`;
       }
@@ -160,7 +163,7 @@ export const featureduploader = multer({
       // Replace any special characters
       originalName = originalName.replace(/[^a-zA-Z0-9-_]/g, '');
 
-      const fileName = `files/${req.uploadUuid}/${originalName}`;
+      const fileName = `files/${req.uploadUuid}/feat/${originalName}`;
       cb(null, fileName);
     },
   }),
@@ -188,7 +191,7 @@ export const recommendeduploader = multer({
       // Replace any special characters
       originalName = originalName.replace(/[^a-zA-Z0-9-_]/g, '');
 
-      const fileName = `files/${req.uploadUuid}/${originalName}`;
+      const fileName = `files/${req.uploadUuid}/recd/${originalName}`;
       cb(null, fileName);
     },
   }),
