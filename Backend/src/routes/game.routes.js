@@ -33,7 +33,7 @@ router.route("/allowfeatured/:gameId").patch(verifyJWT, extractUniqueId, feature
 router.route("/denyfeatured/:gameId").patch(verifyJWT, denyFeatured);
 router.route("/allowrecommended/:gameId").patch(verifyJWT, extractUniqueId, recommendedImageUploader, allowRecommended);
 router.route("/denyrecommended/:gameId").patch(verifyJWT, denyRecommended);
-router.route("/getpopulargames").get(checkApiKey,getPopularGames);
+router.route("/getpopulargames").get(checkApiKey, getPopularGames);
 
 
 

@@ -7,17 +7,14 @@ import { Game } from "../models/game.model.js";
 
 
 const VoteGame = asyncHandler(async (req, res) => {
-    const { gameId, type } = req.query;
+    const { gameId, type, visitorId } = req.query;
 
-    let ip = req.ip;
-    if (ip.startsWith("::ffff:")) ip = ip.slice(7);
-    if (ip === "::1") ip = "127.0.0.1";
 
     if (!isValidObjectId(gameId)) {
         throw new ApiError(400, "Invalid game id");
     }
 
-    const existing = await Vote.findOne({ gameId, ip });
+    const existing = await Vote.findOne({ gameId, visitorId });
 
     async function safelyDecrement(gameId, field) {
         const game = await Game.findById(gameId);
@@ -30,7 +27,7 @@ const VoteGame = asyncHandler(async (req, res) => {
 
     if (existing) {
         if (existing.type === type) {
-            await Vote.deleteOne({ gameId, ip });
+            await Vote.deleteOne({ gameId, visitorId });
 
             const field = type === "like" ? "likesCount" : "dislikesCount";
             await safelyDecrement(gameId, field);
@@ -61,7 +58,7 @@ const VoteGame = asyncHandler(async (req, res) => {
         }
     }
 
-    const vote = await Vote.create({ gameId, ip, type });
+    const vote = await Vote.create({ gameId, visitorId, type });
     const field = type === "like" ? "likesCount" : "dislikesCount";
     await Game.findByIdAndUpdate(gameId, {
         $inc: { [field]: 1 },
@@ -79,4 +76,23 @@ const VoteGame = asyncHandler(async (req, res) => {
 });
 
 
-export { VoteGame };
+
+const checkVoteStatus = asyncHandler(async (req, res) => {
+    const { gameId, visitorId } = req.query;
+
+    if (!isValidObjectId(gameId)) {
+        throw new ApiError(400, "Invalid Object Id");
+    }
+
+    // Find these visitor has liked or not
+
+    const vote = await Vote.findOne({ gameId, visitorId });
+
+    const isLiked = vote?.type === 'like';
+    const isDisliked = vote?.type === 'dislike';
+
+
+    return res.status(200).json(new ApiResponse(200, { isLiked, isDisliked }, "Vote Status Fetched Successfully"));
+})
+
+export { VoteGame, checkVoteStatus };

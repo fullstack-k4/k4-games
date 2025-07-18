@@ -25,7 +25,8 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
 };
 
-app.set('trust proxy', true)
+
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,7 +37,6 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.send("Api Running");
 })
-
 
 
 
@@ -67,7 +67,7 @@ app.use("/api/v1/moreapp", moreAppRouter);
 app.use("/api/v1/form", formRouter);
 app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/pages", pageRouter);
-app.use("/api/v1/vote",voteRouter);
+app.use("/api/v1/vote", voteRouter);
 
 
 

@@ -373,12 +373,8 @@ const getGameById = asyncHandler(async (req, res) => {
 })
 
 // GET:BY SLUG
-
 const getGameBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.query;
-    let ip = req.ip;
-    if (ip.startsWith("::ffff:")) ip = ip.slice(7);
-    if (ip === "::1") ip = "127.0.0.1";
 
     const game = await Game.findOne({ slug });
 
@@ -387,8 +383,6 @@ const getGameBySlug = asyncHandler(async (req, res) => {
     }
 
 
-    // check if this ip has liked or disliked
-    const vote = await Vote.findOne({ gameId: game?._id, ip });
 
     // Calculating   total votes
     const totalVotes = await Vote.find({ gameId: game?._id }).countDocuments();
@@ -396,9 +390,6 @@ const getGameBySlug = asyncHandler(async (req, res) => {
     const primaryCategory = await Category.findOne({ name: game?.primaryCategory }).select('iconUrl');
     const { iconUrl } = primaryCategory;
 
-    // Checking liked or disliked by particular ip
-    const isLiked = vote?.type === 'like';
-    const isDisliked = vote?.type === 'dislike';
 
     // Calulating rating
     const likes = game?.likesCount || 0;
@@ -412,8 +403,9 @@ const getGameBySlug = asyncHandler(async (req, res) => {
     game.topTenCount += 1;
     await game.save();
 
-    return res.status(200).json(new ApiResponse(200, { ...game.toObject(), isLiked, isDisliked, rating, totalVotes, primaryCategoryIcon: iconUrl }, "Game Fetched Successfully"));
+    return res.status(200).json(new ApiResponse(200, { ...game.toObject(), rating, totalVotes, primaryCategoryIcon: iconUrl }, "Game Fetched Successfully"));
 })
+
 
 // DELETE:GAME
 const deleteGame = asyncHandler(async (req, res) => {

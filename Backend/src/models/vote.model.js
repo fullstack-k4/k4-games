@@ -6,7 +6,7 @@ const voteSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Game',
     },
-    ip: {
+    visitorId: {
         type: String
     },
     type: {
