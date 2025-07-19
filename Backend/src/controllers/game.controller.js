@@ -357,10 +357,18 @@ const getRecommendedGames = asyncHandler(async (_, res) => {
 
 // GET:BY ID
 const getGameById = asyncHandler(async (req, res) => {
-    const { _id } = req.query;
+    const { _id, visitorId } = req.query;
+
+    let vote;
+    let isLiked;
 
     if (!isValidObjectId(_id)) {
         throw new ApiError(400, "Invalid Game Id");
+    }
+
+    if (visitorId) {
+        vote = await Vote.findOne({ gameId: _id, visitorId });
+        isLiked = vote?.type === 'like';
     }
 
     const game = await Game.findById(_id);
@@ -368,7 +376,15 @@ const getGameById = asyncHandler(async (req, res) => {
     if (!game) {
         throw new ApiError(404, "Game Not Found");
     }
-    return res.status(200).json(new ApiResponse(200, game, "Game Fetched Successfully"));
+
+    const gameData = game.toObject();
+
+    if (visitorId) {
+        gameData.isLiked = isLiked;
+    }
+
+
+    return res.status(200).json(new ApiResponse(200, gameData, "Game Fetched Successfully"));
 
 })
 
