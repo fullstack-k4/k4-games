@@ -115,6 +115,9 @@ const gameSchema = new Schema({
     dislikesCount: {
         type: Number,
         default: 0
+    },
+    isDesktop: {
+        type: Boolean
     }
 }, { timestamps: true })
 

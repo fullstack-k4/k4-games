@@ -8,7 +8,8 @@ import {
     getTop10Games, getFeaturedGames, allowFeatured,
     denyFeatured, getRecommendedGames, allowRecommended,
     denyRecommended, getGameBySlug, getAllGameWeb,
-    getPopularGames
+    getPopularGames, getFeaturedGamesWeb, getRecommendedGamesWeb, getAllGameDashboard,
+    getTop10GamesWeb
 } from "../controllers/game.controller.js";
 import { gameImageUploader, gameUploader, featuredImageVideoUploader, recommendedImageUploader } from "../middlewares/multer.middleware.js";
 import { extractUniqueId } from "../middlewares/extractUniqueId.js";
@@ -18,6 +19,7 @@ router.route("/upload").post(verifyJWT, gameImageUploader, uploadGame);
 router.route("/edit/:gameId").patch(verifyJWT, extractUniqueId, gameImageUploader, editGame);
 router.route("/getall").get(checkApiKey, getAllGame);
 router.route("/getallweb").get(checkApiKey, getAllGameWeb);
+router.route("/getalldashboard").get(checkApiKey, getAllGameDashboard);
 router.route("/get").get(checkApiKey, getGameById);
 router.route("/getbyslug").get(checkApiKey, getGameBySlug);
 router.route("/delete/:gameId").delete(verifyJWT, deleteGame);
@@ -27,8 +29,11 @@ router.route("/getcategories").get(checkApiKey, getGameCategories);
 router.route("/allowdownload/:gameId").patch(verifyJWT, extractUniqueId, gameUploader, allowDownload);
 router.route("/denydownload/:gameId").patch(verifyJWT, denyDownload);
 router.route("/gettop10games").get(checkApiKey, getTop10Games);
+router.route("/gettop10gamesweb").get(checkApiKey, getTop10GamesWeb);
 router.route("/getfeaturedgames").get(checkApiKey, getFeaturedGames);
+router.route("/getfeaturedgamesweb").get(checkApiKey, getFeaturedGamesWeb);
 router.route("/getrecommendedgames").get(checkApiKey, getRecommendedGames);
+router.route("/getrecommendedgamesweb").get(checkApiKey, getRecommendedGamesWeb);
 router.route("/allowfeatured/:gameId").patch(verifyJWT, extractUniqueId, featuredImageVideoUploader, allowFeatured);
 router.route("/denyfeatured/:gameId").patch(verifyJWT, denyFeatured);
 router.route("/allowrecommended/:gameId").patch(verifyJWT, extractUniqueId, recommendedImageUploader, allowRecommended);

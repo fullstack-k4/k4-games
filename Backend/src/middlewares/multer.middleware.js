@@ -2,6 +2,7 @@ import multer from "multer";
 import multerS3 from 'multer-s3';
 import { s3 } from "../config/dos3.js";
 import { v4 as uuidv4 } from "uuid";
+import { modifyfilename } from "../utils/modifyfilename.js"
 
 
 
@@ -19,21 +20,20 @@ export const uploader = multer({
       if (!req.uploadUuid) {
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
-      // Process the filename:
-      let fileName = file.originalname
-        .toLowerCase() // Convert to lowercase
-        .replace(/\s+/g, "-") // Replace spaces with "-"
-        .replace(/\.zip$/i, ""); // Remove .zip extension if present
+
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
 
       let finalFileName;
-
       if (file.mimetype === "application/zip" || file.mimetype === "application/x-zip-compressed") {
-        finalFileName = `files/${req.uploadUuid}/${fileName}.zip`;
+        finalFileName = `files/${req.uploadUuid}/${baseName}.zip`;
       } else if (file.mimetype.startsWith("video/")) {
-        finalFileName = `files/${req.uploadUuid}/bgiv/${fileName}`
+        finalFileName = `files/${req.uploadUuid}/bgiv/${baseName}${extension}`
 
       } else {
-        finalFileName = `files/${req.uploadUuid}/${fileName}`;
+        finalFileName = `files/${req.uploadUuid}/${baseName}${extension}`;
       }
       cb(null, finalFileName);
     },
@@ -66,7 +66,6 @@ export const zipuploader = multer({
 });
 
 
-
 export const CategoryUploader = multer({
   storage: multerS3({
     s3: s3,
@@ -78,8 +77,12 @@ export const CategoryUploader = multer({
       if (!req.uploadUuid) {
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
       }
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
       let folder = file.mimetype === "image/svg+xml" || file.originalname.endsWith(".svg") ? "icon" : "image"
-      const fileName = `gamecategory/${req.uploadUuid}/${folder}/${Date.now()}-${file.originalname}`;
+      const fileName = `gamecategory/${req.uploadUuid}/${folder}/${baseName}${extension}`;
       cb(null, fileName);
     },
   }),
@@ -97,7 +100,11 @@ export const PopupUploader = multer({
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
       }
       let folder = "image";
-      const fileName = `popups/${req.uploadUuid}/${folder}/${Date.now()}=${file.originalname}`;
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
+      const fileName = `popups/${req.uploadUuid}/${folder}/${baseName}${extension}`;
       cb(null, fileName);
     }
   })
@@ -115,7 +122,10 @@ export const MoreAppUploader = multer({
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
       }
       let folder = "image";
-      const fileName = `moreapps/${req.uploadUuid}/${folder}/${Date.now()}=${file.originalname}`;
+
+      const originalName = file.originalname;
+      const { extension, baseName } = modifyfilename(originalName);
+      const fileName = `moreapps/${req.uploadUuid}/${folder}/${baseName}${extension}`;
       cb(null, fileName);
     }
   })
@@ -154,16 +164,11 @@ export const featureduploader = multer({
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
 
-      // Get first 10 characters of originalname
-      let originalName = file.originalname.substring(0, 20);
+      const originalName = file.originalname;
 
-      // Replace spaces in those 10 characters with hyphens
-      originalName = originalName.replace(/\s/g, "-");
+      const { extension, baseName } = modifyfilename(originalName);
 
-      // Replace any special characters
-      originalName = originalName.replace(/[^a-zA-Z0-9-_]/g, '');
-
-      const fileName = `files/${req.uploadUuid}/feat/${originalName}`;
+      const fileName = `files/${req.uploadUuid}/feat/${baseName}${extension}`;
       cb(null, fileName);
     },
   }),
@@ -182,23 +187,15 @@ export const recommendeduploader = multer({
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
 
-      // Get first 10 characters of originalname
-      let originalName = file.originalname.substring(0, 20);
+      const originalName = file.originalname;
 
-      // Replace spaces in those 10 characters with hyphens
-      originalName = originalName.replace(/\s/g, "-");
+      const { extension, baseName } = modifyfilename(originalName);
 
-      // Replace any special characters
-      originalName = originalName.replace(/[^a-zA-Z0-9-_]/g, '');
-
-      const fileName = `files/${req.uploadUuid}/recd/${originalName}`;
+      const fileName = `files/${req.uploadUuid}/recd/${baseName}${extension}`;
       cb(null, fileName);
     },
   }),
 });
-
-
-
 
 
 
@@ -212,6 +209,8 @@ export const featuredImageVideoUploader = featureduploader.fields([
   { name: "videoFile", maxCount: 1 },
   { name: "imageFile", maxCount: 1 }
 ])
+
+
 export const categoryImageUploader = CategoryUploader.fields([
   { name: "image", maxCount: 1 },
   { name: "icon", maxCount: 1 }

@@ -27,6 +27,7 @@ const AddGamepage = () => {
     defaultValues: {
       downloadable: "",
       instruction: "",
+      isDesktop: false,
     }
   });
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -98,6 +99,7 @@ const AddGamepage = () => {
     }
 
     data.downloadable = data.downloadable || "";
+
 
     const response = await dispatch(uploadGame(data));
     if (response.meta.requestStatus === "fulfilled") {
@@ -420,6 +422,17 @@ const AddGamepage = () => {
                   <SelectItem value="true">Landscape</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* is Desktop Check Box */}
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="isDesktop" className="text-base">Is Desktop?</Label>
+              <input
+                type="checkbox"
+                id="isDesktop"
+                {...register("isDesktop")}
+                className="w-4 h-4 accent-blue-600 cursor-pointer"
+              />
             </div>
 
             {/* GamePlay Video */}

@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose"
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 
 const voteSchema = new Schema({
@@ -13,9 +14,10 @@ const voteSchema = new Schema({
         type: String,
         enum: ['like', 'dislike']
     }
-})
+}, { timestamps: true })
 
 
+voteSchema.plugin(mongooseAggregatePaginate);
+voteSchema.index({ gameId: 1, type: 1 });
 export const Vote = mongoose.model("Vote", voteSchema)
 
-voteSchema.index({ gameId: 1, type: 1 });

@@ -25,7 +25,7 @@ export const getAllGames = createAsyncThunk(
     'getAllGames',
     async ({ page, limit, query, category, userId, userRole }) => {
         try {
-            const url = new URL(`${BASE_URL}/games/getall`)
+            const url = new URL(`${BASE_URL}/games/getalldashboard`)
             if (page) url.searchParams.set("page", page);
             if (limit) url.searchParams.set("limit", limit);
             if (query) url.searchParams.set("query", query);
@@ -106,6 +106,7 @@ export const editGame = createAsyncThunk(
             formData.append("primaryCategory", data.primaryCategory);
             formData.append("instruction", data.instruction);
             formData.append("gamePlayVideo", data.gamePlayVideo);
+            formData.append("isDesktop", data.isDesktop);
 
             if (data.image) {
                 formData.append("image", data.image[0]);
@@ -178,6 +179,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("primaryCategory", data.primaryCategory);
     formData.append("instruction", data.instruction);
     formData.append("gamePlayVideo", data.gamePlayVideo);
+    formData.append("isDesktop", data.isDesktop);
 
 
     try {

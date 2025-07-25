@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Game } from "../models/game.model.js";
 import { isValidObjectId } from "mongoose";
 import admin from "../config/firebaseConfig.js"
+import { Vote } from "../models/vote.model.js";
 
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -262,6 +263,8 @@ const sendGameNotificationtoAllUsers = asyncHandler(async (req, res) => {
 
 
 })
+
+
 
 
 

@@ -11,7 +11,7 @@ import { Vote } from "../models/vote.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop } = req.body;
 
     // validating slug
     const slugFound = await Game.findOne({ slug });
@@ -31,7 +31,7 @@ const uploadGame = asyncHandler(async (req, res) => {
     const downloadable = req.body.downloadable === "true";
 
     // input validation
-    if ([gameName, description, splashColor, isrotate, slug, primaryCategory].some((field) => !field || field?.trim() === "")) {
+    if ([gameName, description, splashColor, isrotate, slug, primaryCategory, isDesktop].some((field) => !field || field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
     if (!category) {
@@ -92,6 +92,7 @@ const uploadGame = asyncHandler(async (req, res) => {
         gamePlayVideo,
         backgroundVideoUrl,
         backgroundVideoSource,
+        isDesktop
     };
 
     if (downloadable) {
@@ -106,7 +107,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo } = req.body;
+    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -116,7 +117,7 @@ const editGame = asyncHandler(async (req, res) => {
 
 
     // input validation
-    if ([gameName, description, splashColor, slug].some((field) => !field || field?.trim() === "")) {
+    if ([gameName, description, splashColor, slug, isDesktop].some((field) => !field || field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
 
@@ -220,6 +221,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.primaryCategory = primaryCategory
     game.instruction = instruction
     game.gamePlayVideo = gamePlayVideo
+    game.isDesktop = isDesktop
 
 
     await game.save();
@@ -227,6 +229,7 @@ const editGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "Game Updated Succesfully"));
 
 })
+
 
 // GET:ALL GAMES
 const getAllGame = asyncHandler(async (req, res) => {
@@ -280,16 +283,18 @@ const getAllGame = asyncHandler(async (req, res) => {
 // GET:All GAMES WEB (FOR WEBSITE)
 const getAllGameWeb = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
+    const { page = 1, limit = 10, query, category, sortBy, filterBy, categoryName } = req.query;
 
     const pipeline = [];
     let foundCategory = null;
 
-    if (userId && userRole !== "admin") {
-        pipeline.push({
-            $match: { createdBy: new mongoose.Types.ObjectId(userId) }
-        });
+
+    if (filterBy && filterBy === "mobile") {
+        pipeline.push({ $match: { isDesktop: false } });
     }
+
+
+
 
     if (query) {
         pipeline.push({
@@ -302,11 +307,21 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
         });
     }
 
+    // in this case  i am sending slug of category
     if (category) {
         foundCategory = await Category.findOne({ slug: category });
         pipeline.push({
             $match: {
                 category: { $in: [foundCategory?.name] }
+            }
+        })
+    }
+
+    // in this case i am sending original category name
+    if (categoryName) {
+        pipeline.push({
+            $match: {
+                category: { $in: [categoryName] }
             }
         })
     }
@@ -328,16 +343,88 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl, searchedcategoryicon: foundCategory?.iconUrl }, "All Games Fetched Successfully"));
 });
 
+// GET:ALL GAMES DASHBOARD (FOR DASHBOARD)
+const getAllGameDashboard = asyncHandler(async (req, res) => {
+
+    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
+
+    const pipeline = [];
+
+    if (userId && userRole !== "admin") {
+        pipeline.push({
+            $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+        });
+    }
+
+    if (query) {
+        pipeline.push({
+            $match: {
+                $or: [
+                    { gameName: { $regex: query, $options: "i" } },
+                    { description: { $regex: query, $options: "i" } }
+                ]
+            }
+        });
+    }
+
+    if (category) {
+        pipeline.push({
+            $match: {
+                category: { $in: [category] }
+            }
+        })
+    }
+
+    if (sortBy === "newest") {
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
+    else if (sortBy === "oldest") {
+        pipeline.push({ $sort: { createdAt: 1 } });
+    }
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+    };
+
+    const game = await Game.aggregatePaginate(Game.aggregate(pipeline), options);
+
+    return res.status(200).json(new ApiResponse(200, game, "All Games Fetched Successfully"));
+});
+
+
 // GET:TOP 10 GAMES
 const getTop10Games = asyncHandler(async (_, res) => {
     const top10games = await Game.find({}).sort({ topTenCount: -1 }).limit(10);
     return res.status(200).json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
 })
 
+// GET:TOP 10 GAMES WEB
+const getTop10GamesWeb = asyncHandler(async (req, res) => {
+    const { filterBy } = req.query;
+
+    const filter = {};
+
+    if (filterBy === "mobile") {
+        filter.isDesktop = false;
+    }
+
+    const top10games = await Game.find(filter).sort({ topTenCount: -1 }).limit(10);
+    return res.status(200).json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
+})
+
 
 // GET: Popular Games
-const getPopularGames = asyncHandler(async (_, res) => {
-    const getPopularGames = await Game.find({}).select("gameName _id slug imageUrl").sort({ topTenCount: -1 }).limit(36);
+const getPopularGames = asyncHandler(async (req, res) => {
+    const { filterBy } = req.query;
+
+    const filter = {};
+
+    if (filterBy === "mobile") {
+        filter.isDesktop = false;
+    }
+
+    const getPopularGames = await Game.find(filter).select("gameName _id slug imageUrl").sort({ topTenCount: -1 }).limit(36);
     return res.status(200).json(new ApiResponse(200, getPopularGames, "Popular Games Fetched Successfully"));
 })
 
@@ -348,10 +435,43 @@ const getFeaturedGames = asyncHandler(async (_, res) => {
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 })
 
-// GET:RECOMMENDED GAMES
 
+// GET:FEATURED GAMES WEB
+
+const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
+    const { filterBy } = req.query;
+
+    const filter = { isFeatured: true }
+
+    if (filterBy === "mobile") {
+        filter.isDesktop = false;
+    }
+
+    const featuredGames = await Game.find(filter).limit(5);
+    return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
+
+})
+
+
+// GET:RECOMMENDED GAMES
 const getRecommendedGames = asyncHandler(async (_, res) => {
     const recommendedGames = await Game.find({ isRecommended: true }).limit(10);
+    return res.status(200).json(new ApiResponse(200, recommendedGames, "Recommended Games Fetched Successfully"));
+})
+
+
+//GET:RECOMMENDED GAMES WEB
+const getRecommendedGamesWeb = asyncHandler(async (req, res) => {
+    const { filterBy } = req.query;
+
+    const filter = { isRecommended: true }
+
+    if (filterBy === "mobile") {
+        filter.isDesktop = false;
+    }
+
+
+    const recommendedGames = await Game.find(filter).limit(10);
     return res.status(200).json(new ApiResponse(200, recommendedGames, "Recommended Games Fetched Successfully"));
 })
 
@@ -720,5 +840,6 @@ export {
     denyDownload, getTop10Games, allowFeatured, denyFeatured,
     getFeaturedGames, allowRecommended, denyRecommended,
     getRecommendedGames, getGameBySlug, getAllGameWeb,
-    getPopularGames
+    getPopularGames, getFeaturedGamesWeb, getRecommendedGamesWeb,
+    getAllGameDashboard, getTop10GamesWeb
 };

@@ -76,7 +76,6 @@ const VoteGame = asyncHandler(async (req, res) => {
 });
 
 
-
 const checkVoteStatus = asyncHandler(async (req, res) => {
     const { gameId, visitorId } = req.query;
 
@@ -95,4 +94,55 @@ const checkVoteStatus = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, { isLiked, isDisliked }, "Vote Status Fetched Successfully"));
 })
 
-export { VoteGame, checkVoteStatus };
+
+const getLikedGames = asyncHandler(async (req, res) => {
+    const { visitorId, page = 1, limit = 10 } = req.query;
+
+    if (!visitorId) {
+        throw new ApiError(400, "Visitor ID is required");
+    }
+
+    const pipeline = [
+        {
+            $match: {
+                visitorId,
+                type: "like"
+            }
+        },
+        {
+            $lookup: {
+                from: 'games',
+                localField: 'gameId',
+                foreignField: '_id',
+                as: 'game'
+            }
+        },
+        {
+            $unwind: '$game'
+        },
+        {
+            $replaceRoot: { newRoot: '$game' }
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        }
+    ];
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10)
+    };
+
+    const likedgames = await Vote.aggregatePaginate(Vote.aggregate(pipeline), options);
+
+    return res.status(200).json(
+        new ApiResponse(200, likedgames, "Liked Games Fetched Successfully")
+    );
+});
+
+
+
+
+export { VoteGame, checkVoteStatus, getLikedGames };

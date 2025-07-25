@@ -85,6 +85,7 @@ const EditGamepage = () => {
             setValue("instruction", gameData.instruction);
             setValue("gamePlayVideo", gameData.gamePlayVideo);
             setValue("videoUrl", gameData?.backgroundVideoUrl);
+            setValue("isDesktop", gameData?.isDesktop);
         }
     }, [gameData, setValue]);
 
@@ -407,6 +408,17 @@ const EditGamepage = () => {
                                         </SelectContent>
                                     </Select>
                                 )}
+                            />
+                        </div>
+
+                        {/* is Desktop Check Box */}
+                        <div className="flex items-center space-x-2">
+                            <Label htmlFor="isDesktop" className="text-base">Is Desktop?</Label>
+                            <input
+                                type="checkbox"
+                                id="isDesktop"
+                                {...register("isDesktop")}
+                                className="w-4 h-4 accent-blue-600 cursor-pointer"
                             />
                         </div>
 
