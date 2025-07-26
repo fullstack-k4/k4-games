@@ -8,10 +8,10 @@ const popupSchema = new Schema({
         type: String,
         required: true
     },
-    imageSource:{
-        type:String,
-        enum:["self","link"],
-        default:"link"
+    imageSource: {
+        type: String,
+        enum: ["self", "link"],
+        default: "link"
     }
 }, { timestamps: true })
 

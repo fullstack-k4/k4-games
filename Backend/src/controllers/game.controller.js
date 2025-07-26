@@ -231,17 +231,19 @@ const editGame = asyncHandler(async (req, res) => {
 })
 
 
-// GET:ALL GAMES
+// GET:ALL GAMES (FOR APP)
 const getAllGame = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
+    const { page = 1, limit = 10, query, category, sortBy, deviceType } = req.query;
 
     const pipeline = [];
 
-    if (userId && userRole !== "admin") {
+    if (deviceType && deviceType === "mobile") {
         pipeline.push({
-            $match: { createdBy: new mongoose.Types.ObjectId(userId) }
-        });
+            $match: {
+                isDesktop: false
+            }
+        })
     }
 
     if (query) {
@@ -393,9 +395,17 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
 });
 
 
-// GET:TOP 10 GAMES
-const getTop10Games = asyncHandler(async (_, res) => {
-    const top10games = await Game.find({}).sort({ topTenCount: -1 }).limit(10);
+// GET:TOP 10 GAMES (FOR APP)
+const getTop10Games = asyncHandler(async (req, res) => {
+    const { deviceType } = req.query;
+
+    const filter = {};
+
+    if (deviceType && deviceType === "mobile") {
+        filter.isDesktop = false;
+    }
+
+    const top10games = await Game.find(filter).sort({ topTenCount: -1 }).limit(10);
     return res.status(200).json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
 })
 
@@ -429,9 +439,17 @@ const getPopularGames = asyncHandler(async (req, res) => {
 })
 
 
-// GET:FEATURED GAMES
-const getFeaturedGames = asyncHandler(async (_, res) => {
-    const featuredGames = await Game.find({ isFeatured: true }).limit(5);
+// GET:FEATURED GAMES FOR APP
+const getFeaturedGames = asyncHandler(async (req, res) => {
+    const { deviceType } = req.query;
+
+    const filter = { isFeatured: true };
+
+    if (deviceType && deviceType === "mobile") {
+        filter.isDesktop = false;
+    }
+
+    const featuredGames = await Game.find(filter).limit(5);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 })
 
@@ -453,9 +471,17 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
 })
 
 
-// GET:RECOMMENDED GAMES
-const getRecommendedGames = asyncHandler(async (_, res) => {
-    const recommendedGames = await Game.find({ isRecommended: true }).limit(10);
+// GET:RECOMMENDED GAMES FOR APP
+const getRecommendedGames = asyncHandler(async (req, res) => {
+    const { deviceType } = req.query;
+
+    const filter = { isRecommended: true };
+
+    if (deviceType && deviceType === "mobile") {
+        filter.isDesktop = false;
+    }
+
+    const recommendedGames = await Game.find(filter).limit(10);
     return res.status(200).json(new ApiResponse(200, recommendedGames, "Recommended Games Fetched Successfully"));
 })
 

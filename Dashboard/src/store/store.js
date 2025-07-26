@@ -8,6 +8,7 @@ import appSliceReducer from "./Slices/appSlice.js"
 import formSliceReducer from "./Slices/formSlice.js";
 import reportSliceReducer from "./Slices/reportSlice.js"
 import pageSliceReducer from "./Slices/pageSlice.js"
+import adBannerSliceReducer from "./Slices/addbannerSlice.js"
 
 const store = configureStore({
     reducer: {
@@ -19,7 +20,8 @@ const store = configureStore({
         app: appSliceReducer,
         form: formSliceReducer,
         report: reportSliceReducer,
-        page: pageSliceReducer
+        page: pageSliceReducer,
+        adbanner: adBannerSliceReducer
     }
 })
 

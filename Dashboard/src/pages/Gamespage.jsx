@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllGames, makeGamesNull, deleteGame, getGameCategories } from "@/store/Slices/gameSlice";
-import { Pencil, Trash, Plus, Search, Bell } from "lucide-react";
+import { Pencil, Trash, Plus, Search, Bell, MonitorCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -339,7 +339,9 @@ const Gamespage = () => {
 
                     {/* Game Image */}
 
-                    <td className="p-4">
+
+                    <td className="p-4 relative">
+                      {/* Image with animation */}
                       <motion.img
                         src={game.imageUrl}
                         alt={game.gameName}
@@ -347,6 +349,14 @@ const Gamespage = () => {
                         animate={{ y: [0, -5, 0] }}
                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                       />
+
+                      {/* Desktop Icon if game.isDesktop is true */}
+                      {game.isDesktop && (
+                        <MonitorCheck
+                          className="absolute top-1 right-1 w-4 h-4 text-green-600 bg-white border border-gray-300 rounded-full p-0.5 shadow"
+                          title="Desktop supported"
+                        />
+                      )}
                     </td>
 
                     {/* Game Source */}

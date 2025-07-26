@@ -111,6 +111,28 @@ export const PopupUploader = multer({
 })
 
 
+export const AdbannerUploader = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: "public-read",
+    key: function (req, file, cb) {
+      if (!req.uploadUuid) {
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+      }
+      let folder = "image";
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
+      const fileName = `adbanners/${req.uploadUuid}/${folder}/${baseName}${extension}`;
+      cb(null, fileName);
+    }
+  })
+})
+
+
 export const MoreAppUploader = multer({
   storage: multerS3({
     s3: s3,
@@ -218,6 +240,7 @@ export const categoryImageUploader = CategoryUploader.fields([
 
 export const gameUploader = zipuploader.single("gameZip");
 export const popupImageUploader = PopupUploader.single("image");
+export const adBannerImageUploader = AdbannerUploader.single("image");
 export const moreappImageUploader = MoreAppUploader.single("image");
 export const userAttachmentUploader = AttachmentUploader.single("attachment");
 export const recommendedImageUploader = recommendeduploader.single("image");

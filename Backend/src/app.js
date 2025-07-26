@@ -53,6 +53,7 @@ import formRouter from "./routes/form.routes.js"
 import reportRouter from "./routes/report.routes.js"
 import pageRouter from "./routes/page.routes.js"
 import voteRouter from "./routes/vote.routes.js"
+import adBannerRouter from "./routes/adbanner.routes.js"
 
 
 
@@ -68,6 +69,7 @@ app.use("/api/v1/form", formRouter);
 app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/pages", pageRouter);
 app.use("/api/v1/vote", voteRouter);
+app.use("/api/v1/adbanner", adBannerRouter);
 
 
 

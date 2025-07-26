@@ -34,7 +34,7 @@ const createPopUp=asyncHandler(async(req,res)=>{
     if (!popup) {
         throw new ApiError(500, "Failed to create popup");
     }
-    return res.status(200).json(new ApiResponse(201, popup, "PopUp Created Successfully"));
+    return res.status(201).json(new ApiResponse(201, popup, "PopUp Created Successfully"));
 
 })
 
