@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Game } from "../models/game.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import { extractAndUpload } from "../utils/extractAndUpload.js";
-import { deleteFileFromDO, deleteFolderFromS3, deleteFileFromDOS3key } from "../utils/do.js";
+import { deleteFileFromDO, deleteFolderFromS3, deleteFileFromDOS3key, uploadJsonToS3 } from "../utils/do.js";
 import { Category } from "../models/category.model.js";
 import { Vote } from "../models/vote.model.js";
 
@@ -99,7 +99,36 @@ const uploadGame = asyncHandler(async (req, res) => {
         gameData.gameZipUrl = uploadedGameUrl;
     }
 
-    const game = await Game.create(gameData);
+
+
+    let gameDataUrl;
+    // Create Json File and Upload To Digital Ocean if Game is downloadable
+    if (downloadable && uploadedGameUrl) {
+
+        const matchedId = uploadedGameUrl.match(/files\/(\d+)\//);
+        const matchedUId = matchedId[1];
+        const gameId = matchedId ? parseInt(matchedId[1], 10) : null;
+
+        const gameJson = {
+            _id: gameId,
+            gameName,
+            description: description?.split(" ").slice(0, 10).join(" "),
+            category: primaryCategory,
+            splashColor,
+            imageUrl,
+            gameUrl,
+            downloadable,
+            isrotate: isrotate === "true",
+        };
+
+
+
+        gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+    }
+
+
+
+    const game = await Game.create({ ...gameData, gameDataUrl });
 
     return res.status(201).json(new ApiResponse(201, game, "Game Uploaded Succesfully"));
 });
@@ -113,8 +142,6 @@ const editGame = asyncHandler(async (req, res) => {
     let imageUrl = req.body.imageUrl || "";
     let gameUrl = req.body.gameUrl || "";
     let backgroundVideoUrl = req.body.backgroundVideoUrl || "";
-
-
 
     // input validation
     if ([gameName, description, splashColor, slug, isDesktop].some((field) => !field || field?.trim() === "")) {
@@ -139,6 +166,12 @@ const editGame = asyncHandler(async (req, res) => {
     const previousGameUrl = game.gameUrl;
     const previousImageUrl = game.imageUrl;
     const previousBackgroundVideoUrl = game?.backgroundVideoUrl;
+    const previousgameName = game?.gameName;
+    const previousDescription = game?.description;
+    const previousSplashColor = game?.splashColor;
+    const previousOrientation = game?.isrotate;
+    const previousPrimaryCategory = game?.primaryCategory;
+
 
     let thumbnailSource = game.thumbnailSource;
     let gameSource = game.gameSource;
@@ -194,6 +227,38 @@ const editGame = asyncHandler(async (req, res) => {
 
     }
 
+    let gameDataUrl;
+
+
+    if (game?.downloadable) {
+        if (previousgameName !== gameName || previousDescription !== description || previousSplashColor !== splashColor || previousOrientation !== isrotate || previousPrimaryCategory !== primaryCategory) {
+            // delete previous gameData.json File 
+            let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
+            await deleteFileFromDOS3key(gameDataS3Key);
+
+            // create new meta data
+
+            const matchedId = game.gameDataUrl.match(/files\/(\d+)\//);
+            const matchedUId = matchedId[1];
+            const gameId = matchedId ? parseInt(matchedId[1], 10) : null;
+
+
+            const gameJson = {
+                _id: gameId,
+                gameName,
+                description: description?.split(" ").slice(0, 10).join(" "),
+                category: primaryCategory,
+                splashColor,
+                imageUrl,
+                gameUrl,
+                downloadable: true,
+                isrotate
+            };
+
+            gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+        }
+    }
+
 
 
 
@@ -202,6 +267,7 @@ const editGame = asyncHandler(async (req, res) => {
         // if the game is not downloadable , delete the uploaded game zip
         await deleteFileFromDO(uploadedGameUrl);
     }
+
 
     game.gameName = gameName;
     game.description = description;
@@ -222,6 +288,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.instruction = instruction
     game.gamePlayVideo = gamePlayVideo
     game.isDesktop = isDesktop
+    game.gameDataUrl = gameDataUrl;
 
 
     await game.save();
@@ -229,7 +296,6 @@ const editGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "Game Updated Succesfully"));
 
 })
-
 
 // GET:ALL GAMES (FOR APP)
 const getAllGame = asyncHandler(async (req, res) => {
@@ -455,7 +521,6 @@ const getFeaturedGames = asyncHandler(async (req, res) => {
 
 
 // GET:FEATURED GAMES WEB
-
 const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
     const { filterBy } = req.query;
 
@@ -625,6 +690,11 @@ const deleteGame = asyncHandler(async (req, res) => {
         await deleteFileFromDOS3key(imageS3Key);
     }
 
+    if (game?.gameDataUrl) {
+        let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
+        await deleteFileFromDOS3key(gameDataS3Key);
+    }
+
     return res.status(200).json(new ApiResponse(200, game, "Game Deleted Succesfully"));
 })
 
@@ -648,10 +718,31 @@ const allowDownload = asyncHandler(async (req, res) => {
 
     let uploadedGameUrl = req.file ? req.file.location : null;
 
+    //Extract uuid
+    const matchedId = uploadedGameUrl.match(/files\/(\d+)\//);
+    const matchedUId = matchedId[1];
+    const gameId = matchedId ? parseInt(matchedId[1], 10) : null;
+
+    const gameJson = {
+        _id: gameId,
+        gameName: game?.gameName,
+        description: game?.description?.split(" ").slice(0, 10).join(" "),
+        category: game?.primaryCategory,
+        splashColor: game?.splashColor,
+        imageUrl: game?.imageUrl,
+        gameUrl: game?.gameUrl,
+        downloadable: true,
+        isrotate: game?.isrotate
+    }
+
+    // upload gameData.json file to digital ocean
+    let gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+
     if (uploadedGameUrl) {
         game.gameZipUrl = uploadedGameUrl;
     }
     game.downloadable = true;
+    game.gameDataUrl = gameDataUrl;
 
     await game.save();
 
@@ -675,11 +766,20 @@ const denyDownload = asyncHandler(async (req, res) => {
     // delete game zip
     await deleteFileFromDO(game.gameZipUrl);
 
+    // delete gameData.json file
+    if (game?.gameDataUrl) {
+        let gameDataS3Key = game?.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
+        await deleteFileFromDOS3key(gameDataS3Key);
+    }
+
     game.gameZipUrl = null;
     game.downloadable = false;
 
-    await game.save();
+    if (game?.gameDataUrl) {
+        game.gameDataUrl = "";
+    }
 
+    await game.save();
     return res.status(200).json(new ApiResponse(200, game, "Downloaded Deny Successfully"));
 
 })

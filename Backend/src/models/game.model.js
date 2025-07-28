@@ -118,7 +118,12 @@ const gameSchema = new Schema({
     },
     isDesktop: {
         type: Boolean
+    },
+    gameDataUrl: {
+        type: String,
+        default: "",
     }
+
 }, { timestamps: true })
 
 gameSchema.plugin(mongooseAggregatePaginate);
