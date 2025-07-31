@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Container, SpecialLoadingButton, Loader } from "./sub-components/"
+import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createCategory } from "@/store/Slices/categorySlice";
 import { useEffect } from "react";
@@ -211,6 +211,31 @@ const CreateCategorypage = () => {
                 {errors.icon && <p className="text-red-500 text-sm">{errors.icon.message}</p>}
               </div>
             </div>
+
+
+            {/* Is SideBar CheckBox */}
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="isDesktop" className="text-base">Display on Sidebar?</Label>
+              <input
+                type="checkbox"
+                id="isSidebar"
+                {...register("isSidebar")}
+                className="w-4 h-4 accent-blue-600 cursor-pointer"
+              />
+            </div>
+
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <MyEditor
+                value={watch("description")}
+                onChange={(content) => setValue("description", content, { shouldValidate: true })}
+              />
+              {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+            </div>
+
+
 
 
             {/* Submit Button */}

@@ -16,6 +16,8 @@ import { denyDownload } from "@/store/Slices/gameSlice";
 import { denyFeatured } from "@/store/Slices/gameSlice";
 import { denyRecommended } from "@/store/Slices/gameSlice";
 import { sendGameNotificationtoAllUsers } from "@/store/Slices/authSlice";
+import { formatPlaysCount } from "@/utils/format";
+
 
 const Gamespage = () => {
   const dispatch = useDispatch();
@@ -34,6 +36,7 @@ const Gamespage = () => {
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
   const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedGame, setSelectedGame] = useState(null);
   const [openCheck, setOpenCheck] = useState(false);
   const [openFeaturedCheck, setOpenFeaturedCheck] = useState(false);
@@ -43,7 +46,6 @@ const Gamespage = () => {
   const [selectedGameForNotification, setSelectedGameForNotification] = useState(null);
   const debouncedQuery = useDebounce(searchQuery, 500); // Delay API calls
   const gamesPerPage = 10;
-
 
 
 
@@ -66,12 +68,11 @@ const Gamespage = () => {
   useEffect(() => {
     dispatch(makeGamesNull()); // Clear previous page data
     if (userId && userRole) {
-      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory, userRole: userRole, userId: userId })).then(() => {
+      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory, userRole: userRole, userId: userId, filterBy: selectedFilter })).then(() => {
         setloader(false);
       });
     }
-
-  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled, userId, userRole]);
+  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled, userId, userRole, selectedFilter]);
 
   // 🔹 Cleanup on unmount
   useEffect(() => {
@@ -237,18 +238,28 @@ const Gamespage = () => {
         setNotificationModalOpen(false)
       }
     }
-
   };
 
 
-
-
-
-
-
+  const filters = [
+    {
+      _id: 1,
+      name: "Featured",
+      value: "featured"
+    },
+    {
+      _id: 2,
+      name: "Recommended",
+      value: "recommended"
+    },
+    {
+      _id: 3,
+      name: "Downloadable",
+      value: "downloadable"
+    }
+  ]
 
   return (
-
     loader ? <Loader /> : (
       <div className="p-6 space-y-6">
         {/* Header & Search */}
@@ -275,20 +286,37 @@ const Gamespage = () => {
         </div>
 
 
-        {/* Category Dropdown */}
-        <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="All Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories?.map((category) => (
-              <SelectItem key={category._id} value={category._id}>
-                {category._id} ({category.count})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-row gap-1">
+          {/* Category Dropdown */}
+          <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories?.map((category) => (
+                <SelectItem key={category._id} value={category._id}>
+                  {category._id} ({category.count})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+
+          <Select value={selectedFilter || "all"} onValueChange={(value) => setSelectedFilter(value === "all" ? "" : value)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Filters" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Filters</SelectItem>
+              {filters?.map((filter) => (
+                <SelectItem key={filter._id} value={filter.value}>
+                  {filter.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Table */}
 
@@ -302,7 +330,7 @@ const Gamespage = () => {
                 <th className="p-4 text-left text-md font-semibold">Category</th>
                 <th className="p-4 text-left text-md font-semibold">Image</th>
                 <th className="p-4 text-left text-md font-semibold">Source</th>
-                <th className="p-4  text-md font-semibold text-center">Top 10 Count</th>
+                <th className="p-4  text-md font-semibold text-center">Plays</th>
                 <th className="p-4 text-center text-md font-semibold">Download Allowed</th>
                 <th className="p-4  text-center text-md font-semibold">Featured</th>
                 <th className="p-4  text-center text-md font-semibold">Recommended</th>
@@ -342,13 +370,15 @@ const Gamespage = () => {
 
                     <td className="p-4 relative">
                       {/* Image with animation */}
-                      <motion.img
-                        src={game.imageUrl}
-                        alt={game.gameName}
-                        className="w-16 h-16 rounded-lg shadow-md"
-                        animate={{ y: [0, -5, 0] }}
-                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                      />
+                      <a href={`https://play.k4.games/play/${game?.slug}/`} target="_blank">
+                        <motion.img
+                          src={game.imageUrl}
+                          alt={game.gameName}
+                          className="w-16 h-16 rounded-lg shadow-md "
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        />
+                      </a>
 
                       {/* Desktop Icon if game.isDesktop is true */}
                       {game.isDesktop && (
@@ -370,7 +400,7 @@ const Gamespage = () => {
                     </td>
 
                     {/* Top 10 Count */}
-                    <td className=" font-semibold text-center  ">{game.topTenCount}</td>
+                    <td className=" font-semibold text-center  ">{formatPlaysCount(game.topTenCount)}</td>
 
 
                     {/* Download Allowed */}
@@ -513,7 +543,7 @@ const Gamespage = () => {
               <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-500">...</span>
             ) : (
               <motion.button
-                key={`page-${page}`}  // 🔥 Unique key fix
+                key={`page-${page}`}
                 onClick={() => paginate(page)}
                 className={`px-4 py-2 font-semibold rounded-lg ${currentPage === page
                   ? "bg-blue-600 text-white"

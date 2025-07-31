@@ -41,6 +41,7 @@ export const uploader = multer({
 });
 
 
+
 export const zipuploader = multer({
   storage: multerS3({
     s3: s3,
@@ -53,13 +54,12 @@ export const zipuploader = multer({
       if (!req.uploadUuid) {
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
-      // Process the filename:
-      let fileName = file.originalname
-        .toLowerCase() // Convert to lowercase
-        .replace(/\s+/g, "-") // Replace spaces with "-"
-        .replace(/\.zip$/i, ""); // Remove .zip extension if present
 
-      const finalFileName = `files/${req.uploadUuid}/${fileName}-zip`;
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
+      const finalFileName = `files/${req.uploadUuid}/${baseName}${extension}`;
       cb(null, finalFileName);
     },
   }),
@@ -87,7 +87,6 @@ export const CategoryUploader = multer({
     },
   }),
 });
-
 
 export const PopupUploader = multer({
   storage: multerS3({

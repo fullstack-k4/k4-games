@@ -408,13 +408,13 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
 
     const game = await Game.aggregatePaginate(Game.aggregate(pipeline), options);
 
-    return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl, searchedcategoryicon: foundCategory?.iconUrl }, "All Games Fetched Successfully"));
+    return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl, searchedcategoryicon: foundCategory?.iconUrl, searchedcategorydescription: foundCategory?.description }, "All Games Fetched Successfully"));
 });
 
 // GET:ALL GAMES DASHBOARD (FOR DASHBOARD)
 const getAllGameDashboard = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query, category, userRole, userId, sortBy } = req.query;
+    const { page = 1, limit = 10, query, category, userRole, userId, sortBy, filterBy } = req.query;
 
     const pipeline = [];
 
@@ -423,6 +423,26 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
             $match: { createdBy: new mongoose.Types.ObjectId(userId) }
         });
     }
+
+    if (filterBy === "featured") {
+        pipeline.push({
+            $match: { isFeatured: true }
+        })
+    }
+
+
+    if (filterBy === "downloadable") {
+        pipeline.push({
+            $match: { downloadable: true }
+        })
+    }
+
+    if (filterBy === "recommended") {
+        pipeline.push({
+            $match: { isRecommended: true }
+        })
+    }
+
 
     if (query) {
         pipeline.push({
@@ -515,7 +535,7 @@ const getFeaturedGames = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const featuredGames = await Game.find(filter).limit(5);
+    const featuredGames = await Game.find(filter).limit(7);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 })
 
@@ -530,7 +550,7 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const featuredGames = await Game.find(filter).limit(5);
+    const featuredGames = await Game.find(filter).limit(7);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 
 })

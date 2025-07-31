@@ -2,7 +2,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Container, SpecialLoadingButton, Loader } from "./sub-components/"
+import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { editCategory, getCategoryById, makeCategoryNull } from "@/store/Slices/categorySlice";
 import { useEffect } from "react";
@@ -29,9 +29,7 @@ const EditCategorypage = () => {
   const { isDirty } = useFormState({ control });
 
 
-
   // fetch image
-
   useEffect(() => {
     dispatch(getCategoryById({ id })).then(() => {
       setloader(false);
@@ -55,6 +53,8 @@ const EditCategorypage = () => {
       setValue("slug", category?.slug);
       setValue("imageUrl", category?.imageUrl);
       setValue("iconUrl", category?.iconUrl);
+      setValue("isSidebar", category?.isSidebar);
+      setValue("description", category?.description)
     }
   }, [category])
 
@@ -105,6 +105,7 @@ const EditCategorypage = () => {
     loader ? <Loader /> : (
       <Container className="flex justify-center items-center min-h-screen">
         <div className="w-full max-w-lg p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg space-y-6 relative">
+
           {/* Go Back to Categories Page link */}
           <div className="absolute top-4 left-4">
             <Link to="/categories" className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
@@ -116,6 +117,7 @@ const EditCategorypage = () => {
           <h2 className="text-2xl font-bold text-center mt-[10px]">Edit Category</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
             {/* Slug */}
             <div>
               <Label className={`mb-2`} >Slug</Label>
@@ -125,6 +127,7 @@ const EditCategorypage = () => {
               />
               {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
             </div>
+
 
             {/* Image Selection */}
             <div>
@@ -206,6 +209,27 @@ const EditCategorypage = () => {
                 {errors.iconUrl && <p className="text-red-500 text-sm">{errors.iconUrl.message}</p>}
                 {errors.icon && <p className="text-red-500 text-sm">{errors.icon.message}</p>}
               </div>
+            </div>
+
+            {/* Is SideBar CheckBox */}
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="isDesktop" className="text-base">Display on Sidebar?</Label>
+              <input
+                type="checkbox"
+                id="isSidebar"
+                {...register("isSidebar")}
+                className="w-4 h-4 accent-blue-600 cursor-pointer"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <MyEditor
+                value={watch("description")}
+                onChange={(content) => setValue("description", content, { shouldValidate: true, shouldDirty: true })}
+              />
+              {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
             </div>
 
 

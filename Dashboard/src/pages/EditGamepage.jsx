@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGameById, editGame, makeGameNull } from "@/store/Slices/gameSlice";
-import { getAllCategories } from "@/store/Slices/categorySlice";
+import { getAllCategoriesDashboardPopup } from "@/store/Slices/categorySlice";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
@@ -38,20 +38,22 @@ const EditGamepage = () => {
     const [videoType, setVideoType] = useState("url");
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loader, setloader] = useState(true);
+    const [selectedAlphabet, setSelectedAlphabet] = useState("A");
+    const [categorySearch, setCategorySearch] = useState("");
+    const [showCategoryPopup, setShowCategoryPopup] = useState(false);
+
+
+
     const gameData = useSelector((state) => state.game.game);
     const editing = useSelector((state) => state.game.editing);
     const { isDirty } = useFormState({ control });
-    const { categories } = useSelector((state) => state.category);
+    const { categoriespopup } = useSelector((state) => state.category);
 
 
-    // fetch all categories
 
     useEffect(() => {
-        dispatch(getAllCategories());
-    }, [])
-
-
-
+        dispatch(getAllCategoriesDashboardPopup({ alphabetquery: selectedAlphabet, query: categorySearch }));
+    }, [selectedAlphabet, categorySearch])
 
 
 
@@ -174,21 +176,12 @@ const EditGamepage = () => {
                         {/* hidden fields */}
 
                         <input type="hidden" {...register("categories")} />
+
                         {/* Category Selection  */}
                         <div>
-                            <Label>Categories</Label>
-                            <Select onValueChange={handleCategorySelect}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {categories && categories.map((category) => (
-                                        <SelectItem key={category?._id} value={category?.name}>
-                                            {category?.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Button type="button" onClick={() => setShowCategoryPopup(true)}>
+                                Select Categories
+                            </Button>
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {selectedCategories.map((category) => (
                                     <Badge key={category} className="flex items-center gap-1">
@@ -217,8 +210,8 @@ const EditGamepage = () => {
                                             <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {categories.map((category) => (
-                                                <SelectItem key={category?._id} value={category?.name}>{category?.name}</SelectItem>
+                                            {selectedCategories.map((category) => (
+                                                <SelectItem key={category} value={category}>{category}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -413,7 +406,7 @@ const EditGamepage = () => {
 
                         {/* is Desktop Check Box */}
                         <div className="flex items-center space-x-2">
-                            <Label htmlFor="isDesktop" className="text-base">Is Desktop?</Label>
+                            <Label htmlFor="isDesktop" className="text-base">Desktop Only?</Label>
                             <input
                                 type="checkbox"
                                 id="isDesktop"
@@ -448,6 +441,92 @@ const EditGamepage = () => {
                         )}
                     </form>
                 </div>
+
+                {showCategoryPopup && (
+                    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center px-4">
+                        <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-6xl relative max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700">
+
+                            {/* Close Button */}
+                            <button
+                                className="absolute top-4 right-6 text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white text-3xl"
+                                onClick={() => setShowCategoryPopup(false)}
+                            >
+                                ✕
+                            </button>
+
+                            {/* Title */}
+                            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+                                Select Categories
+                            </h2>
+
+                            {/* Search Input */}
+                            <Input
+                                placeholder="Search categories"
+                                value={categorySearch}
+                                onChange={(e) => setCategorySearch(e.target.value)}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 mb-4"
+                            />
+
+                            {/* Alphabet Filter Row */}
+                            <div className="flex flex-wrap gap-1 justify-center md:justify-start mb-6">
+                                {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((char) => (
+                                    <button
+                                        key={char}
+                                        onClick={() => {
+                                            setSelectedAlphabet(char);
+                                            setCategorySearch("");
+                                        }}
+                                        className={`w-9 h-9 flex items-center justify-center rounded-md text-sm font-medium ${selectedAlphabet === char
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                                            }`}
+                                    >
+                                        {char}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Category Grid */}
+                            <div className="overflow-y-auto max-h-[55vh] pr-1">
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    {categoriespopup.map((category) => {
+                                        const isChecked = selectedCategories.includes(category.name);
+                                        return (
+                                            <label
+                                                key={category._id}
+                                                className="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md hover:shadow-sm transition"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={() => {
+                                                        if (isChecked) {
+                                                            removeCategory(category.name);
+                                                        } else {
+                                                            handleCategorySelect(category.name);
+                                                        }
+                                                    }}
+                                                    className="accent-blue-600"
+                                                />
+                                                <span className=" text-sm text-gray-800 dark:text-white">{category.name}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Footer Action */}
+                            <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
+                                <Button
+                                    onClick={() => setShowCategoryPopup(false)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                    Done
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </Container>
         )
     );

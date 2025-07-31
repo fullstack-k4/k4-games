@@ -23,7 +23,7 @@ const initialState = {
 
 export const getAllGames = createAsyncThunk(
     'getAllGames',
-    async ({ page, limit, query, category, userId, userRole }) => {
+    async ({ page, limit, query, category, userId, userRole, filterBy }) => {
         try {
             const url = new URL(`${BASE_URL}/games/getalldashboard`)
             if (page) url.searchParams.set("page", page);
@@ -32,6 +32,7 @@ export const getAllGames = createAsyncThunk(
             if (category) url.searchParams.set("category", category);
             if (userId) url.searchParams.set("userId", userId);
             if (userRole) url.searchParams.set("userRole", userRole);
+            if (filterBy) url.searchParams.set("filterBy", filterBy);
 
             // manually adding sortBy equals to newest 
             url.searchParams.set("sortBy", "newest");
