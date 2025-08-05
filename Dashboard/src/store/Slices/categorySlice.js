@@ -88,7 +88,10 @@ export const createCategory = createAsyncThunk(
 
         formData.append('name', data.name);
         formData.append('slug', data.slug);
-        formData.append('isSidebar', data.isSidebar)
+        formData.append('isSidebar', data.isSidebar);
+        formData.append('gradientColor1', data.gradientColor1);
+        formData.append('gradientColor2', data.gradientColor2);
+
 
         try {
             const response = await axiosInstance.post("category/create", formData);
@@ -150,7 +153,6 @@ export const editCategory = createAsyncThunk(
                 formData.append('iconUrl', data.iconUrl);
             }
 
-
             if (data.description) {
                 formData.append('description', data.description);
             }
@@ -159,6 +161,9 @@ export const editCategory = createAsyncThunk(
             formData.append("imageSource", data.imageSource);
             formData.append("iconSource", data.iconSource);
             formData.append("isSidebar", data.isSidebar);
+
+            formData.append("gradientColor1", data.gradientColor1);
+            formData.append("gradientColor2", data.gradientColor2);
 
             const url = new URL(`${BASE_URL}/category/edit/${categoryId}`);
             const response = await axiosInstance.patch(url, formData);

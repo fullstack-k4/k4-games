@@ -81,7 +81,12 @@ export const CategoryUploader = multer({
 
       const { extension, baseName } = modifyfilename(originalName);
 
-      let folder = file.mimetype === "image/svg+xml" || file.originalname.endsWith(".svg") ? "icon" : "image"
+      const fieldFolderMap = {
+        icon: "icon",
+        image: "image"
+      };
+
+      const folder = fieldFolderMap[file.fieldname]
       const fileName = `gamecategory/${req.uploadUuid}/${folder}/${baseName}${extension}`;
       cb(null, fileName);
     },

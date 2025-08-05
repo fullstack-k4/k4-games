@@ -152,7 +152,7 @@ const CreateCategorypage = () => {
                 ) : (
                   <Input
                     type="file"
-                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml"
                     {...register("image", {
                       required: "Image is required",
                       validate: {
@@ -211,6 +211,32 @@ const CreateCategorypage = () => {
                 {errors.icon && <p className="text-red-500 text-sm">{errors.icon.message}</p>}
               </div>
             </div>
+
+
+            {/* Gradient Color Selection */}
+            <div>
+              <Label className="block mb-2">Gradient Color</Label>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-center">
+                  <span className="text-xs mb-1">Start</span>
+                  <Input
+                    type="color"
+                    className="w-12 h-10 p-1"
+                    {...register("gradientColor1")}
+                  />
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <span className="text-xs mb-1">End</span>
+                  <Input
+                    type="color"
+                    className="w-12 h-10 p-1"
+                    {...register("gradientColor2")}
+                  />
+                </div>
+              </div>
+            </div>
+
 
 
             {/* Is SideBar CheckBox */}

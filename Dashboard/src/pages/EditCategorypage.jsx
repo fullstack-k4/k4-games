@@ -55,6 +55,8 @@ const EditCategorypage = () => {
       setValue("iconUrl", category?.iconUrl);
       setValue("isSidebar", category?.isSidebar);
       setValue("description", category?.description)
+      setValue("gradientColor1", category?.gradientColor1);
+      setValue("gradientColor2", category?.gradientColor2);
     }
   }, [category])
 
@@ -151,7 +153,7 @@ const EditCategorypage = () => {
                 ) : (
                   <Input
                     type="file"
-                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    accept="image/png, image/jpeg, image/jpg, image/webp,image/svg+xml"
                     {...register("image", {
                       required: "Image is required",
                       validate: {
@@ -211,6 +213,30 @@ const EditCategorypage = () => {
               </div>
             </div>
 
+            {/* Gradient Color Selection */}
+            <div>
+              <Label className="block mb-2">Gradient Color</Label>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-center">
+                  <span className="text-xs mb-1">Start</span>
+                  <Input
+                    type="color"
+                    className="w-12 h-10 p-1"
+                    {...register("gradientColor1")}
+                  />
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <span className="text-xs mb-1">End</span>
+                  <Input
+                    type="color"
+                    className="w-12 h-10 p-1"
+                    {...register("gradientColor2")}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Is SideBar CheckBox */}
             <div className="flex items-center space-x-2">
               <Label htmlFor="isDesktop" className="text-base">Display on Sidebar?</Label>
@@ -235,7 +261,7 @@ const EditCategorypage = () => {
 
             {/* Submit Button */}
             {editing ? (
-              <SpecialLoadingButton content={"Uploading"} />
+              <SpecialLoadingButton content={"Editing"} />
             ) : (
               <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty}>
                 Edit Category

@@ -7,7 +7,7 @@ import { deleteFileFromDO } from "../utils/do.js"
 
 
 const createCategory = asyncHandler(async (req, res) => {
-    const { name, slug, isSidebar, description } = req.body;
+    const { name, slug, isSidebar, description, gradientColor1, gradientColor2 } = req.body;
 
     // validating slug
     const slugFound = await Category.findOne({ slug });
@@ -23,8 +23,6 @@ const createCategory = asyncHandler(async (req, res) => {
     let uploadedImageUrl = req.files["image"] ? req.files["image"][0].location : null;
     let iconImageUrl = req.files["icon"] ? req.files["icon"][0].location : null;
 
-
-
     if (uploadedImageUrl) {
         imageUrl = uploadedImageUrl;
         imageSource = "self"
@@ -38,7 +36,7 @@ const createCategory = asyncHandler(async (req, res) => {
     if (!name) {
         throw new ApiError(400, "Please fill in all fields");
     }
-    const category = await Category.create({ name, imageUrl, imageSource, slug, iconUrl, iconSource, isSidebar, description });
+    const category = await Category.create({ name, imageUrl, imageSource, slug, iconUrl, iconSource, isSidebar, description, gradientColor1, gradientColor2 });
     return res.status(201).json(new ApiResponse(201, category, "Category Created Successfully"));
 
 })
@@ -55,8 +53,25 @@ const getAllCategoryWeb = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, categories, "All Categories Fetched Successfully"));
 })
 
+// for websites all categories page
 const getAllCategoriesList = asyncHandler(async (req, res) => {
-    const categories = await Category.find({}).select("-__v -imageSource -iconSource -iconUrl -isSidebar -createdAt -updatedAt");
+
+    const { page = 1, limit = 10 } = req.query;
+
+    const pipeline = [];
+
+    pipeline.push({
+        $match: {}
+    })
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10)
+    }
+
+
+    const categories = await Category.aggregatePaginate(Category.aggregate(pipeline), options);
+
     return res.status(200).json(new ApiResponse(200, categories, "All Categories Fetched Successfully"));
 })
 
@@ -177,7 +192,7 @@ const getById = asyncHandler(async (req, res) => {
 })
 
 const editCategory = asyncHandler(async (req, res) => {
-    const { slug, isSidebar, description } = req.body;
+    const { slug, isSidebar, description, gradientColor1, gradientColor2 } = req.body;
     let imageUrl = req.body.imageUrl || "";
     let imageSource = req.body.imageSource;
     let iconUrl = req.body.iconUrl;
@@ -209,10 +224,14 @@ const editCategory = asyncHandler(async (req, res) => {
         imageUrl = uploadedImageUrl;
         imageSource = "self"
     }
+
+
     if (iconImageUrl) {
         iconUrl = iconImageUrl;
         iconSource = "self"
     }
+
+
     category.slug = slug;
     category.imageUrl = imageUrl;
     category.imageSource = imageSource;
@@ -220,6 +239,8 @@ const editCategory = asyncHandler(async (req, res) => {
     category.iconSource = iconSource;
     category.isSidebar = isSidebar;
     category.description = description;
+    category.gradientColor1 = gradientColor1;
+    category.gradientColor2 = gradientColor2;
 
     await category.save();
 

@@ -31,11 +31,11 @@ const Loginpage = () => {
     const response = await dispatch(userLogin(data));
     const user = await dispatch(getCurrentUser());
 
-    if (response?.type ==="login/fulfilled" ) {
-      if(user.payload.role==="admin"){
+    if (response?.type === "login/fulfilled") {
+      if (user.payload.role === "admin") {
         navigate("/")
       }
-      else{
+      else {
         navigate("/games");
       }
     }

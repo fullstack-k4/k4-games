@@ -36,6 +36,12 @@ const categorySchema = Schema({
     isSidebar: {
         type: Boolean,
         default: false
+    },
+    gradientColor1: {
+        type: String,
+    },
+    gradientColor2: {
+        type: String
     }
 }, { timestamps: true })
 
