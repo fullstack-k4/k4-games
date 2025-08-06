@@ -35,6 +35,7 @@ export const getAllCategoriesDashboard = createAsyncThunk(
             if (query) url.searchParams.set("query", query);
             if (filterBy) url.searchParams.set("filterBy", filterBy);
 
+
             const response = await axiosInstance.get(url);
             return response.data.data;
         } catch (error) {
@@ -86,11 +87,14 @@ export const createCategory = createAsyncThunk(
             formData.append('description', data.description);
         }
 
+
+
         formData.append('name', data.name);
         formData.append('slug', data.slug);
         formData.append('isSidebar', data.isSidebar);
         formData.append('gradientColor1', data.gradientColor1);
         formData.append('gradientColor2', data.gradientColor2);
+        formData.append('order', data.order);
 
 
         try {
@@ -161,6 +165,7 @@ export const editCategory = createAsyncThunk(
             formData.append("imageSource", data.imageSource);
             formData.append("iconSource", data.iconSource);
             formData.append("isSidebar", data.isSidebar);
+            formData.append("order", data.order);
 
             formData.append("gradientColor1", data.gradientColor1);
             formData.append("gradientColor2", data.gradientColor2);

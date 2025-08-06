@@ -7,7 +7,7 @@ import { deleteFileFromDO } from "../utils/do.js"
 
 
 const createCategory = asyncHandler(async (req, res) => {
-    const { name, slug, isSidebar, description, gradientColor1, gradientColor2 } = req.body;
+    const { name, slug, isSidebar, description, gradientColor1, gradientColor2, order } = req.body;
 
     // validating slug
     const slugFound = await Category.findOne({ slug });
@@ -36,7 +36,7 @@ const createCategory = asyncHandler(async (req, res) => {
     if (!name) {
         throw new ApiError(400, "Please fill in all fields");
     }
-    const category = await Category.create({ name, imageUrl, imageSource, slug, iconUrl, iconSource, isSidebar, description, gradientColor1, gradientColor2 });
+    const category = await Category.create({ name, imageUrl, imageSource, slug, iconUrl, iconSource, isSidebar, description, gradientColor1, gradientColor2, order });
     return res.status(201).json(new ApiResponse(201, category, "Category Created Successfully"));
 
 })
@@ -49,7 +49,7 @@ const getAllCategory = asyncHandler(async (req, res) => {
 
 // For Sidebar in website
 const getAllCategoryWeb = asyncHandler(async (req, res) => {
-    const categories = await Category.find({ isSidebar: true }).select("-__v -imageSource -iconSource");
+    const categories = await Category.find({ isSidebar: true }).select("-__v -imageSource -iconSource").sort({ order: 1, name: 1 });
     return res.status(200).json(new ApiResponse(200, categories, "All Categories Fetched Successfully"));
 })
 
@@ -63,6 +63,11 @@ const getAllCategoriesList = asyncHandler(async (req, res) => {
     pipeline.push({
         $match: {}
     })
+
+    // sort by order and then name
+    pipeline.push({
+        $sort: { order: 1, name: 1 }
+    });
 
     const options = {
         page: parseInt(page, 10),
@@ -106,7 +111,7 @@ const getAllCategoryDashboard = asyncHandler(async (req, res) => {
     }
 
 
-    pipeline.push({ $sort: { createdAt: -1 } })
+    pipeline.push({ $sort: { createdAt: -1, _id: -1 } })
 
     const options = {
         page: parseInt(page, 10),
@@ -197,6 +202,8 @@ const editCategory = asyncHandler(async (req, res) => {
     let imageSource = req.body.imageSource;
     let iconUrl = req.body.iconUrl;
     let iconSource = req.body.iconSource;
+    let order = req.body.order
+
     const category = req.category;
 
     const slugFound = await Category.findOne({ slug, _id: { $ne: category._id } });
@@ -241,6 +248,7 @@ const editCategory = asyncHandler(async (req, res) => {
     category.description = description;
     category.gradientColor1 = gradientColor1;
     category.gradientColor2 = gradientColor2;
+    category.order = order;
 
     await category.save();
 

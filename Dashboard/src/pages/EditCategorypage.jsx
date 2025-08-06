@@ -57,6 +57,7 @@ const EditCategorypage = () => {
       setValue("description", category?.description)
       setValue("gradientColor1", category?.gradientColor1);
       setValue("gradientColor2", category?.gradientColor2);
+      setValue("order", category?.order);
     }
   }, [category])
 
@@ -100,6 +101,7 @@ const EditCategorypage = () => {
     }
 
   }, [iconType, unregister, setValue]);
+
 
 
 
@@ -246,6 +248,24 @@ const EditCategorypage = () => {
                 {...register("isSidebar")}
                 className="w-4 h-4 accent-blue-600 cursor-pointer"
               />
+            </div>
+
+            {/* Order */}
+            <div>
+              <Label>Order</Label>
+              <Input
+                type="number"
+                {...register("order", {
+                  required: "Order is required",
+                  valueAsNumber: true,
+                  min: {
+                    value: 0,
+                    message: "Order must be 0 or higher",
+                  },
+                })}
+                placeholder="Enter display order"
+              />
+              {errors.order && <p className="text-red-500 text-sm">{errors.order.message}</p>}
             </div>
 
             {/* Description */}

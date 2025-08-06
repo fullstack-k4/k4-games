@@ -42,6 +42,10 @@ const categorySchema = Schema({
     },
     gradientColor2: {
         type: String
+    },
+    order: {
+        type: Number,
+        required: [true, "Order is required"]
     }
 }, { timestamps: true })
 

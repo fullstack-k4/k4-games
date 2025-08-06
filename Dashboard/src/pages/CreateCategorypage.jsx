@@ -93,6 +93,9 @@ const CreateCategorypage = () => {
     }
   }, [iconType, unregister, setValue]);
 
+
+
+
   return (
     loader ? <Loader /> : (
       <Container className="flex justify-center items-center min-h-screen">
@@ -128,6 +131,10 @@ const CreateCategorypage = () => {
               />
               {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
             </div>
+
+
+
+
 
 
             {/* Image Selection */}
@@ -248,6 +255,25 @@ const CreateCategorypage = () => {
                 {...register("isSidebar")}
                 className="w-4 h-4 accent-blue-600 cursor-pointer"
               />
+            </div>
+
+
+            {/* Order */}
+            <div>
+              <Label>Order</Label>
+              <Input
+                type="number"
+                {...register("order", {
+                  required: "Order is required",
+                  valueAsNumber: true,
+                  min: {
+                    value: 0,
+                    message: "Order must be 0 or higher",
+                  },
+                })}
+                placeholder="Enter display order"
+              />
+              {errors.order && <p className="text-red-500 text-sm">{errors.order.message}</p>}
             </div>
 
 

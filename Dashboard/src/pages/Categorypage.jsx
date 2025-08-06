@@ -172,6 +172,7 @@ const Categorypage = () => {
                             <tr>
                                 <th className="p-4 text-left text-md font-semibold">#</th>
                                 <th className="p-4 text-left text-md font-semibold">Name</th>
+                                <th className="p-4 text-left text-md font-semibold">Order</th>
                                 <th className="p-4 text-left text-md font-semibold">Image</th>
                                 <th className="p-4 text-left text-md font-semibold">Icon</th>
                                 <th className="p-4 text-left text-md font-semibold">Actions</th>
@@ -192,6 +193,11 @@ const Categorypage = () => {
                                         {/* Category Name */}
                                         <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
                                             {category?.name}
+                                        </td>
+
+                                        {/* Order */}
+                                        <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                                            {category?.order}
                                         </td>
 
 
@@ -263,7 +269,6 @@ const Categorypage = () => {
                                     ? "bg-blue-600 text-white"
                                     : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
                                     }`}
-                                whileHover={{ scale: 1.1 }}
                             >
                                 {page}
                             </button>
