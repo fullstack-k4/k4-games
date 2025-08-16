@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useForm, useFormState, Controller } from "react-hook-form";
+import { useEffect, useState, useCallback } from "react";
+import { useForm, useFormState, Controller, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     Select,
@@ -13,12 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGameById, editGame, makeGameNull } from "@/store/Slices/gameSlice";
 import { getAllCategoriesDashboardPopup } from "@/store/Slices/categorySlice";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import axios from "axios";
 
 
 const EditGamepage = () => {
@@ -37,6 +37,8 @@ const EditGamepage = () => {
     const [gameType, setGameType] = useState("url");
     const [videoType, setVideoType] = useState("url");
     const [selectedCategories, setSelectedCategories] = useState([]);
+    const [slugAvailable, setSlugAvailable] = useState(true);
+    const [checkingSlug, setCheckingSlug] = useState(false);
     const [loader, setloader] = useState(true);
     const [selectedAlphabet, setSelectedAlphabet] = useState("A");
     const [categorySearch, setCategorySearch] = useState("");
@@ -44,10 +46,12 @@ const EditGamepage = () => {
 
 
 
+
     const gameData = useSelector((state) => state.game.game);
     const editing = useSelector((state) => state.game.editing);
     const { isDirty } = useFormState({ control });
     const { categoriespopup } = useSelector((state) => state.category);
+    const slug = useWatch({ name: "slug", control });
 
 
 
@@ -88,6 +92,8 @@ const EditGamepage = () => {
             setValue("gamePlayVideo", gameData.gamePlayVideo);
             setValue("videoUrl", gameData?.backgroundVideoUrl);
             setValue("isDesktop", gameData?.isDesktop);
+            setValue("isAppOnly", gameData?.isAppOnly);
+            setValue("isPremium", gameData?.isPremium);
         }
     }, [gameData, setValue]);
 
@@ -116,6 +122,39 @@ const EditGamepage = () => {
         }
 
     };
+
+
+    const checkSlugAvailability = useCallback(
+        async (slug) => {
+            try {
+                setCheckingSlug(true);
+                const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/games/checkslug?slug=${slug}&gameId=${gameId}`);
+                if (res.data?.statusCode === 200 && res.data?.data) {
+                    setSlugAvailable(false) //slug exists
+                } else {
+                    setSlugAvailable(true) //slug does not exist
+                }
+            } catch (error) {
+                setSlugAvailable(true);
+            } finally {
+                setCheckingSlug(false);
+            }
+        },
+        []
+    )
+
+    useEffect(() => {
+        if (!slug) return;
+
+        const delayDebounce = setTimeout(() => {
+            checkSlugAvailability(slug);
+        }, 600);
+
+        return () => clearTimeout(delayDebounce);
+    }, [slug, checkSlugAvailability]);
+
+
+
 
     return (
         loader ? <Loader /> : (
@@ -155,7 +194,12 @@ const EditGamepage = () => {
                                 {...register("slug", { required: "Slug is required" })}
                                 placeholder="Enter slug"
                             />
-                            {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+                            {!checkingSlug && slug && slugAvailable && (
+                                <p className="text-green-600 text-sm">✅ Slug is available</p>
+                            )}
+                            {!checkingSlug && slug && !slugAvailable && (
+                                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+                            )}
                         </div>
 
 
@@ -415,8 +459,32 @@ const EditGamepage = () => {
                             />
                         </div>
 
-                        {/* Game Play Video */}
+                        {/* is App Only Check Box */}
 
+                        <div className="flex items-center space-x-2">
+                            <Label htmlFor="isAppOnly" className="text-base">App Only?</Label>
+                            <input
+                                type="checkbox"
+                                id="isAppOnly"
+                                {...register("isAppOnly")}
+                                className="w-4 h-4 accent-blue-600 cursor-pointer"
+                            />
+                        </div>
+
+                        {/* is Premium Check Box */}
+                        <div className="flex items-center space-x-2">
+                            <Label htmlFor="isPremium" className="text-base">Premium?</Label>
+                            <input
+                                type="checkbox"
+                                id="isPremium"
+                                {...register("isPremium")}
+                                className="w-4 h-4 accent-blue-600 cursor-pointer"
+                            />
+                        </div>
+
+
+
+                        {/* Game Play Video */}
                         <div>
                             <Label>Game Play Video</Label>
                             <Input
@@ -435,7 +503,7 @@ const EditGamepage = () => {
                         </div>
 
                         {editing ? (<SpecialLoadingButton content={"Editing"} />) : (
-                            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty}>
+                            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty || !slugAvailable}>
                                 Update Game
                             </Button>
                         )}

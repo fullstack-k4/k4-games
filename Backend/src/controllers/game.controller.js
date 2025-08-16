@@ -11,14 +11,9 @@ import { Vote } from "../models/vote.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium } = req.body;
 
-    // validating slug
-    const slugFound = await Game.findOne({ slug });
 
-    if (slugFound) {
-        throw new ApiError(400, "Slug Already Exists");
-    }
 
     let gameUrl = req.body.gameUrl || "";
     let imageUrl = req.body.imageUrl || "";
@@ -92,7 +87,9 @@ const uploadGame = asyncHandler(async (req, res) => {
         gamePlayVideo,
         backgroundVideoUrl,
         backgroundVideoSource,
-        isDesktop
+        isDesktop,
+        isAppOnly,
+        isPremium
     };
 
     if (downloadable) {
@@ -136,7 +133,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop } = req.body;
+    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -154,14 +151,9 @@ const editGame = asyncHandler(async (req, res) => {
 
     let game = req.game;
 
-    // validating slug
-    const slugFound = await Game.findOne({ slug: slug, _id: { $ne: game._id } });
 
-    if (slugFound) {
-        throw new ApiError(400, "Slug Already Exists");
-    }
-
-    const downloadable = game.downloadable;
+    let downloadable = game?.downloadable;
+    let gameZipUrl = game?.gameZipUrl;
 
     const previousGameUrl = game.gameUrl;
     const previousImageUrl = game.imageUrl;
@@ -173,9 +165,6 @@ const editGame = asyncHandler(async (req, res) => {
     const previousPrimaryCategory = game?.primaryCategory;
 
 
-    let thumbnailSource = game.thumbnailSource;
-    let gameSource = game.gameSource;
-    let backgroundVideoSource = game?.backgroundVideoSource;
 
 
     let extractedFiles = [];
@@ -190,34 +179,68 @@ const editGame = asyncHandler(async (req, res) => {
         const indexHtmlFileLink = extractedFiles.filter((file) => file.fileName === "index.html");
         let gameLink = indexHtmlFileLink[0].url;
         gameUrl = gameLink.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com`, `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com`);
-        gameSource = "self";
 
         //Delete previous game folder
-        await deleteFolderFromS3(previousGameUrl);
+        if (game.gameSource === "self") {
+            await deleteFolderFromS3(previousGameUrl);
+        }
+
         // Delete previous game zip
         if (game?.gameZipUrl) {
             await deleteFileFromDO(game.gameZipUrl);
         }
     }
 
+    if (!gameUrl.includes("digitalocean") && previousGameUrl.includes("digitalocean") && !uploadedGameUrl) {
+        // which means game is edited via link and previous game was uploaded on cloud
+        // delete previous game from cloud
+
+        // Delete previous  game folder
+        await deleteFolderFromS3(previousGameUrl);
+
+        // Delete previous game zip 
+
+        if (game?.gameZipUrl) {
+            await deleteFileFromDO(game.gameZipUrl);
+        }
+        // delete gameData.json
+
+        if (game?.gameDataUrl) {
+            let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
+            await deleteFileFromDOS3key(gameDataS3Key);
+        }
+
+        // reset these fields
+        downloadable = false;
+        gameZipUrl = null;
+    }
+
+
+
+
     let uploadedImageUrl = req.files["image"] ? req.files["image"][0].location : null;
 
     if (uploadedImageUrl) {
         imageUrl = uploadedImageUrl;
-        thumbnailSource = "self";
 
         // Delete previous image
-
         if (game.thumbnailSource === "self") {
             await deleteFileFromDO(previousImageUrl);
         }
+
+    }
+
+    if (!imageUrl.includes("digitalocean") && previousImageUrl.includes("digitalocean") && !uploadedImageUrl) {
+        // which means image is edited via link and previous image was uploaded on cloud
+        // delete previous image from cloud
+        await deleteFileFromDO(previousImageUrl);
+
     }
 
     let uploadedVideoUrl = req.files["video"] ? req.files["video"][0].location : null;
 
     if (uploadedVideoUrl) {
         backgroundVideoUrl = uploadedVideoUrl;
-        backgroundVideoSource = "self";
 
         // Delete previous video
 
@@ -226,6 +249,14 @@ const editGame = asyncHandler(async (req, res) => {
         }
 
     }
+
+    if (!backgroundVideoUrl.includes("digitalocean") && previousBackgroundVideoUrl.includes("digitalocean") && !uploadedVideoUrl) {
+        // which means background video is edited via link and previous image was uploaded on cloud
+        // delete previous video from cloud
+        await deleteFileFromDO(previousBackgroundVideoUrl);
+    }
+
+
 
     let gameDataUrl;
 
@@ -275,20 +306,42 @@ const editGame = asyncHandler(async (req, res) => {
     game.splashColor = splashColor;
     game.imageUrl = imageUrl;
     game.gameUrl = gameUrl;
-    game.thumbnailSource = thumbnailSource;
-    game.gameSource = gameSource;
+
+    if (imageUrl.includes("digitalocean")) {
+        game.thumbnailSource = "self"
+    }
+    else {
+        game.thumbnailSource = "link"
+    }
+
+    if (gameUrl.includes("digitalocean")) {
+        game.gameSource = "self"
+    }
+    else {
+        game.gameSource = "link"
+    }
+
     if (downloadable && uploadedGameUrl) {
         game.gameZipUrl = uploadedGameUrl;
     }
     game.backgroundVideoUrl = backgroundVideoUrl;
-    game.backgroundVideoSource = backgroundVideoSource;
+    if (backgroundVideoUrl.includes("digitalocean")) {
+        game.backgroundVideoSource = "self"
+    }
+    else {
+        game.backgroundVideoSource = "link"
+    }
     game.isrotate = isrotate;
     game.slug = slug
     game.primaryCategory = primaryCategory
     game.instruction = instruction
     game.gamePlayVideo = gamePlayVideo
     game.isDesktop = isDesktop
-    game.gameDataUrl = gameDataUrl;
+    game.isAppOnly = isAppOnly
+    game.isPremium = isPremium
+    game.gameDataUrl = gameDataUrl
+    game.downloadable = downloadable
+    game.gameZipUrl = gameZipUrl
 
 
     await game.save();
@@ -715,6 +768,7 @@ const deleteGame = asyncHandler(async (req, res) => {
         await deleteFileFromDOS3key(gameDataS3Key);
     }
 
+
     return res.status(200).json(new ApiResponse(200, game, "Game Deleted Succesfully"));
 })
 
@@ -979,6 +1033,30 @@ const updateLoadingState = asyncHandler(async (req, res) => {
 })
 
 
+// CHECK SLUG AVAILABILITY
+const checkSlugAvailability = asyncHandler(async (req, res) => {
+    const { slug, gameId } = req.query;
+
+    if (!slug) {
+        return res.status.json({
+            status: 400,
+            message: "Slug is required"
+        })
+    }
+
+    const slugFound = await Game.findOne({ slug });
+
+    // If Slug is found and does not belong to the current game
+
+    if (slugFound && slugFound._id.toString() !== gameId) {
+        return res.status(200).json(new ApiResponse(200, true, "Slug already exists"));
+    }
+
+    // Slug is either not found or belongs to the same category
+    return res.status(200).json(new ApiResponse(200, false, "Slug is available"));
+})
+
+
 export {
     uploadGame, getAllGame, getGameById,
     deleteGame, editGame, incrementTopTenCount,
@@ -987,5 +1065,5 @@ export {
     getFeaturedGames, allowRecommended, denyRecommended,
     getRecommendedGames, getGameBySlug, getAllGameWeb,
     getPopularGames, getFeaturedGamesWeb, getRecommendedGamesWeb,
-    getAllGameDashboard, getTop10GamesWeb
+    getAllGameDashboard, getTop10GamesWeb, checkSlugAvailability
 };

@@ -1,22 +1,22 @@
-import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createCategory } from "@/store/Slices/categorySlice";
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { generateSlug } from "@/utils/generateSlug";
+import axios from "axios";
 
 
 
 const CreateCategorypage = () => {
-  const { register, handleSubmit, setValue, reset, formState: { errors }, unregister, watch } = useForm();
+  const { register, handleSubmit, setValue, reset, formState: { errors }, unregister, watch, control } = useForm();
   const [loader, setloader] = useState(true);
   const dispatch = useDispatch();
   const adding = useSelector((state) => state.category.adding);
@@ -24,10 +24,13 @@ const CreateCategorypage = () => {
 
   const [selectedimageType, setSelectedimageType] = useState("url");
   const [selectediconType, setSelectediconType] = useState("url");
+  const [slugAvailable, setSlugAvailable] = useState(true);
+  const [checkingSlug, setCheckingSlug] = useState(false);
 
   const imageType = watch("imageType", "url"); // Watch the selected image type
   const iconType = watch("iconType", "url"); // Watch the selected icon type
-  const name = watch("name") //wath the name field
+  const name = useWatch({ name: "name", control });
+  const slug = useWatch({ name: "slug", control });
 
 
   // Update slug whenever the name changes
@@ -95,6 +98,38 @@ const CreateCategorypage = () => {
 
 
 
+  const checkSlugAvailability = useCallback(
+    async (slug) => {
+      try {
+        setCheckingSlug(true);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/category/checkslug?slug=${slug}`);
+        if (res.data?.statusCode === 200 && res.data?.data) {
+          setSlugAvailable(false); // slug exists
+        } else {
+          setSlugAvailable(true); // slug does not exist
+        }
+      } catch (error) {
+        setSlugAvailable(true);
+      } finally {
+        setCheckingSlug(false);
+      }
+    },
+    []
+  );
+
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const delayDebounce = setTimeout(() => {
+      checkSlugAvailability(slug);
+    }, 600);
+
+    return () => clearTimeout(delayDebounce);
+  }, [slug, checkSlugAvailability]);
+
+
+
 
   return (
     loader ? <Loader /> : (
@@ -126,15 +161,18 @@ const CreateCategorypage = () => {
             <div>
               <Label>Slug</Label>
               <Input
-                {...register("slug", { required: "Slug is required" })}
+                {...register("slug", {
+                  required: "Slug is required",
+                })}
                 placeholder="Enter slug"
               />
-              {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+              {!checkingSlug && slug && slugAvailable && (
+                <p className="text-green-600 text-sm">✅ Slug is available</p>
+              )}
+              {!checkingSlug && slug && !slugAvailable && (
+                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+              )}
             </div>
-
-
-
-
 
 
             {/* Image Selection */}
@@ -294,7 +332,7 @@ const CreateCategorypage = () => {
             {adding ? (
               <SpecialLoadingButton content={"Uploading"} />
             ) : (
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!slugAvailable || checkingSlug}>
                 Create Category
               </Button>
             )}

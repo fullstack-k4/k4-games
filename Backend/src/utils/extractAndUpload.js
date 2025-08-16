@@ -3,6 +3,7 @@ import unzipper from "unzipper";
 import fs from "fs";
 import axios from "axios";
 import { uploadFileToS3 } from "./do.js";
+import { deleteFileFromDOS3key } from "./do.js";
 
 // 📥 Function to Download ZIP File
 const downloadFile = async (url, destPath) => {
@@ -56,10 +57,15 @@ export const extractAndUpload = async (zipFileUrl, uploadUuid, originalFileName)
 
   // ✅ Upload entire folder structure to S3
   const s3BaseKey = `files/${uploadUuid}/${originalFileName}`;
+
   const uploadedFiles = await uploadFolderToS3(tempDir, s3BaseKey);
 
   // 🧹 Cleanup
   await fs.promises.rm(tempDir, { recursive: true, force: true });
+
+  const gameZipFiles3Key = `files/${uploadUuid}/${originalFileName}/game.zip`;
+
+  await deleteFileFromDOS3key(gameZipFiles3Key);
 
   return uploadedFiles;
 };

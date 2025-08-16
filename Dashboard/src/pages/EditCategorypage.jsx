@@ -1,17 +1,16 @@
-import { useForm, useFormState } from "react-hook-form";
-import { useState } from "react";
+import { useForm, useFormState, useWatch } from "react-hook-form";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { editCategory, getCategoryById, makeCategoryNull } from "@/store/Slices/categorySlice";
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import axios from "axios";
 
 
 
@@ -24,9 +23,12 @@ const EditCategorypage = () => {
   const { editing, category } = useSelector((state) => state.category);
   const [selectedimageType, setSelectedimageType] = useState("url");
   const [selectediconType, setSelectediconType] = useState("url");
+  const [slugAvailable, setSlugAvailable] = useState(true);
+  const [checkingSlug, setCheckingSlug] = useState(false);
   const imageType = watch("imageType", "url"); // Watch the selected image type
   const iconType = watch("iconType", "url"); //Watch the selected icon type
   const { isDirty } = useFormState({ control });
+  const slug = useWatch({ name: "slug", control });
 
 
   // fetch image
@@ -63,16 +65,6 @@ const EditCategorypage = () => {
 
 
   const onSubmit = async (data) => {
-
-    if (data.image) {
-      const file = data.image[0];
-      if (file && file.size > 1 * 1024 * 1024) {
-        toast.error("Image must be less than 1MB");
-        return;
-      }
-    }
-    data.imageSource = category.imageSource;
-    data.iconSource = category.iconSource;
     const response = await dispatch(editCategory({ categoryId: id, data }));
     if (response.meta.requestStatus === "fulfilled") {
       navigate("/categories");
@@ -103,6 +95,36 @@ const EditCategorypage = () => {
   }, [iconType, unregister, setValue]);
 
 
+  const checkSlugAvailability = useCallback(
+    async (slug) => {
+      try {
+        setCheckingSlug(true);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/category/checkslug?slug=${slug}&categoryId=${id}`);
+        if (res.data?.statusCode === 200 && res.data?.data) {
+          setSlugAvailable(false); // slug exists
+        } else {
+          setSlugAvailable(true); // slug does not exist
+        }
+      } catch (error) {
+        setSlugAvailable(true);
+      } finally {
+        setCheckingSlug(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const delayDebounce = setTimeout(() => {
+      checkSlugAvailability(slug);
+    }, 600);
+
+    return () => clearTimeout(delayDebounce);
+  }, [slug, checkSlugAvailability]);
+
+
 
 
   return (
@@ -126,10 +148,17 @@ const EditCategorypage = () => {
             <div>
               <Label className={`mb-2`} >Slug</Label>
               <Input
-                {...register("slug", { required: "Slug is required" })}
+                {...register("slug", {
+                  required: "Slug is required",
+                })}
                 placeholder="Enter slug"
               />
-              {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+              {!checkingSlug && slug && slugAvailable && (
+                <p className="text-green-600 text-sm">✅ Slug is available</p>
+              )}
+              {!checkingSlug && slug && !slugAvailable && (
+                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+              )}
             </div>
 
 
@@ -283,7 +312,7 @@ const EditCategorypage = () => {
             {editing ? (
               <SpecialLoadingButton content={"Editing"} />
             ) : (
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty}>
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty || !slugAvailable}>
                 Edit Category
               </Button>
             )}

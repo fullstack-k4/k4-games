@@ -108,6 +108,8 @@ export const editGame = createAsyncThunk(
             formData.append("instruction", data.instruction);
             formData.append("gamePlayVideo", data.gamePlayVideo);
             formData.append("isDesktop", data.isDesktop);
+            formData.append("isAppOnly", data.isAppOnly);
+            formData.append("isPremium", data.isPremium);
 
             if (data.image) {
                 formData.append("image", data.image[0]);
@@ -179,8 +181,10 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("slug", data.slug);
     formData.append("primaryCategory", data.primaryCategory);
     formData.append("instruction", data.instruction);
-    formData.append("gamePlayVideo", data.gamePlayVideo);
+    formData.append("gamePlayVideo", data.gamePlayVideo); ``
     formData.append("isDesktop", data.isDesktop);
+    formData.append("isAppOnly", data.isAppOnly);
+    formData.append("isPremium", data.isPremium);
 
 
     try {

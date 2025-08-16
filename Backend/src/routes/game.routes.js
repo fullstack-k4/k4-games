@@ -9,7 +9,7 @@ import {
     denyFeatured, getRecommendedGames, allowRecommended,
     denyRecommended, getGameBySlug, getAllGameWeb,
     getPopularGames, getFeaturedGamesWeb, getRecommendedGamesWeb, getAllGameDashboard,
-    getTop10GamesWeb
+    getTop10GamesWeb, checkSlugAvailability
 } from "../controllers/game.controller.js";
 import { gameImageUploader, gameUploader, featuredImageVideoUploader, recommendedImageUploader } from "../middlewares/multer.middleware.js";
 import { extractUniqueId } from "../middlewares/extractUniqueId.js";
@@ -39,6 +39,7 @@ router.route("/denyfeatured/:gameId").patch(verifyJWT, denyFeatured);
 router.route("/allowrecommended/:gameId").patch(verifyJWT, extractUniqueId, recommendedImageUploader, allowRecommended);
 router.route("/denyrecommended/:gameId").patch(verifyJWT, denyRecommended);
 router.route("/getpopulargames").get(checkApiKey, getPopularGames);
+router.route("/checkslug").get(checkSlugAvailability);
 
 
 

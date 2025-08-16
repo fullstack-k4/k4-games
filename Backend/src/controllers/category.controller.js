@@ -9,12 +9,6 @@ import { deleteFileFromDO } from "../utils/do.js"
 const createCategory = asyncHandler(async (req, res) => {
     const { name, slug, isSidebar, description, gradientColor1, gradientColor2, order } = req.body;
 
-    // validating slug
-    const slugFound = await Category.findOne({ slug });
-
-    if (slugFound) {
-        throw new ApiError(400, "Slug Already Exists");
-    }
     let imageUrl = req.body.imageUrl || "";
     let iconUrl = req.body.iconUrl || "";
     let imageSource;
@@ -199,20 +193,13 @@ const getById = asyncHandler(async (req, res) => {
 const editCategory = asyncHandler(async (req, res) => {
     const { slug, isSidebar, description, gradientColor1, gradientColor2 } = req.body;
     let imageUrl = req.body.imageUrl || "";
-    let imageSource = req.body.imageSource;
     let iconUrl = req.body.iconUrl;
-    let iconSource = req.body.iconSource;
     let order = req.body.order
 
     const category = req.category;
 
-    const slugFound = await Category.findOne({ slug, _id: { $ne: category._id } });
-    if (slugFound) {
-        throw new ApiError(400, "Slug Already Exists");
-    }
-
     let uploadedImageUrl = req.files["image"] ? req.files["image"][0].location : null;
-    let iconImageUrl = req.files["icon"] ? req.files["icon"][0].location : null;
+    let uploadediconImageUrl = req.files["icon"] ? req.files["icon"][0].location : null;
 
 
     if (uploadedImageUrl && category.imageSource === "self") {
@@ -221,7 +208,7 @@ const editCategory = asyncHandler(async (req, res) => {
         await deleteFileFromDO(categoryimageUrl);
     }
 
-    if (iconImageUrl && category.iconSource === "self") {
+    if (uploadediconImageUrl && category.iconSource === "self") {
         // delete previously uploaded category icon
         let iconimageUrl = category?.iconUrl;
         await deleteFileFromDO(iconimageUrl);
@@ -229,32 +216,86 @@ const editCategory = asyncHandler(async (req, res) => {
 
     if (uploadedImageUrl) {
         imageUrl = uploadedImageUrl;
-        imageSource = "self"
     }
 
 
-    if (iconImageUrl) {
-        iconUrl = iconImageUrl;
-        iconSource = "self"
+    if (uploadediconImageUrl) {
+        iconUrl = uploadediconImageUrl;
     }
+
+    if (!imageUrl.includes("digitalocean") && category.imageUrl.includes("digitalocean") && !uploadedImageUrl) {
+        // which means image is edited via url and previous image was uploaded on digital ocean
+        // delete previous image
+
+        await deleteFileFromDO(category.imageUrl);
+    }
+
+    if (!iconUrl.includes("digitalocean") && category.iconUrl.includes("digitalocean") && !uploadediconImageUrl) {
+        // which means icon is edited via url and previous icon was uploaded on digital ocean
+        // delete previous icon
+
+        await deleteFileFromDO(category.iconUrl);
+    }
+
+
+
 
 
     category.slug = slug;
     category.imageUrl = imageUrl;
-    category.imageSource = imageSource;
     category.iconUrl = iconUrl;
-    category.iconSource = iconSource;
     category.isSidebar = isSidebar;
     category.description = description;
     category.gradientColor1 = gradientColor1;
     category.gradientColor2 = gradientColor2;
     category.order = order;
 
+    if (imageUrl.includes("digitalocean")) {
+        category.imageSource = "self"
+    }
+    else {
+        category.imageSource = "link"
+    }
+
+    if (iconUrl.includes("digitalocean")) {
+        category.iconSource = "self"
+    }
+    else {
+        category.iconSource = "link"
+    }
+
     await category.save();
 
     return res.status(200).json(new ApiResponse(200, category, "Category Updated Successfully"));
 })
 
+const checkSlugAvailability = asyncHandler(async (req, res) => {
+    const { slug, categoryId } = req.query;
+
+    if (!slug) {
+        return res.status.json({
+            status: 400,
+            message: "Slug is required"
+        })
+    }
+
+    const slugFound = await Category.findOne({ slug });
+
+    // If Slug is found and does not belong to the current category
+
+    if (slugFound && slugFound._id.toString() !== categoryId) {
+        return res.status(200).json(new ApiResponse(200, true, "Slug already exists"));
+    }
+
+    // Slug is either not found or belongs to the same category
+    return res.status(200).json(new ApiResponse(200, false, "Slug is available"));
+})
 
 
-export { createCategory, getAllCategory, deleteCategory, getById, editCategory, getAllCategoryDashboard, getAllCategoriesDashboardPopup, getAllCategoryWeb, getAllCategoriesList };
+
+export {
+    createCategory, getAllCategory, deleteCategory,
+    getById, editCategory, getAllCategoryDashboard,
+    getAllCategoriesDashboardPopup, getAllCategoryWeb,
+    getAllCategoriesList, checkSlugAvailability
+};

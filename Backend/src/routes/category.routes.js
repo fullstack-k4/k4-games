@@ -3,7 +3,7 @@ import { verifyJWT, verifyAdmin, checkApiKey } from "../middlewares/auth.middlew
 import {
     createCategory, getAllCategory, deleteCategory, getById, editCategory,
     getAllCategoryDashboard, getAllCategoriesDashboardPopup, getAllCategoryWeb,
-    getAllCategoriesList
+    getAllCategoriesList, checkSlugAvailability
 } from "../controllers/category.controller.js";
 import { categoryImageUploader } from "../middlewares/multer.middleware.js";
 import { extractCategoryUniqueId } from "../middlewares/extractUniqueId.js";
@@ -19,6 +19,7 @@ router.route("/getalldashboardpopup").get(checkApiKey, getAllCategoriesDashboard
 router.route("/delete/:id").delete(verifyJWT, verifyAdmin, deleteCategory);
 router.route("/get/:id").get(getById);
 router.route("/edit/:categoryId").patch(verifyJWT, verifyAdmin, extractCategoryUniqueId, categoryImageUploader, editCategory)
+router.route("/checkslug").get(checkSlugAvailability);
 
 
 

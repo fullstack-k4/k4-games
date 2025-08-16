@@ -162,8 +162,6 @@ export const editCategory = createAsyncThunk(
             }
 
             formData.append("slug", data.slug);
-            formData.append("imageSource", data.imageSource);
-            formData.append("iconSource", data.iconSource);
             formData.append("isSidebar", data.isSidebar);
             formData.append("order", data.order);
 

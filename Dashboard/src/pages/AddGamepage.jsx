@@ -1,27 +1,25 @@
-import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAllCategoriesDashboardPopup } from "@/store/Slices/categorySlice";
 import { uploadGame } from "@/store/Slices/gameSlice";
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, X } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import { generateSlug } from "@/utils/generateSlug";
 import { toast } from "sonner";
+import axios from "axios";
 
 
 
 
 const AddGamepage = () => {
-  const { register, handleSubmit, setValue, formState: { errors }, clearErrors, unregister, watch } = useForm({
+  const { register, handleSubmit, setValue, formState: { errors }, clearErrors, unregister, watch, control } = useForm({
     defaultValues: {
       downloadable: "",
       instruction: "",
@@ -44,11 +42,14 @@ const AddGamepage = () => {
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
   const [selectedAlphabet, setSelectedAlphabet] = useState("A");
   const [categorySearch, setCategorySearch] = useState("");
+  const [slugAvailable, setSlugAvailable] = useState(true);
+  const [checkingSlug, setCheckingSlug] = useState(false);
 
   const imageType = watch("imageType", "url"); // Watch the selected image type
   const gameType = watch("gameType", "url"); // Watch the selected game type
   const videoType = watch("videoType", "url"); // Watch the selected video type
-  const gameName = watch("gameName") //watch the gamename field
+  const gameName = useWatch({ name: "gameName", control });
+  const slug = useWatch({ name: "slug", control });
 
 
   // Update slug whenever the gameName changes
@@ -106,6 +107,7 @@ const AddGamepage = () => {
     }
 
     data.downloadable = data.downloadable || "";
+
 
 
 
@@ -171,6 +173,37 @@ const AddGamepage = () => {
   };
 
 
+  const checkSlugAvailability = useCallback(
+    async (slug) => {
+      try {
+        setCheckingSlug(true);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/games/checkslug?slug=${slug}`);
+        if (res.data?.statusCode === 200 && res.data?.data) {
+          setSlugAvailable(false) //slug exists
+        } else {
+          setSlugAvailable(true) //slug does not exist
+        }
+      } catch (error) {
+        setSlugAvailable(true);
+      } finally {
+        setCheckingSlug(false);
+      }
+    }, []
+  )
+
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const delayDebounce = setTimeout(() => {
+      checkSlugAvailability(slug);
+    }, 600);
+
+    return () => clearTimeout(delayDebounce);
+
+  }, [slug, checkSlugAvailability])
+
+
 
   return (
     loader ? <Loader /> : (
@@ -204,7 +237,12 @@ const AddGamepage = () => {
                 {...register("slug", { required: "Slug is required" })}
                 placeholder="Enter slug"
               />
-              {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+              {!checkingSlug && slug && slugAvailable && (
+                <p className="text-green-600 text-sm">✅ Slug is available</p>
+              )}
+              {!checkingSlug && slug && !slugAvailable && (
+                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+              )}
             </div>
 
             {/* Description */}
@@ -434,6 +472,32 @@ const AddGamepage = () => {
               />
             </div>
 
+            {/* is App Only */}
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="isAppOnly" className="text-base">App Only?</Label>
+              <input
+                type="checkbox"
+                id="isAppOnly"
+                {...register("isAppOnly")}
+                className="w-4 h-4 accent-blue-600 cursor-pointer"
+              />
+            </div>
+
+            {/* is Premium */}
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="isPremium" className="text-base">Premium?</Label>
+              <input
+                type="checkbox"
+                id="isPremium"
+                {...register("isPremium")}
+                className="w-4 h-4 accent-blue-600 cursor-pointer"
+              />
+            </div>
+
+
+
+
+
             {/* GamePlay Video */}
             <div>
               <Label>Game Play Video</Label>
@@ -455,7 +519,7 @@ const AddGamepage = () => {
             {loading ? (
               <SpecialLoadingButton content={"Adding"} />
             ) : (
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!slugAvailable || checkingSlug}>
                 Add Game
               </Button>
             )}

@@ -45,6 +45,12 @@ const gameSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    isAppOnly: {
+        type: Boolean
+    },
+    isPremium: {
+        type: Boolean
+    },
     recommendedImageUrl: {
         type: String,
         default: null,
@@ -80,17 +86,14 @@ const gameSchema = new Schema({
     gameSource: {
         type: String,
         enum: ["self", "link"],
-        default: "link"
     },
     thumbnailSource: {
         type: String,
         enum: ["self", "link"],
-        default: "link"
     },
     backgroundVideoSource: {
         type: String,
         enum: ["self", "link"],
-        default: "link"
     },
     createdBy: {
         type: Schema.Types.ObjectId,
