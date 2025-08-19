@@ -24,6 +24,9 @@ const AddGamepage = () => {
       downloadable: "",
       instruction: "",
       isDesktop: false,
+      isAppOnly: false,
+      isHiddenWeb: false,
+      isPremium: "false"
     }
   });
 
@@ -50,6 +53,36 @@ const AddGamepage = () => {
   const videoType = watch("videoType", "url"); // Watch the selected video type
   const gameName = useWatch({ name: "gameName", control });
   const slug = useWatch({ name: "slug", control });
+  const isAppOnly = watch("isAppOnly");
+  const isDesktop = watch("isDesktop");
+  const isHiddenWeb = watch("isHiddenWeb");
+
+
+  useEffect(() => {
+    if (isAppOnly === "true") {
+      setValue('isDesktop', 'false');
+      setValue('isHiddenWeb', 'false');
+    }
+  }, [isAppOnly, setValue])
+
+  useEffect(() => {
+    if (isDesktop === "true") {
+      setValue('isAppOnly', 'false');
+      setValue('isHiddenWeb', 'false');
+    }
+  }, [isDesktop, setValue])
+
+  useEffect(() => {
+    if (isHiddenWeb === "true") {
+      setValue('isAppOnly', 'false');
+      setValue('isDesktop', 'false');
+    }
+  }, [isHiddenWeb, setValue])
+
+
+
+
+
 
 
   // Update slug whenever the gameName changes
@@ -107,8 +140,6 @@ const AddGamepage = () => {
     }
 
     data.downloadable = data.downloadable || "";
-
-
 
 
     const response = await dispatch(uploadGame(data));
@@ -461,37 +492,90 @@ const AddGamepage = () => {
               </Select>
             </div>
 
-            {/* is Desktop Check Box */}
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="isDesktop" className="text-base">Desktop Only?</Label>
-              <input
-                type="checkbox"
-                id="isDesktop"
-                {...register("isDesktop")}
-                className="w-4 h-4 accent-blue-600 cursor-pointer"
-              />
+            {/* Game Visibility Options */}
+            <div className="flex flex-col space-y-2">
+              <Label
+                htmlFor="visibilityOption"
+                className="text-base text-red-600 font-medium"
+              >
+                Game Visibility
+              </Label>
+
+              <Select
+                onValueChange={(value) => {
+                  setValue("visibilityOption", value);
+
+                  setValue("isDesktop", false);
+                  setValue("isAppOnly", false);
+                  setValue("isHiddenWeb", false);
+
+                  if (value === "isDesktop") {
+                    setValue("isDesktop", true);
+                  } else if (value === "isAppOnly") {
+                    setValue("isAppOnly", true);
+                  } else if (value === "isHiddenWeb") {
+                    setValue("isHiddenWeb", true);
+                  }
+                }}
+              >
+                <SelectTrigger id="visibilityOption" className="w-full">
+                  <SelectValue placeholder="-- Select an Option --" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="isHiddenWeb">Show Game Only in App</SelectItem>
+                  <SelectItem value="isDesktop">Desktop Only</SelectItem>
+                  <SelectItem value="isAppOnly">App Promotion</SelectItem>
+                </SelectContent>
+              </Select>
+
             </div>
 
-            {/* is App Only */}
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="isAppOnly" className="text-base">App Only?</Label>
-              <input
-                type="checkbox"
-                id="isAppOnly"
-                {...register("isAppOnly")}
-                className="w-4 h-4 accent-blue-600 cursor-pointer"
-              />
-            </div>
 
-            {/* is Premium */}
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="isPremium" className="text-base">Premium?</Label>
-              <input
-                type="checkbox"
-                id="isPremium"
-                {...register("isPremium")}
-                className="w-4 h-4 accent-blue-600 cursor-pointer"
-              />
+
+
+
+            {/* VIP GAME? */}
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center space-x-4">
+                <Label
+                  htmlFor="isPremium"
+                  className="text-base text-red-600 font-medium"
+                >
+                  VIP Game?
+                </Label>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="isPremiumYes"
+                    value="true"
+                    {...register("isPremium")}
+                    className="w-4 h-4 accent-green-600 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="isPremiumYes"
+                    className="text-sm text-green-600 cursor-pointer"
+                  >
+                    Yes
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="isPremiumNo"
+                    value="false"
+                    {...register("isPremium")}
+                    className="w-4 h-4 accent-red-600 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="isPremiumNo"
+                    className="text-sm text-red-600 cursor-pointer"
+                  >
+                    No
+                  </label>
+                </div>
+              </div>
             </div>
 
 

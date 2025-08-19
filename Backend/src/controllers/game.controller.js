@@ -11,7 +11,7 @@ import { Vote } from "../models/vote.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb } = req.body;
 
 
 
@@ -89,7 +89,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         backgroundVideoSource,
         isDesktop,
         isAppOnly,
-        isPremium
+        isPremium,
+        isHiddenWeb
     };
 
     if (downloadable) {
@@ -133,7 +134,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium } = req.body;
+    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -342,6 +343,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.gameDataUrl = gameDataUrl
     game.downloadable = downloadable
     game.gameZipUrl = gameZipUrl
+    game.isHiddenWeb = isHiddenWeb
 
 
     await game.save();
@@ -454,6 +456,17 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
         pipeline.push({ $sort: { createdAt: 1 } });
     }
 
+    pipeline.push({
+        $match: {
+            $or: [
+                { isHiddenWeb: { $exists: false } },
+                { isHiddenWeb: false }
+            ]
+        }
+    });
+
+
+
     const options = {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
@@ -552,22 +565,38 @@ const getTop10Games = asyncHandler(async (req, res) => {
 const getTop10GamesWeb = asyncHandler(async (req, res) => {
     const { filterBy } = req.query;
 
-    const filter = {};
+    const filter = {
+        $or: [
+            { isHiddenWeb: { $exists: false } },
+            { isHiddenWeb: false }
+        ]
+    };
 
     if (filterBy === "mobile") {
         filter.isDesktop = false;
     }
 
-    const top10games = await Game.find(filter).sort({ topTenCount: -1 }).limit(10);
-    return res.status(200).json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
-})
+    const top10games = await Game.find(filter)
+        .sort({ topTenCount: -1 })
+        .limit(10);
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
+});
+
 
 
 // GET: Popular Games
 const getPopularGames = asyncHandler(async (req, res) => {
     const { filterBy } = req.query;
 
-    const filter = {};
+    const filter = {
+        $or: [
+            { isHiddenWeb: { $exists: false } },
+            { isHiddenWeb: false }
+        ]
+    };
 
     if (filterBy === "mobile") {
         filter.isDesktop = false;
@@ -597,7 +626,13 @@ const getFeaturedGames = asyncHandler(async (req, res) => {
 const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
     const { filterBy } = req.query;
 
-    const filter = { isFeatured: true }
+    const filter = {
+        isFeatured: true,
+        $or: [
+            { isHiddenWeb: { $exists: false } },
+            { isHiddenWeb: false }
+        ]
+    }
 
     if (filterBy === "mobile") {
         filter.isDesktop = false;
@@ -628,7 +663,13 @@ const getRecommendedGames = asyncHandler(async (req, res) => {
 const getRecommendedGamesWeb = asyncHandler(async (req, res) => {
     const { filterBy } = req.query;
 
-    const filter = { isRecommended: true }
+    const filter = {
+        isRecommended: true,
+        $or: [
+            { isHiddenWeb: { $exists: false } },
+            { isHiddenWeb: false }
+        ]
+    }
 
     if (filterBy === "mobile") {
         filter.isDesktop = false;

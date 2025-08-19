@@ -48,6 +48,9 @@ const gameSchema = new Schema({
     isAppOnly: {
         type: Boolean
     },
+    isHiddenWeb: {
+        type: Boolean
+    },
     isPremium: {
         type: Boolean
     },
