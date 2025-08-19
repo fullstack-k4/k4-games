@@ -140,6 +140,7 @@ const AddGamepage = () => {
     }
 
     data.downloadable = data.downloadable || "";
+    console.log(data);
 
 
     const response = await dispatch(uploadGame(data));
@@ -502,6 +503,7 @@ const AddGamepage = () => {
               </Label>
 
               <Select
+                value={watch("visibilityOption")}
                 onValueChange={(value) => {
                   setValue("visibilityOption", value);
 
@@ -515,6 +517,8 @@ const AddGamepage = () => {
                     setValue("isAppOnly", true);
                   } else if (value === "isHiddenWeb") {
                     setValue("isHiddenWeb", true);
+                  } else if (value === "unselect") {
+                    setValue("visibilityOption", "",);
                   }
                 }}
               >
@@ -525,6 +529,7 @@ const AddGamepage = () => {
                   <SelectItem value="isHiddenWeb">Show Game Only in App</SelectItem>
                   <SelectItem value="isDesktop">Desktop Only</SelectItem>
                   <SelectItem value="isAppOnly">App Promotion</SelectItem>
+                  <SelectItem value="unselect">Unselect</SelectItem>
                 </SelectContent>
               </Select>
 

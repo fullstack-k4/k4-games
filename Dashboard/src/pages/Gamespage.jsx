@@ -256,6 +256,21 @@ const Gamespage = () => {
       _id: 3,
       name: "Downloadable",
       value: "downloadable"
+    },
+    {
+      _id: 4,
+      name: "Desktop Only",
+      value: "desktoponly"
+    },
+    {
+      _id: 5,
+      name: "App Promotion",
+      value: "apppromotion"
+    },
+    {
+      _id: 6,
+      name: "Show Only in App",
+      value: "showonlyinapp"
     }
   ]
 

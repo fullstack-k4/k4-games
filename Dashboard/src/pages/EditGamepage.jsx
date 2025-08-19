@@ -128,7 +128,6 @@ const EditGamepage = () => {
 
         if (response.meta.requestStatus === "fulfilled") {
             navigate("/games")
-
         }
 
     };
@@ -481,6 +480,8 @@ const EditGamepage = () => {
                                         setValue("isAppOnly", true, { shouldDirty: true });
                                     } else if (value === "isHiddenWeb") {
                                         setValue("isHiddenWeb", true, { shouldDirty: true });
+                                    } else if (value === "unselect") {
+                                        setValue("visibilityOption", "", { shouldDirty: true });
                                     }
                                 }}
                             >
@@ -491,6 +492,7 @@ const EditGamepage = () => {
                                     <SelectItem value="isHiddenWeb">Show Game Only in App</SelectItem>
                                     <SelectItem value="isDesktop">Desktop Only</SelectItem>
                                     <SelectItem value="isAppOnly">App Promotion</SelectItem>
+                                    <SelectItem value="unselect">Unselect</SelectItem>
                                 </SelectContent>
                             </Select>
 

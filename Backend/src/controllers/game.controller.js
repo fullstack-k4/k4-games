@@ -509,6 +509,26 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
         })
     }
 
+    if (filterBy === "desktoponly") {
+        pipeline.push({
+            $match: { isDesktop: true }
+        })
+    }
+
+    if (filterBy === "apppromotion") {
+        pipeline.push({
+            $match: { isAppOnly: true }
+        })
+    }
+
+    if (filterBy === "showonlyinapp") {
+        pipeline.push({
+            $match: { isHiddenWeb: true }
+        })
+    }
+
+
+
 
     if (query) {
         pipeline.push({
