@@ -115,7 +115,6 @@ export const sendGameNotificationtoAllUsers = createAsyncThunk(
             throw error;
         }
     }
-
 )
 
 

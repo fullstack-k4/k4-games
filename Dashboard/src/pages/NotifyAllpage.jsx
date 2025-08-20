@@ -16,7 +16,7 @@ const NotifyAllpage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors},
+    formState: { errors },
     reset
   } = useForm()
 
@@ -28,7 +28,6 @@ const NotifyAllpage = () => {
       reset();
       navigate("/notification/choose");
     }
-
 
   }
 

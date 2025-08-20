@@ -26,7 +26,8 @@ const AddGamepage = () => {
       isDesktop: false,
       isAppOnly: false,
       isHiddenWeb: false,
-      isPremium: "false"
+      isPremium: "false",
+      topTenCount: 0
     }
   });
 
@@ -261,6 +262,26 @@ const AddGamepage = () => {
               <Input {...register("gameName", { required: "Game name is required" })} />
               {errors.gameName && <p className="text-red-500 text-sm">{errors.gameName.message}</p>}
             </div>
+
+            {/*Plays Count  */}
+            <div>
+              <Label>Plays Count</Label>
+              <Input
+                type="number"
+                {...register("topTenCount", {
+                  required: "Plays count is required",
+                  valueAsNumber: true,
+                  min: {
+                    value: 0,
+                    message: "Plays count cannot be negative",
+                  },
+                })}
+              />
+              {errors.topTenCount && (
+                <p className="text-red-500 text-sm">{errors.topTenCount.message}</p>
+              )}
+            </div>
+
 
             {/* Slug */}
             <div>

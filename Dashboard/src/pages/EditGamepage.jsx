@@ -95,6 +95,7 @@ const EditGamepage = () => {
             setValue("isDesktop", gameData?.isDesktop);
             setValue("isAppOnly", gameData?.isAppOnly);
             setValue("isHiddenWeb", gameData?.isHiddenWeb);
+            setValue("topTenCount", gameData?.topTenCount);
 
             if (gameData.isDesktop) {
                 setValue("visibilityOption", "isDesktop");
@@ -193,6 +194,25 @@ const EditGamepage = () => {
                             />
                             {errors.gameName && (
                                 <p className="text-red-500 text-sm">{errors.gameName.message}</p>
+                            )}
+                        </div>
+
+                        {/*Plays Count  */}
+                        <div>
+                            <Label>Plays Count</Label>
+                            <Input
+                                type="number"
+                                {...register("topTenCount", {
+                                    required: "Plays count is required",
+                                    valueAsNumber: true,
+                                    min: {
+                                        value: 0,
+                                        message: "Plays count cannot be negative",
+                                    },
+                                })}
+                            />
+                            {errors.topTenCount && (
+                                <p className="text-red-500 text-sm">{errors.topTenCount.message}</p>
                             )}
                         </div>
 

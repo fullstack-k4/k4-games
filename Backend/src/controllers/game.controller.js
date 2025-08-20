@@ -11,7 +11,7 @@ import { Vote } from "../models/vote.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount } = req.body;
 
 
 
@@ -90,7 +90,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         isDesktop,
         isAppOnly,
         isPremium,
-        isHiddenWeb
+        isHiddenWeb,
+        topTenCount
     };
 
     if (downloadable) {
@@ -134,7 +135,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb } = req.body;
+    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -344,6 +345,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.downloadable = downloadable
     game.gameZipUrl = gameZipUrl
     game.isHiddenWeb = isHiddenWeb
+    game.topTenCount = topTenCount
 
 
     await game.save();
