@@ -238,9 +238,6 @@ const editCategory = asyncHandler(async (req, res) => {
     }
 
 
-
-
-
     category.slug = slug;
     category.imageUrl = imageUrl;
     category.iconUrl = iconUrl;

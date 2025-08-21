@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-components/";
 import { Link } from "react-router-dom";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, PhoneCall, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGameById, editGame, makeGameNull } from "@/store/Slices/gameSlice";
 import { getAllCategoriesDashboardPopup } from "@/store/Slices/categorySlice";
@@ -97,6 +97,7 @@ const EditGamepage = () => {
             setValue("isHiddenWeb", gameData?.isHiddenWeb);
             setValue("topTenCount", gameData?.topTenCount);
             setValue("likesCount", gameData?.likesCount);
+            setValue("dislikesCount", gameData?.dislikesCount);
 
             if (gameData.isDesktop) {
                 setValue("visibilityOption", "isDesktop");
@@ -254,7 +255,24 @@ const EditGamepage = () => {
                             )}
                         </div>
 
-
+                        {/* Dislikes Count */}
+                        <div>
+                            <Label>Dislike Count</Label>
+                            <Input
+                                type="number"
+                                {...register("dislikesCount", {
+                                    required: "dislike count is required",
+                                    valueAsNumber: true,
+                                    min: {
+                                        value: 0,
+                                        message: "Dislike count cannot be negative"
+                                    }
+                                })}
+                            />
+                            {errors.dislikesCount && (
+                                <p className="text-red-500 text-sm">{errors.dislikesCount.message}</p>
+                            )}
+                        </div>
 
 
                         {/* Description */}

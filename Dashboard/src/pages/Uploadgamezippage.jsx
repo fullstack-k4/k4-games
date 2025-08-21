@@ -58,6 +58,8 @@ const Uploadgamezippage = () => {
             </Link>
           </div>
 
+          <p className="text-red-500 font-bold">Note:- Zip must include gamelogo.png file </p>
+
           <h2 className="text-2xl font-bold text-center">Upload Zip</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

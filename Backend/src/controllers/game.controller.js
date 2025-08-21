@@ -11,8 +11,13 @@ import { Vote } from "../models/vote.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount, likesCount } = req.body;
+    const { gameName, description, category,
+        splashColor, isrotate, slug,
+        primaryCategory, instruction, gamePlayVideo,
+        isDesktop, isAppOnly, isPremium,
+        isHiddenWeb, topTenCount, likesCount, dislikesCount } = req.body;
 
+    const downloadable = req.body.downloadable === "true";
 
 
     let gameUrl = req.body.gameUrl || "";
@@ -22,8 +27,8 @@ const uploadGame = asyncHandler(async (req, res) => {
     let gameSource;
     let thumbnailSource;
     let backgroundVideoSource;
-    //  ensuring boolean value
-    const downloadable = req.body.downloadable === "true";
+
+
 
     // input validation
     if ([gameName, description, splashColor, isrotate, slug, primaryCategory, isDesktop].some((field) => !field || field?.trim() === "")) {
@@ -64,7 +69,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 
 
     // if download not allowed delete zip folder
-    if (!downloadable && req.body.downloadable !== "") {
+    if (!downloadable && uploadedGameUrl) {
         await deleteFileFromDO(uploadedGameUrl);
     }
 
@@ -92,7 +97,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         isPremium,
         isHiddenWeb,
         topTenCount,
-        likesCount
+        likesCount,
+        dislikesCount
     };
 
     if (downloadable) {
@@ -136,7 +142,11 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount, likesCount } = req.body;
+    const { gameName, description, category,
+        splashColor, slug, primaryCategory,
+        instruction, gamePlayVideo, isDesktop,
+        isAppOnly, isPremium, isHiddenWeb,
+        topTenCount, likesCount, dislikesCount } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -348,6 +358,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.isHiddenWeb = isHiddenWeb
     game.topTenCount = topTenCount
     game.likesCount = likesCount
+    game.dislikesCount = dislikesCount
 
     await game.save();
 
@@ -768,7 +779,7 @@ const getGameBySlug = asyncHandler(async (req, res) => {
     const dislikes = game?.dislikesCount || 0;
     const total = likes + dislikes;
 
-    const rating = total > 0 ? (likes / total) * 10 : 0;
+    const rating = total > 0 ? ((likes / total) * 10).toFixed(1) : 0;
 
     // Increment Top 10 Count
 

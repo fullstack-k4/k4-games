@@ -31,7 +31,7 @@ const EditCategorypage = () => {
   const slug = useWatch({ name: "slug", control });
 
 
-  // fetch image
+  // fetch category
   useEffect(() => {
     dispatch(getCategoryById({ id })).then(() => {
       setloader(false);

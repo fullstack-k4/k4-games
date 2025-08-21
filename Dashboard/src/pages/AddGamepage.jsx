@@ -28,7 +28,8 @@ const AddGamepage = () => {
       isHiddenWeb: false,
       isPremium: "false",
       topTenCount: 0,
-      likesCount: 0
+      likesCount: 0,
+      dislikesCount: 0
     }
   });
 
@@ -131,6 +132,7 @@ const AddGamepage = () => {
 
   const onSubmit = async (data) => {
 
+
     if (!data.primaryCategory) {
       toast.error("Primary Category is required");
       return;
@@ -140,10 +142,6 @@ const AddGamepage = () => {
       toast.error("Category is requried");
       return;
     }
-
-    data.downloadable = data.downloadable || "";
-    console.log(data);
-
 
     const response = await dispatch(uploadGame(data));
     if (response.meta.requestStatus === "fulfilled") {
@@ -167,6 +165,7 @@ const AddGamepage = () => {
     if (gameType === "url") {
       unregister("gameZip"); // Remove gameZip if URL is selected
       setValue("gameZip", null); // Ensure it's reset
+      setValue("downloadable", false);
     } else {
       unregister("gameUrl"); // Remove gameUrl if ZIP upload is selected
       setValue("gameUrl", ""); // Ensure it's reset
@@ -318,7 +317,24 @@ const AddGamepage = () => {
               )}
             </div>
 
-
+            {/* Dislikes Count */}
+            <div>
+              <Label>Dislike Count</Label>
+              <Input
+                type="number"
+                {...register("dislikesCount", {
+                  required: "dislike count is required",
+                  valueAsNumber: true,
+                  min: {
+                    value: 0,
+                    message: "Dislike count cannot be negative"
+                  }
+                })}
+              />
+              {errors.dislikesCount && (
+                <p className="text-red-500 text-sm">{errors.dislikesCount.message}</p>
+              )}
+            </div>
 
 
             {/* Description */}
@@ -510,7 +526,7 @@ const AddGamepage = () => {
                   setValue("downloadable", value);
                   clearErrors("downloadable");
                 }}
-                defaultValue=""
+                defaultValue="false"
               >
                 <SelectTrigger className={errors.downloadable ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select Option" />
@@ -521,6 +537,7 @@ const AddGamepage = () => {
                 </SelectContent>
               </Select>
               {errors.downloadable && <p className="text-red-500 text-sm">{errors.downloadable.message}</p>}
+              <p className="mt-1 text-red-500 font-semibold">Note:-If Allowing download Game Zip must include gamelogo.png</p>
             </div>}
 
             {/* Orientation */}

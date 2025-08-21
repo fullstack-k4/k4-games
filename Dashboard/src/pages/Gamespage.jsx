@@ -99,7 +99,6 @@ const Gamespage = () => {
   }
 
   const handleDelete = async (game) => {
-    console.log(selectedGame?._id);
     if (selectedGame) {
       let response = await dispatch(deleteGame({ gameId: selectedGame?._id }));
 
