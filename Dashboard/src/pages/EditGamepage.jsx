@@ -96,6 +96,7 @@ const EditGamepage = () => {
             setValue("isAppOnly", gameData?.isAppOnly);
             setValue("isHiddenWeb", gameData?.isHiddenWeb);
             setValue("topTenCount", gameData?.topTenCount);
+            setValue("likesCount", gameData?.likesCount);
 
             if (gameData.isDesktop) {
                 setValue("visibilityOption", "isDesktop");
@@ -197,6 +198,23 @@ const EditGamepage = () => {
                             )}
                         </div>
 
+
+
+                        {/* Slug Input */}
+                        <div>
+                            <Label>Slug</Label>
+                            <Input
+                                {...register("slug", { required: "Slug is required" })}
+                                placeholder="Enter slug"
+                            />
+                            {!checkingSlug && slug && slugAvailable && (
+                                <p className="text-green-600 text-sm">✅ Slug is available</p>
+                            )}
+                            {!checkingSlug && slug && !slugAvailable && (
+                                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+                            )}
+                        </div>
+
                         {/*Plays Count  */}
                         <div>
                             <Label>Plays Count</Label>
@@ -216,20 +234,27 @@ const EditGamepage = () => {
                             )}
                         </div>
 
-                        {/* Slug Input */}
+                        {/* Likes Count */}
+
                         <div>
-                            <Label>Slug</Label>
+                            <Label>Likes Count</Label>
                             <Input
-                                {...register("slug", { required: "Slug is required" })}
-                                placeholder="Enter slug"
+                                type="number"
+                                {...register("likesCount", {
+                                    required: "Likes count is required",
+                                    valueAsNumber: true,
+                                    min: {
+                                        value: 0,
+                                        message: "Likes count cannot be negative",
+                                    },
+                                })}
                             />
-                            {!checkingSlug && slug && slugAvailable && (
-                                <p className="text-green-600 text-sm">✅ Slug is available</p>
-                            )}
-                            {!checkingSlug && slug && !slugAvailable && (
-                                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+                            {errors.likesCount && (
+                                <p className="text-red-500 text-sm">{errors.likesCount.message}</p>
                             )}
                         </div>
+
+
 
 
                         {/* Description */}

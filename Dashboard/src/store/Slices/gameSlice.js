@@ -21,6 +21,8 @@ const initialState = {
     categories: null,
 }
 
+
+
 export const getAllGames = createAsyncThunk(
     'getAllGames',
     async ({ page, limit, query, category, userId, userRole, filterBy }) => {
@@ -112,6 +114,7 @@ export const editGame = createAsyncThunk(
             formData.append("isPremium", data.isPremium);
             formData.append("isHiddenWeb", data.isHiddenWeb);
             formData.append("topTenCount", data.topTenCount);
+            formData.append("likesCount", data.likesCount);
 
             if (data.image) {
                 formData.append("image", data.image[0]);
@@ -189,6 +192,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("isPremium", data.isPremium);
     formData.append("isHiddenWeb", data.isHiddenWeb);
     formData.append("topTenCount", data.topTenCount);
+    formData.append("likesCount", data.likesCount);
 
 
     try {
@@ -219,7 +223,6 @@ export const allowDownload = createAsyncThunk("allowDownload",
             toast.error(error?.response?.data?.error);
             throw error;
         }
-
     })
 
 export const denyDownload = createAsyncThunk("denyDownload",

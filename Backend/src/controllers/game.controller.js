@@ -11,7 +11,7 @@ import { Vote } from "../models/vote.model.js";
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
-    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount } = req.body;
+    const { gameName, description, category, splashColor, isrotate, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount, likesCount } = req.body;
 
 
 
@@ -91,7 +91,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         isAppOnly,
         isPremium,
         isHiddenWeb,
-        topTenCount
+        topTenCount,
+        likesCount
     };
 
     if (downloadable) {
@@ -135,7 +136,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 // EDIT:GAME
 const editGame = asyncHandler(async (req, res) => {
 
-    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount } = req.body;
+    const { gameName, description, category, splashColor, slug, primaryCategory, instruction, gamePlayVideo, isDesktop, isAppOnly, isPremium, isHiddenWeb, topTenCount, likesCount } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -346,7 +347,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.gameZipUrl = gameZipUrl
     game.isHiddenWeb = isHiddenWeb
     game.topTenCount = topTenCount
-
+    game.likesCount = likesCount
 
     await game.save();
 
@@ -457,6 +458,9 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
     else if (sortBy === "oldest") {
         pipeline.push({ $sort: { createdAt: 1 } });
     }
+    else if (sortBy === "top") {
+        pipeline.push({ $sort: { topTenCount: -1 } })
+    }
 
     pipeline.push({
         $match: {
@@ -558,6 +562,11 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
         pipeline.push({ $sort: { createdAt: 1 } });
     }
 
+
+    if (filterBy === "featured") {
+        pipeline.push({ $sort: { topTenCount: -1 } });
+    }
+
     const options = {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
@@ -639,7 +648,7 @@ const getFeaturedGames = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const featuredGames = await Game.find(filter).limit(7);
+    const featuredGames = await Game.find(filter).sort({ topTenCount: -1 }).limit(7);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 })
 
@@ -660,7 +669,7 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const featuredGames = await Game.find(filter).limit(7);
+    const featuredGames = await Game.find(filter).sort({ topTenCount: -1 }).limit(7);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 
 })

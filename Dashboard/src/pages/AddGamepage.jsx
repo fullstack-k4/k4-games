@@ -27,7 +27,8 @@ const AddGamepage = () => {
       isAppOnly: false,
       isHiddenWeb: false,
       isPremium: "false",
-      topTenCount: 0
+      topTenCount: 0,
+      likesCount: 0
     }
   });
 
@@ -263,6 +264,22 @@ const AddGamepage = () => {
               {errors.gameName && <p className="text-red-500 text-sm">{errors.gameName.message}</p>}
             </div>
 
+
+            {/* Slug */}
+            <div>
+              <Label>Slug</Label>
+              <Input
+                {...register("slug", { required: "Slug is required" })}
+                placeholder="Enter slug"
+              />
+              {!checkingSlug && slug && slugAvailable && (
+                <p className="text-green-600 text-sm">✅ Slug is available</p>
+              )}
+              {!checkingSlug && slug && !slugAvailable && (
+                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+              )}
+            </div>
+
             {/*Plays Count  */}
             <div>
               <Label>Plays Count</Label>
@@ -282,21 +299,27 @@ const AddGamepage = () => {
               )}
             </div>
 
-
-            {/* Slug */}
+            {/*Likes Count  */}
             <div>
-              <Label>Slug</Label>
+              <Label>Likes Count</Label>
               <Input
-                {...register("slug", { required: "Slug is required" })}
-                placeholder="Enter slug"
+                type="number"
+                {...register("likesCount", {
+                  required: "likes count is required",
+                  valueAsNumber: true,
+                  min: {
+                    value: 0,
+                    message: "Likes count cannot be negative",
+                  },
+                })}
               />
-              {!checkingSlug && slug && slugAvailable && (
-                <p className="text-green-600 text-sm">✅ Slug is available</p>
-              )}
-              {!checkingSlug && slug && !slugAvailable && (
-                <p className="text-red-500 text-sm">❌ Slug is already taken</p>
+              {errors.likesCount && (
+                <p className="text-red-500 text-sm">{errors.likesCount.message}</p>
               )}
             </div>
+
+
+
 
             {/* Description */}
             <div>
