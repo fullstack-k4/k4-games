@@ -85,7 +85,7 @@ const CreateBannerpage = () => {
                             <SelectContent>
                                 {positions.map((pos) => (
                                     <SelectItem key={pos} value={pos}>
-                                        {pos.replace(/_/g, " ")} {/* optional: make it more readable */}
+                                        {pos.replace(/_/g, " ")} 
                                     </SelectItem>
                                 ))}
                             </SelectContent>

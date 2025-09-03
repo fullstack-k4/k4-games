@@ -367,6 +367,9 @@ const Gamespage = () => {
                     {/* Game Name */}
                     <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
                       {game.gameName}
+                      {game.gameSource === "self" && <div className="text-sm font-normal text-red-500 dark:text-gray-400">
+                        ({game.gameUrl?.split("/")[4]})
+                      </div>}
                     </td>
 
                     {/* Game Description */}

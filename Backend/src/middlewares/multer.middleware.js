@@ -35,6 +35,7 @@ export const uploader = multer({
       } else {
         finalFileName = `files/${req.uploadUuid}/${baseName}${extension}`;
       }
+
       cb(null, finalFileName);
     },
   }),
@@ -130,7 +131,7 @@ export const AdbannerUploader = multer({
 
       const { extension, baseName } = modifyfilename(originalName);
 
-      const fileName = `adbanners/${req.uploadUuid}/${folder}/${baseName}${extension}`;
+      const fileName = `posters/${req.uploadUuid}/${folder}/${baseName}${extension}`;
       cb(null, fileName);
     }
   })

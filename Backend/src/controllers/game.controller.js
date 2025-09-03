@@ -23,11 +23,9 @@ const uploadGame = asyncHandler(async (req, res) => {
     let gameUrl = req.body.gameUrl || "";
     let imageUrl = req.body.imageUrl || "";
     let backgroundVideoUrl = req.body.backgroundVideoUrl || "";
-
     let gameSource;
     let thumbnailSource;
     let backgroundVideoSource;
-
 
 
     // input validation
@@ -40,6 +38,13 @@ const uploadGame = asyncHandler(async (req, res) => {
 
     let extractedFiles = [];
     let uploadedGameUrl = req.files["gameZip"] ? req.files["gameZip"][0].location : null;
+
+    if (uploadedGameUrl) {
+        // we are keeping url constant irrespective of file size,because for larger files digital ocean returns different url
+        const relativePath = uploadedGameUrl.split("files/")[1];
+        uploadedGameUrl = `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${relativePath}`
+    }
+
 
     if (uploadedGameUrl) {
         const uploadUuid = req.uploadUuid || uuidv4().replace(/-/g, "").substring(0, 5);
@@ -183,6 +188,13 @@ const editGame = asyncHandler(async (req, res) => {
     let extractedFiles = [];
     let uploadedGameUrl = req.files["gameZip"] ? req.files["gameZip"][0].location : null;
 
+
+    if (uploadedGameUrl) {
+        // we are keeping url constant irrespective of file size,because for larger files digital ocean returns different url
+        const relativePath = uploadedGameUrl.split("files/")[1];
+        uploadedGameUrl = `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${relativePath}`
+    }
+
     if (uploadedGameUrl) {
         const uploadUuid = req.uploadUuid || uuidv4().replace(/-/g, "").substring(0, 8);
         const originalFileName = req.files["gameZip"][0].originalname.toLowerCase() // Convert to lowercase
@@ -271,11 +283,17 @@ const editGame = asyncHandler(async (req, res) => {
 
 
 
-    let gameDataUrl;
+    let gameDataUrl = game?.gameDataUrl;
 
 
     if (game?.downloadable) {
-        if (previousgameName !== gameName || previousDescription !== description || previousSplashColor !== splashColor || previousOrientation !== isrotate || previousPrimaryCategory !== primaryCategory) {
+        if (!uploadedGameUrl && !uploadedImageUrl && (
+            previousgameName !== gameName
+            || previousDescription !== description ||
+            previousSplashColor !== splashColor ||
+            previousOrientation !== isrotate ||
+            previousPrimaryCategory !== primaryCategory
+        )) {
             // delete previous gameData.json File 
             let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
             await deleteFileFromDOS3key(gameDataS3Key);
@@ -300,6 +318,37 @@ const editGame = asyncHandler(async (req, res) => {
             };
 
             gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+        }
+
+        // this condition is because if new zip is uploaded or new image is uploaded and download is allowed it is must to upload new gameData.json file
+
+        if (uploadedGameUrl || uploadedImageUrl) {
+            // delete previous gameData.json File 
+            let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
+            await deleteFileFromDOS3key(gameDataS3Key);
+
+            // create new meta data
+
+            const matchedId = game.gameDataUrl.match(/files\/(\d+)\//);
+            const matchedUId = matchedId[1];
+            const gameId = matchedId ? parseInt(matchedId[1], 10) : null;
+
+
+            const gameJson = {
+                _id: gameId,
+                gameName,
+                description: description?.split(" ").slice(0, 10).join(" "),
+                category: primaryCategory,
+                splashColor,
+                imageUrl,
+                gameUrl,
+                downloadable: true,
+                isrotate
+            };
+
+            gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+
+
         }
     }
 
@@ -334,8 +383,9 @@ const editGame = asyncHandler(async (req, res) => {
         game.gameSource = "link"
     }
 
+    // when game is already downloadable  and new zip file got uploaded so we have to update gameZipUrl 
     if (downloadable && uploadedGameUrl) {
-        game.gameZipUrl = uploadedGameUrl;
+        gameZipUrl = uploadedGameUrl;
     }
     game.backgroundVideoUrl = backgroundVideoUrl;
     if (backgroundVideoUrl.includes("digitalocean")) {
@@ -628,7 +678,6 @@ const getTop10GamesWeb = asyncHandler(async (req, res) => {
 });
 
 
-
 // GET: Popular Games
 const getPopularGames = asyncHandler(async (req, res) => {
     const { filterBy } = req.query;
@@ -765,8 +814,6 @@ const getGameBySlug = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Game Not Found");
     }
 
-
-
     // Calculating   total votes
     const totalVotes = await Vote.find({ gameId: game?._id }).countDocuments();
 
@@ -874,6 +921,10 @@ const allowDownload = asyncHandler(async (req, res) => {
     let game = req.game;
 
     let uploadedGameUrl = req.file ? req.file.location : null;
+
+    // we are keeping url constant irrespective of file size,because for larger files digital ocean returns different url
+    const relativePath = uploadedGameUrl.split("files/")[1];
+    uploadedGameUrl = `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${relativePath}`
 
     //Extract uuid
     const matchedId = uploadedGameUrl.match(/files\/(\d+)\//);
