@@ -128,6 +128,19 @@ const gameSchema = new Schema({
     gameDataUrl: {
         type: String,
         default: "",
+    },
+    status: {
+        type: String,
+        enum: ["draft", "scheduled", "published"],
+        default: "published"
+    },
+    scheduledAt: {
+        type: Date,
+        default: null
+    },
+    notify: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 

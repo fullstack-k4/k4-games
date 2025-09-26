@@ -15,7 +15,7 @@ const uploadGame = asyncHandler(async (req, res) => {
         splashColor, isrotate, slug,
         primaryCategory, instruction, gamePlayVideo,
         isDesktop, isAppOnly, isPremium,
-        isHiddenWeb, topTenCount, likesCount, dislikesCount } = req.body;
+        isHiddenWeb, topTenCount, likesCount, dislikesCount, status, scheduledAt, notify } = req.body;
 
     const downloadable = req.body.downloadable === "true";
 
@@ -103,7 +103,10 @@ const uploadGame = asyncHandler(async (req, res) => {
         isHiddenWeb,
         topTenCount,
         likesCount,
-        dislikesCount
+        dislikesCount,
+        status,
+        scheduledAt: status === "scheduled" ? new Date(scheduledAt) : null,
+        notify,
     };
 
     if (downloadable) {
@@ -151,7 +154,7 @@ const editGame = asyncHandler(async (req, res) => {
         splashColor, slug, primaryCategory,
         instruction, gamePlayVideo, isDesktop,
         isAppOnly, isPremium, isHiddenWeb,
-        topTenCount, likesCount, dislikesCount } = req.body;
+        topTenCount, likesCount, dislikesCount, status, scheduledAt, notify } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -409,6 +412,18 @@ const editGame = asyncHandler(async (req, res) => {
     game.topTenCount = topTenCount
     game.likesCount = likesCount
     game.dislikesCount = dislikesCount
+    game.notify = notify
+
+    if (status) {
+        game.status = status;
+
+        if (status === "scheduled") {
+            game.scheduledAt = new Date(scheduledAt);
+        } else {
+            game.scheduledAt = null;
+        }
+    }
+
 
     await game.save();
 
@@ -422,6 +437,13 @@ const getAllGame = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, category, sortBy, deviceType } = req.query;
 
     const pipeline = [];
+
+    pipeline.push({
+        $match: {
+            status: "published"
+        }
+    })
+
 
     if (deviceType && deviceType === "mobile") {
         pipeline.push({
@@ -457,6 +479,7 @@ const getAllGame = asyncHandler(async (req, res) => {
         pipeline.push({ $sort: { createdAt: 1 } });
     }
 
+
     const options = {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
@@ -467,20 +490,28 @@ const getAllGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "All Games Fetched Successfully"));
 });
 
+
 // GET:All GAMES WEB (FOR WEBSITE)
 const getAllGameWeb = asyncHandler(async (req, res) => {
 
     const { page = 1, limit = 10, query, category, sortBy, filterBy, categoryName } = req.query;
 
     const pipeline = [];
+
+
+    pipeline.push({
+        $match: {
+            status: "published"
+        }
+    })
+
+
     let foundCategory = null;
 
 
     if (filterBy && filterBy === "mobile") {
         pipeline.push({ $match: { isDesktop: false } });
     }
-
-
 
 
     if (query) {
@@ -533,7 +564,6 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
     });
 
 
-
     const options = {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
@@ -544,10 +574,12 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl, searchedcategoryicon: foundCategory?.iconUrl, searchedcategorydescription: foundCategory?.description }, "All Games Fetched Successfully"));
 });
 
+
+
 // GET:ALL GAMES DASHBOARD (FOR DASHBOARD)
 const getAllGameDashboard = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query, category, userRole, userId, sortBy, filterBy } = req.query;
+    const { page = 1, limit = 10, query, category, userRole, userId, sortBy, filterBy, status } = req.query;
 
     const pipeline = [];
 
@@ -556,6 +588,16 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
             $match: { createdBy: new mongoose.Types.ObjectId(userId) }
         });
     }
+
+    if (status) {
+        pipeline.push({
+            $match: { status }
+        })
+        if (status === "scheduled") {
+            pipeline.push({ $sort: { scheduledAt: 1 } })
+        }
+    }
+
 
     if (filterBy === "featured") {
         pipeline.push({
@@ -595,8 +637,6 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
     }
 
 
-
-
     if (query) {
         pipeline.push({
             $match: {
@@ -616,7 +656,7 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
         })
     }
 
-    if (sortBy === "newest") {
+    if (sortBy === "newest" && status !== "scheduled") {
         pipeline.push({ $sort: { createdAt: -1 } });
     }
     else if (sortBy === "oldest") {
@@ -643,7 +683,7 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
 const getTop10Games = asyncHandler(async (req, res) => {
     const { deviceType } = req.query;
 
-    const filter = {};
+    const filter = { status: "published" };
 
     if (deviceType && deviceType === "mobile") {
         filter.isDesktop = false;
@@ -663,6 +703,8 @@ const getTop10GamesWeb = asyncHandler(async (req, res) => {
             { isHiddenWeb: false }
         ]
     };
+
+    filter.status = "published"
 
     if (filterBy === "mobile") {
         filter.isDesktop = false;
@@ -689,6 +731,8 @@ const getPopularGames = asyncHandler(async (req, res) => {
         ]
     };
 
+    filter.status = "published"
+
     if (filterBy === "mobile") {
         filter.isDesktop = false;
     }
@@ -702,7 +746,7 @@ const getPopularGames = asyncHandler(async (req, res) => {
 const getFeaturedGames = asyncHandler(async (req, res) => {
     const { deviceType } = req.query;
 
-    const filter = { isFeatured: true };
+    const filter = { isFeatured: true, status: "published" };
 
     if (deviceType && deviceType === "mobile") {
         filter.isDesktop = false;
@@ -719,6 +763,7 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
 
     const filter = {
         isFeatured: true,
+        status: "published",
         $or: [
             { isHiddenWeb: { $exists: false } },
             { isHiddenWeb: false }
@@ -739,7 +784,7 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
 const getRecommendedGames = asyncHandler(async (req, res) => {
     const { deviceType } = req.query;
 
-    const filter = { isRecommended: true };
+    const filter = { isRecommended: true, status: "published" };
 
     if (deviceType && deviceType === "mobile") {
         filter.isDesktop = false;
@@ -756,6 +801,7 @@ const getRecommendedGamesWeb = asyncHandler(async (req, res) => {
 
     const filter = {
         isRecommended: true,
+        status: "published",
         $or: [
             { isHiddenWeb: { $exists: false } },
             { isHiddenWeb: false }
@@ -901,6 +947,8 @@ const deleteGame = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, game, "Game Deleted Succesfully"));
 })
+
+
 
 // GET:GAME CATEGORIES
 const getGameCategories = asyncHandler(async (req, res) => {

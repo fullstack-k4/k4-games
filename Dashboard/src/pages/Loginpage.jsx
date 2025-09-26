@@ -14,7 +14,6 @@ import { Eye, EyeOff } from 'lucide-react';
 
 
 const Loginpage = () => {
-
   const {
     handleSubmit,
     register,
@@ -44,8 +43,6 @@ const Loginpage = () => {
   const togglePasswordVisibility = () => {
     setshowPassword((prev) => !prev);
   }
-
-
 
 
   return (

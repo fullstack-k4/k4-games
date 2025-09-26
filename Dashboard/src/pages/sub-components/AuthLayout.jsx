@@ -23,11 +23,11 @@ const AuthLayout = ({ children, authentication = true, admin }) => {
     }
   }, [status, location.pathname])
 
-  if (isAuthenticated === null) return null 
+  if (isAuthenticated === null) return null
 
-    if (!isAuthenticated && authentication) {
-      return <Loginpage />
-    }
+  if (!isAuthenticated && authentication) {
+    return <Loginpage />
+  }
 
   return children
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllGames, makeGamesNull, deleteGame, getGameCategories } from "@/store/Slices/gameSlice";
-import { Pencil, Trash, Plus, Search, Bell, MonitorCheck } from "lucide-react";
+import { Pencil, Trash, Plus, Search, Bell, MonitorCheck, BellOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,7 @@ const Gamespage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedGame, setSelectedGame] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [openCheck, setOpenCheck] = useState(false);
   const [openFeaturedCheck, setOpenFeaturedCheck] = useState(false);
   const [openRecommendedCheck, setOpenRecommendedCheck] = useState(false);
@@ -68,11 +69,20 @@ const Gamespage = () => {
   useEffect(() => {
     dispatch(makeGamesNull()); // Clear previous page data
     if (userId && userRole) {
-      dispatch(getAllGames({ page: currentPage, limit: gamesPerPage, query: debouncedQuery, category: selectedCategory, userRole: userRole, userId: userId, filterBy: selectedFilter })).then(() => {
+      dispatch(getAllGames({
+        page: currentPage,
+        limit: gamesPerPage,
+        query: debouncedQuery,
+        category: selectedCategory,
+        userRole: userRole,
+        userId: userId,
+        filterBy: selectedFilter,
+        status: selectedStatus
+      })).then(() => {
         setloader(false);
       });
     }
-  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled, userId, userRole, selectedFilter]);
+  }, [dispatch, currentPage, deleted, debouncedQuery, selectedCategory, toggled, userId, userRole, selectedFilter, selectedStatus]);
 
   // 🔹 Cleanup on unmount
   useEffect(() => {
@@ -239,7 +249,6 @@ const Gamespage = () => {
     }
   };
 
-
   const filters = [
     {
       _id: 1,
@@ -272,6 +281,24 @@ const Gamespage = () => {
       value: "showonlyinapp"
     }
   ]
+
+
+  const status = [{
+    _id: 1,
+    name: "Published",
+    value: "published"
+  }, {
+    _id: 2,
+    name: "Draft",
+    value: "draft"
+  }, {
+    _id: 3,
+    name: "Scheduled",
+    value: "scheduled"
+  }]
+
+
+
 
   return (
     loader ? <Loader /> : (
@@ -330,6 +357,22 @@ const Gamespage = () => {
               ))}
             </SelectContent>
           </Select>
+
+
+          <Select value={selectedStatus || "all"} onValueChange={(value) => setSelectedStatus(value === "all" ? "" : value)}>
+            <SelectTrigger className="w-[200px] cursor-pointer">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="cursor-pointer">All Status</SelectItem>
+              {status?.map((status) => (
+                <SelectItem key={status?._id} value={status.value} className="cursor-pointer">
+                  {status.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
         </div>
 
         {/* Table */}
@@ -344,6 +387,7 @@ const Gamespage = () => {
                 <th className="p-4 text-left text-md font-semibold">Category</th>
                 <th className="p-4 text-left text-md font-semibold">Image</th>
                 <th className="p-4 text-left text-md font-semibold">Source</th>
+                <th className="p-4 text-left text-md font-semibold">Status</th>
                 <th className="p-4  text-md font-semibold text-center">Plays</th>
                 <th className="p-4 text-center text-md font-semibold">Download Allowed</th>
                 <th className="p-4  text-center text-md font-semibold">Featured</th>
@@ -383,8 +427,6 @@ const Gamespage = () => {
                     </td>
 
                     {/* Game Image */}
-
-
                     <td className="p-4 relative">
                       {/* Image with animation */}
                       <a href={`https://play.k4.games/play/${game?.slug}/`} target="_blank">
@@ -414,6 +456,31 @@ const Gamespage = () => {
                       >
                         {game.gameSource === "self" ? "Self" : "Link"}
                       </Badge>
+                    </td>
+
+
+                    {/* status */}
+                    <td className="p-4">
+                      {game.status === "published" && (
+                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                          Published
+                        </span>
+                      )}
+                      {game.status === "draft" && (
+                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-500 text-white">
+                          Draft
+                        </span>
+                      )}
+                      {game.status === "scheduled" && (
+                        <div className="flex flex-col items-start">
+                          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-200 text-yellow-800 shadow-sm">
+                            Scheduled
+                          </span>
+                          <span className="text-xs text-red-500 mt-1 ml-1">
+                            {new Date(game.scheduledAt).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Top 10 Count */}
@@ -500,18 +567,32 @@ const Gamespage = () => {
                     </td>
 
                     {/* notify */}
-                    <td className="p-4 font-bold text-gray-900 dark:text-gray-100 ">
-                      <Bell className="ml-4 cursor-pointer" size={20} onClick={() => {
-                        setSelectedGameForNotification(game);
-                        setNotificationModalOpen(true);
-                      }} />
+                    <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                      {game.status === "published" || game.notify ? (
+                        game.notify ? (
+                          <Bell
+                            className="ml-4 text-red-500 fill-red-500"
+                            size={20}
+                          />
+                        ) : (
+                          <Bell
+                            className="ml-4 cursor-pointer"
+                            size={20}
+                            onClick={() => {
+                              setSelectedGameForNotification(game);
+                              setNotificationModalOpen(true);
+                            }}
+                          />
+                        )
+                      ) : (
+                        <BellOff size={20} className="ml-4" />
+                      )}
                     </td>
 
 
 
 
                     {/* Actions */}
-
                     <td className="p-4 space-x-3">
                       <Link to={`/edit/${game?._id}`}>
                         <button className="text-blue-500 hover:scale-110 transition">

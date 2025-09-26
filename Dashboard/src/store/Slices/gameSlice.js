@@ -25,7 +25,7 @@ const initialState = {
 
 export const getAllGames = createAsyncThunk(
     'getAllGames',
-    async ({ page, limit, query, category, userId, userRole, filterBy }) => {
+    async ({ page, limit, query, category, userId, userRole, filterBy, status }) => {
         try {
             const url = new URL(`${BASE_URL}/games/getalldashboard`)
             if (page) url.searchParams.set("page", page);
@@ -35,6 +35,7 @@ export const getAllGames = createAsyncThunk(
             if (userId) url.searchParams.set("userId", userId);
             if (userRole) url.searchParams.set("userRole", userRole);
             if (filterBy) url.searchParams.set("filterBy", filterBy);
+            if (status) url.searchParams.set("status", status);
 
             // manually adding sortBy equals to newest 
             url.searchParams.set("sortBy", "newest");
@@ -116,6 +117,12 @@ export const editGame = createAsyncThunk(
             formData.append("topTenCount", data.topTenCount);
             formData.append("likesCount", data.likesCount);
             formData.append("dislikesCount", data.dislikesCount);
+            formData.append("status", data.status);
+            formData.append("notify", data.notify);
+
+            if(data.scheduledAt){
+                formData.append("scheduledAt",data.scheduledAt);
+            }
 
             if (data.image) {
                 formData.append("image", data.image[0]);
@@ -195,6 +202,12 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("topTenCount", data.topTenCount);
     formData.append("likesCount", data.likesCount);
     formData.append("dislikesCount", data.dislikesCount);
+    formData.append("status", data.status);
+    formData.append("notify", data.notify);
+
+    if (data.scheduledAt) {
+        formData.append("scheduledAt", data.scheduledAt);
+    }
 
 
     try {

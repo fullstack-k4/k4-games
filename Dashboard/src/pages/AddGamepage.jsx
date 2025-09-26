@@ -29,7 +29,8 @@ const AddGamepage = () => {
       isPremium: "false",
       topTenCount: 0,
       likesCount: 0,
-      dislikesCount: 0
+      dislikesCount: 0,
+      status: "published"
     }
   });
 
@@ -59,6 +60,8 @@ const AddGamepage = () => {
   const isAppOnly = watch("isAppOnly");
   const isDesktop = watch("isDesktop");
   const isHiddenWeb = watch("isHiddenWeb");
+
+  const status = watch("status");
 
 
   useEffect(() => {
@@ -110,7 +113,6 @@ const AddGamepage = () => {
 
 
 
-
   useEffect(() => {
     dispatch(getAllCategoriesDashboardPopup({ alphabetquery: selectedAlphabet, query: categorySearch }));
   }, [selectedAlphabet, categorySearch])
@@ -143,7 +145,16 @@ const AddGamepage = () => {
       return;
     }
 
-    const response = await dispatch(uploadGame(data));
+
+    const payload = {
+      ...data,
+      scheduledAt: data.status === "scheduled" && data.scheduledAt
+        ? new Date(data.scheduledAt).toISOString()
+        : null,
+      notify: data.status === "scheduled" ? data.notify : false,
+    }
+
+    const response = await dispatch(uploadGame(payload));
     if (response.meta.requestStatus === "fulfilled") {
       navigate("/games");
     }
@@ -430,7 +441,7 @@ const AddGamepage = () => {
 
 
 
-
+            {/* Game Selection */}
             <div>
               <Label>Game</Label>
               <Select value={selectedGameType || undefined} onValueChange={(value) => setValue("gameType", value)}>
@@ -477,6 +488,55 @@ const AddGamepage = () => {
                 {errors.gameZip && <p className="text-red-500 text-sm">{errors.gameZip.message}</p>}
               </div>
             </div>
+
+            {/* Status Dropdown */}
+            <div>
+              <Label className="mb-2">Status</Label>
+              <Select
+                onValueChange={(value) => setValue("status", value)}
+                defaultValue="published"
+              >
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
+                  <SelectItem value="published" className="cursor-pointer" >Published</SelectItem>
+                  <SelectItem value="scheduled" className="cursor-pointer" >Schedule</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Scheduled At */}
+            {status === "scheduled" && (
+              <div>
+                <Label className="mb-2">Schedule At</Label>
+                <Input
+                  type="datetime-local"
+                  {...register("scheduledAt", { required: "Schedule date & time is required when status is scheduled" })}
+                />
+                {errors.scheduledAt && (
+                  <p className="text-red-500 text-sm">{errors.scheduledAt.message}</p>
+                )}
+              </div>
+            )}
+
+            {status === "scheduled" && (
+              <div className="flex items-center space-x-2 mt-4">
+                <input
+                  type="checkbox"
+                  id="notify"
+                  {...register("notify")}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="notify"
+                  className="text-sm font-medium text-red-500 cursor-pointer"
+                >
+                  Notify all users when this game gets published
+                </label>
+              </div>
+            )}
 
 
 
