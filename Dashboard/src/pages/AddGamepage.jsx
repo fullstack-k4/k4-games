@@ -192,10 +192,7 @@ const AddGamepage = () => {
       unregister("videoUrl"); // Remove videoUrl if video is selected
       setValue("videoUrl", ""); // Ensure it's reset
     }
-
   }, [videoType, unregister, setValue]);
-
-
 
 
 
@@ -489,56 +486,6 @@ const AddGamepage = () => {
               </div>
             </div>
 
-            {/* Status Dropdown */}
-            <div>
-              <Label className="mb-2">Status</Label>
-              <Select
-                onValueChange={(value) => setValue("status", value)}
-                defaultValue="published"
-              >
-                <SelectTrigger className="w-full cursor-pointer">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
-                  <SelectItem value="published" className="cursor-pointer" >Published</SelectItem>
-                  <SelectItem value="scheduled" className="cursor-pointer" >Schedule</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Scheduled At */}
-            {status === "scheduled" && (
-              <div>
-                <Label className="mb-2">Schedule At</Label>
-                <Input
-                  type="datetime-local"
-                  {...register("scheduledAt", { required: "Schedule date & time is required when status is scheduled" })}
-                />
-                {errors.scheduledAt && (
-                  <p className="text-red-500 text-sm">{errors.scheduledAt.message}</p>
-                )}
-              </div>
-            )}
-
-            {status === "scheduled" && (
-              <div className="flex items-center space-x-2 mt-4">
-                <input
-                  type="checkbox"
-                  id="notify"
-                  {...register("notify")}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                />
-                <label
-                  htmlFor="notify"
-                  className="text-sm font-medium text-red-500 cursor-pointer"
-                >
-                  Notify all users when this game gets published
-                </label>
-              </div>
-            )}
-
-
 
             {/* Background Video */}
             <div>
@@ -723,6 +670,57 @@ const AddGamepage = () => {
               />
               {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
             </div>
+
+
+            {/* Status Dropdown */}
+            <div>
+              <Label className="mb-2">Status</Label>
+              <Select
+                onValueChange={(value) => setValue("status", value)}
+                defaultValue="published"
+              >
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
+                  <SelectItem value="published" className="cursor-pointer" >Published</SelectItem>
+                  <SelectItem value="scheduled" className="cursor-pointer" >Schedule</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Scheduled At */}
+            {status === "scheduled" && (
+              <div>
+                <Label className="mb-2">Schedule At</Label>
+                <Input
+                  type="datetime-local"
+                  {...register("scheduledAt", { required: "Schedule date & time is required when status is scheduled" })}
+                />
+                {errors.scheduledAt && (
+                  <p className="text-red-500 text-sm">{errors.scheduledAt.message}</p>
+                )}
+              </div>
+            )}
+
+            {status === "scheduled" && (
+              <div className="flex items-center space-x-2 mt-4">
+                <input
+                  type="checkbox"
+                  id="notify"
+                  {...register("notify")}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="notify"
+                  className="text-sm font-medium text-red-500 cursor-pointer"
+                >
+                  Notify all users when this game gets published
+                </label>
+              </div>
+            )}
+
 
 
             {/* Submit Button */}

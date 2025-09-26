@@ -15,7 +15,7 @@ import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-compone
 import { Link } from "react-router-dom";
 import { ArrowLeft, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { getGameById, editGame, makeGameNull, uploadGame } from "@/store/Slices/gameSlice";
+import { getGameById, editGame, makeGameNull} from "@/store/Slices/gameSlice";
 import { getAllCategoriesDashboardPopup } from "@/store/Slices/categorySlice";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
@@ -467,54 +467,6 @@ const EditGamepage = () => {
                             </div>
                         </div>
 
-                        {/* Status Selection */}
-                        <div>
-                            <Label className="mb-2">Status</Label>
-                            <Select
-                                onValueChange={(value) => setValue("status", value, { shouldDirty: true })}
-                                value={statusValue}
-                            >
-                                <SelectTrigger className="w-full cursor-pointer">
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
-                                    <SelectItem value="published" className="cursor-pointer">Published</SelectItem>
-                                    <SelectItem value="scheduled" className="cursor-pointer">Schedule</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-
-                        {statusValue === "scheduled" && (
-                            <div>
-                                <Label className="mb-2">Schedule At</Label>
-                                <Input
-                                    type="datetime-local"
-                                    {...register("scheduledAt", { required: "Schedule date & time is required when status is scheduled" })}
-                                />
-                                {errors.scheduledAt && (
-                                    <p className="text-red-500 text-sm">{errors.scheduledAt.message}</p>
-                                )}
-                            </div>
-                        )}
-
-                        {statusValue === "scheduled" && (
-                            <div className="flex items-center space-x-2 mt-4">
-                                <input
-                                    type="checkbox"
-                                    id="notify"
-                                    {...register("notify")}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                                />
-                                <label
-                                    htmlFor="notify"
-                                    className="text-sm font-medium text-red-500 cursor-pointer"
-                                >
-                                    Notify all users when this image gets published
-                                </label>
-                            </div>
-                        )}
 
 
 
@@ -697,6 +649,55 @@ const EditGamepage = () => {
                             />
                             {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
                         </div>
+
+                        {/* Status Selection */}
+                        <div>
+                            <Label className="mb-2">Status</Label>
+                            <Select
+                                onValueChange={(value) => setValue("status", value, { shouldDirty: true })}
+                                value={statusValue}
+                            >
+                                <SelectTrigger className="w-full cursor-pointer">
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
+                                    <SelectItem value="published" className="cursor-pointer">Published</SelectItem>
+                                    <SelectItem value="scheduled" className="cursor-pointer">Schedule</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+
+                        {statusValue === "scheduled" && (
+                            <div>
+                                <Label className="mb-2">Schedule At</Label>
+                                <Input
+                                    type="datetime-local"
+                                    {...register("scheduledAt", { required: "Schedule date & time is required when status is scheduled" })}
+                                />
+                                {errors.scheduledAt && (
+                                    <p className="text-red-500 text-sm">{errors.scheduledAt.message}</p>
+                                )}
+                            </div>
+                        )}
+
+                        {statusValue === "scheduled" && (
+                            <div className="flex items-center space-x-2 mt-4">
+                                <input
+                                    type="checkbox"
+                                    id="notify"
+                                    {...register("notify")}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                />
+                                <label
+                                    htmlFor="notify"
+                                    className="text-sm font-medium text-red-500 cursor-pointer"
+                                >
+                                    Notify all users when this image gets published
+                                </label>
+                            </div>
+                        )}
 
                         {editing ? (<SpecialLoadingButton content={"Editing"} />) : (
                             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isDirty || !slugAvailable}>

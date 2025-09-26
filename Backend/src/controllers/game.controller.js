@@ -505,7 +505,6 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
         }
     })
 
-
     let foundCategory = null;
 
 
@@ -573,7 +572,6 @@ const getAllGameWeb = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, { ...game, searchedcategory: foundCategory?.name, searchedcategoryimage: foundCategory?.imageUrl, searchedcategoryicon: foundCategory?.iconUrl, searchedcategorydescription: foundCategory?.description }, "All Games Fetched Successfully"));
 });
-
 
 
 // GET:ALL GAMES DASHBOARD (FOR DASHBOARD)
