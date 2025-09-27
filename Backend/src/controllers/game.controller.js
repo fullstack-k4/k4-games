@@ -735,7 +735,7 @@ const getPopularGames = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const getPopularGames = await Game.find(filter).select("gameName _id slug imageUrl").sort({ topTenCount: -1 }).limit(36);
+    const getPopularGames = await Game.find(filter).select("gameName _id slug imageUrl").sort({ topTenCount: -1 }).limit(37);
     return res.status(200).json(new ApiResponse(200, getPopularGames, "Popular Games Fetched Successfully"));
 })
 

@@ -40,7 +40,6 @@ const getAllCategory = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, categories, "All Categories Fetched Successfully"));
 })
 
-
 // For Sidebar in website
 const getAllCategoryWeb = asyncHandler(async (req, res) => {
     const categories = await Category.find({ isSidebar: true }).select("-__v -imageSource -iconSource").sort({ order: 1, name: 1 });
@@ -141,12 +140,26 @@ const getAllCategoriesDashboardPopup = asyncHandler(async (req, res) => {
         })
     }
 
+
     if (alphabetquery) {
-        pipeline.push({
-            $match: {
-                name: { $regex: `^${alphabetquery}`, $options: "i" }
-            }
-        });
+        if (alphabetquery === "#") {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        // names starting with non-alphabet characters
+                        { name: { $regex: '^[^A-Za-z]', $options: '' } },
+                        // OR names that are null/empty
+                        { name: { $in: [null, ""] } }
+                    ]
+                }
+            });
+        } else {
+            pipeline.push({
+                $match: {
+                    name: { $regex: `^${alphabetquery}`, $options: "i" }
+                }
+            });
+        }
     }
 
 

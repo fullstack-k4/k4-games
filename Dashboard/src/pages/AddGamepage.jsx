@@ -47,7 +47,7 @@ const AddGamepage = () => {
   const [selectedGameType, setSelectedGameType] = useState("url");
   const [selectedVideoType, setSelectedVideoType] = useState("url");
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
-  const [selectedAlphabet, setSelectedAlphabet] = useState("A");
+  const [selectedAlphabet, setSelectedAlphabet] = useState("#");
   const [categorySearch, setCategorySearch] = useState("");
   const [slugAvailable, setSlugAvailable] = useState(true);
   const [checkingSlug, setCheckingSlug] = useState(false);
@@ -358,6 +358,17 @@ const AddGamepage = () => {
             </div>
 
 
+            {/* Instructions */}
+            <div>
+              <Label htmlFor="instruction">Instruction</Label>
+              <MyEditor
+                value={watch("instruction")}
+                onChange={(content) => setValue("instruction", content, { shouldValidate: true })}
+              />
+              {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
+            </div>
+
+
             {/* Category Selection */}
             <div>
               <Button type="button" onClick={() => setShowCategoryPopup(true)}>
@@ -389,10 +400,6 @@ const AddGamepage = () => {
                 </SelectContent>
               </Select>
             </div>
-
-
-
-
 
             <div>
               {/* Image Selection */}
@@ -661,15 +668,7 @@ const AddGamepage = () => {
               <Input {...register("gamePlayVideo")} />
             </div>
 
-            {/* Instructions */}
-            <div>
-              <Label htmlFor="instruction">Instruction</Label>
-              <MyEditor
-                value={watch("instruction")}
-                onChange={(content) => setValue("instruction", content, { shouldValidate: true })}
-              />
-              {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
-            </div>
+
 
 
             {/* Status Dropdown */}
@@ -761,7 +760,7 @@ const AddGamepage = () => {
 
               {/* Alphabet Filter Row */}
               <div className="flex flex-wrap gap-1 justify-center md:justify-start mb-6">
-                {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((char) => (
+                {["#", ... "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")].map((char) => (
                   <button
                     key={char}
                     onClick={() => {
@@ -786,7 +785,7 @@ const AddGamepage = () => {
                     return (
                       <label
                         key={category._id}
-                        className="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md hover:shadow-sm transition"
+                        className="flex items-center cursor-pointer space-x-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md hover:shadow-sm transition"
                       >
                         <input
                           type="checkbox"

@@ -15,7 +15,7 @@ import { Container, SpecialLoadingButton, Loader, MyEditor } from "./sub-compone
 import { Link } from "react-router-dom";
 import { ArrowLeft, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { getGameById, editGame, makeGameNull} from "@/store/Slices/gameSlice";
+import { getGameById, editGame, makeGameNull } from "@/store/Slices/gameSlice";
 import { getAllCategoriesDashboardPopup } from "@/store/Slices/categorySlice";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
@@ -40,7 +40,7 @@ const EditGamepage = () => {
     const [slugAvailable, setSlugAvailable] = useState(true);
     const [checkingSlug, setCheckingSlug] = useState(false);
     const [loader, setloader] = useState(true);
-    const [selectedAlphabet, setSelectedAlphabet] = useState("A");
+    const [selectedAlphabet, setSelectedAlphabet] = useState("#");
     const [categorySearch, setCategorySearch] = useState("");
     const [showCategoryPopup, setShowCategoryPopup] = useState(false);
 
@@ -306,6 +306,16 @@ const EditGamepage = () => {
                             {errors.description && (
                                 <p className="text-red-500 text-sm">{errors.description.message}</p>
                             )}
+                        </div>
+
+                        {/* Instructions */}
+                        <div>
+                            <Label htmlFor="instruction">Instruction</Label>
+                            <MyEditor
+                                value={watch("instruction")}
+                                onChange={(content) => setValue("instruction", content, { shouldValidate: true, shouldDirty: true })}
+                            />
+                            {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
                         </div>
 
 
@@ -640,15 +650,7 @@ const EditGamepage = () => {
                             />
                         </div>
 
-                        {/* Instructions */}
-                        <div>
-                            <Label htmlFor="instruction">Instruction</Label>
-                            <MyEditor
-                                value={watch("instruction")}
-                                onChange={(content) => setValue("instruction", content, { shouldValidate: true, shouldDirty: true })}
-                            />
-                            {errors.instruction && <p className="text-red-500 text-sm">{errors.instruction.message}</p>}
-                        </div>
+
 
                         {/* Status Selection */}
                         <div>
@@ -734,7 +736,7 @@ const EditGamepage = () => {
 
                             {/* Alphabet Filter Row */}
                             <div className="flex flex-wrap gap-1 justify-center md:justify-start mb-6">
-                                {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((char) => (
+                                {["#", ... "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")].map((char) => (
                                     <button
                                         key={char}
                                         onClick={() => {
