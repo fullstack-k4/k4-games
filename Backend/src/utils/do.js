@@ -5,36 +5,30 @@ import mime from "mime-types";
 
 
 
-const deleteFileFromDO = async (fileUrl) => {
-  try {
-    const bucketName = process.env.DIGITALOCEAN_BUCKET_NAME;
-    const gamesIndex = fileUrl.indexOf("files/");
-    let s3Key;
 
-    if (gamesIndex !== -1) {
-      // Extract the key (path after the bucket name)
-      s3Key = fileUrl.substring(fileUrl.indexOf("files/"));
-      s3Key = decodeURIComponent(s3Key);
-    }
-    else {
-      s3Key = fileUrl.substring(fileUrl.indexOf("gamecategory/"));
-      s3Key = decodeURIComponent(s3Key);
-    }
-    console.log("Deleting file:", s3Key);
+
+const deleteFileFromDO = async (url) => {
+  try {
+    let s3Key = url.replace(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/`, "")
 
     const deleteParams = {
-      Bucket: bucketName,
+      Bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
       Key: s3Key,
     }
 
-    const response = await s3.send(new DeleteObjectCommand(deleteParams));
+    await s3.send(new DeleteObjectCommand(deleteParams));
     console.log(`File deleted: ${s3Key}`);
+
     return { success: true, message: "File deleted successfully" };
   } catch (error) {
     console.log("Error deleting file:", error);
-    throw new Error("Failed to delete file");
+    throw new Error("Failed to delete file.");
   }
+
 }
+
+
+
 
 const deleteFileFromDOS3key = async (s3Key) => {
   try {
@@ -133,7 +127,7 @@ const uploadJsonToS3 = async (matchedId, gameJson) => {
 
     await s3.send(new PutObjectCommand(uploadParams));
 
-    return `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${matchedId}/gameData.json`
+    return `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/files/${matchedId}/gameData.json`
   } catch (error) {
     console.error("Error uploading file to S3:", error);
     throw error;

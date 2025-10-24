@@ -10,26 +10,25 @@ import { deleteFileFromDO } from "../utils/do.js"
 
 const createApp = asyncHandler(async (req, res) => {
     const { link } = req.body;
+
+    let imageUrl = req.body.imageUrl || ""
+
     if (!link) {
         throw new ApiError(400, "link is required");
     }
 
     let uploadedImageUrl = req.file ? req.file.location : null;
 
-    let bool;
-
-
-    let imageUrl = req.body.imageUrl || ""
+    uploadedImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.file.key}`
 
     if (uploadedImageUrl) {
         imageUrl = uploadedImageUrl
-        bool = true;
     }
 
     const app = await MoreApp.create({
         link,
         imageUrl,
-        imageSource: bool ? "self" : "link"
+        imageSource: uploadedImageUrl ? "self" : "link"
     })
 
     if (!app) {
@@ -76,7 +75,6 @@ const deleteApp = asyncHandler(async (req, res) => {
     }
 
     if (imageUrl && app.imageSource === "self") {
-        imageUrl = imageUrl.replace(`${process.env.DIGITALOCEAN_ENDPOINT}/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "")  ;
         await deleteFileFromDO(imageUrl);
     }
 

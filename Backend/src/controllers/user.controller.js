@@ -259,15 +259,7 @@ const sendGameNotificationtoAllUsers = asyncHandler(async (req, res) => {
             error: error.message
         })
     }
-
-
 })
-
-
-
-
-
-
 
 
 export {

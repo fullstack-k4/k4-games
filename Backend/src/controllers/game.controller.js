@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Game } from "../models/game.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import { extractAndUpload } from "../utils/extractAndUpload.js";
-import { deleteFileFromDO, deleteFolderFromS3, deleteFileFromDOS3key, uploadJsonToS3 } from "../utils/do.js";
+import { deleteFileFromDO, deleteFolderFromS3, uploadJsonToS3 } from "../utils/do.js";
 import { Category } from "../models/category.model.js";
 import { Vote } from "../models/vote.model.js";
 
@@ -40,9 +40,7 @@ const uploadGame = asyncHandler(async (req, res) => {
     let uploadedGameUrl = req.files["gameZip"] ? req.files["gameZip"][0].location : null;
 
     if (uploadedGameUrl) {
-        // we are keeping url constant irrespective of file size,because for larger files digital ocean returns different url
-        const relativePath = uploadedGameUrl.split("files/")[1];
-        uploadedGameUrl = `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${relativePath}`
+        uploadedGameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["gameZip"][0].key}`
     }
 
 
@@ -54,21 +52,22 @@ const uploadGame = asyncHandler(async (req, res) => {
         extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName);
         const indexHtmlFileLink = extractedFiles.filter((file) => file.fileName === "index.html");
         let gameLink = indexHtmlFileLink[0].url;
-        gameUrl = gameLink.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com`, `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com`);
+        const relativePath = gameLink.split(".com/")[1];
+        gameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${relativePath}`;
         gameSource = "self";
     }
 
     let uploadedImageUrl = req.files["image"] ? req.files["image"][0].location : null;
 
     if (uploadedImageUrl) {
-        imageUrl = uploadedImageUrl;
+        imageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["image"][0].key}`;
         thumbnailSource = "self";
     }
 
     let uploadedVideoUrl = req.files["video"] ? req.files["video"][0].location : null;
 
     if (uploadedVideoUrl) {
-        backgroundVideoUrl = uploadedVideoUrl;
+        backgroundVideoUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["video"][0].key}`;
         backgroundVideoSource = "self"
     }
 
@@ -88,8 +87,8 @@ const uploadGame = asyncHandler(async (req, res) => {
         imageUrl,
         gameUrl,
         downloadable,
-        gameSource,
-        thumbnailSource,
+        gameSource: gameSource === "self" ? "self" : "link",
+        thumbnailSource: thumbnailSource === "self" ? "self" : "link",
         createdBy: req.user?._id,
         slug,
         primaryCategory,
@@ -135,11 +134,8 @@ const uploadGame = asyncHandler(async (req, res) => {
             isrotate: isrotate === "true",
         };
 
-
-
         gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
     }
-
 
 
     const game = await Game.create({ ...gameData, gameDataUrl });
@@ -193,9 +189,7 @@ const editGame = asyncHandler(async (req, res) => {
 
 
     if (uploadedGameUrl) {
-        // we are keeping url constant irrespective of file size,because for larger files digital ocean returns different url
-        const relativePath = uploadedGameUrl.split("files/")[1];
-        uploadedGameUrl = `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${relativePath}`
+        uploadedGameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["gameZip"][0].key}`
     }
 
     if (uploadedGameUrl) {
@@ -206,7 +200,8 @@ const editGame = asyncHandler(async (req, res) => {
         extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName);
         const indexHtmlFileLink = extractedFiles.filter((file) => file.fileName === "index.html");
         let gameLink = indexHtmlFileLink[0].url;
-        gameUrl = gameLink.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com`, `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com`);
+        const relativePath = gameLink.split(".com/")[1];
+        gameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${relativePath}`;
 
         //Delete previous game folder
         if (game.gameSource === "self") {
@@ -219,7 +214,7 @@ const editGame = asyncHandler(async (req, res) => {
         }
     }
 
-    if (!gameUrl.includes("digitalocean") && previousGameUrl.includes("digitalocean") && !uploadedGameUrl) {
+    if (!gameUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && previousGameUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && !uploadedGameUrl) {
         // which means game is edited via link and previous game was uploaded on cloud
         // delete previous game from cloud
 
@@ -234,8 +229,7 @@ const editGame = asyncHandler(async (req, res) => {
         // delete gameData.json
 
         if (game?.gameDataUrl) {
-            let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
-            await deleteFileFromDOS3key(gameDataS3Key);
+            await deleteFileFromDO(gameDataUrl);
         }
 
         // reset these fields
@@ -249,7 +243,7 @@ const editGame = asyncHandler(async (req, res) => {
     let uploadedImageUrl = req.files["image"] ? req.files["image"][0].location : null;
 
     if (uploadedImageUrl) {
-        imageUrl = uploadedImageUrl;
+        imageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["image"][0].key}`;
 
         // Delete previous image
         if (game.thumbnailSource === "self") {
@@ -258,7 +252,7 @@ const editGame = asyncHandler(async (req, res) => {
 
     }
 
-    if (!imageUrl.includes("digitalocean") && previousImageUrl.includes("digitalocean") && !uploadedImageUrl) {
+    if (!imageUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && previousImageUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && !uploadedImageUrl) {
         // which means image is edited via link and previous image was uploaded on cloud
         // delete previous image from cloud
         await deleteFileFromDO(previousImageUrl);
@@ -268,7 +262,7 @@ const editGame = asyncHandler(async (req, res) => {
     let uploadedVideoUrl = req.files["video"] ? req.files["video"][0].location : null;
 
     if (uploadedVideoUrl) {
-        backgroundVideoUrl = uploadedVideoUrl;
+        backgroundVideoUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["video"][0].key}`;
 
         // Delete previous video
 
@@ -278,7 +272,7 @@ const editGame = asyncHandler(async (req, res) => {
 
     }
 
-    if (!backgroundVideoUrl.includes("digitalocean") && previousBackgroundVideoUrl.includes("digitalocean") && !uploadedVideoUrl) {
+    if (!backgroundVideoUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && previousBackgroundVideoUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && !uploadedVideoUrl) {
         // which means background video is edited via link and previous image was uploaded on cloud
         // delete previous video from cloud
         await deleteFileFromDO(previousBackgroundVideoUrl);
@@ -298,8 +292,7 @@ const editGame = asyncHandler(async (req, res) => {
             previousPrimaryCategory !== primaryCategory
         )) {
             // delete previous gameData.json File 
-            let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
-            await deleteFileFromDOS3key(gameDataS3Key);
+            await deleteFileFromDO(game?.gameDataUrl);
 
             // create new meta data
 
@@ -327,8 +320,7 @@ const editGame = asyncHandler(async (req, res) => {
 
         if (uploadedGameUrl || uploadedImageUrl) {
             // delete previous gameData.json File 
-            let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
-            await deleteFileFromDOS3key(gameDataS3Key);
+            await deleteFileFromDO(game.gameDataUrl);
 
             // create new meta data
 
@@ -372,14 +364,14 @@ const editGame = asyncHandler(async (req, res) => {
     game.imageUrl = imageUrl;
     game.gameUrl = gameUrl;
 
-    if (imageUrl.includes("digitalocean")) {
+    if (imageUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`)) {
         game.thumbnailSource = "self"
     }
     else {
         game.thumbnailSource = "link"
     }
 
-    if (gameUrl.includes("digitalocean")) {
+    if (gameUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`)) {
         game.gameSource = "self"
     }
     else {
@@ -391,7 +383,7 @@ const editGame = asyncHandler(async (req, res) => {
         gameZipUrl = uploadedGameUrl;
     }
     game.backgroundVideoUrl = backgroundVideoUrl;
-    if (backgroundVideoUrl.includes("digitalocean")) {
+    if (backgroundVideoUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`)) {
         game.backgroundVideoSource = "self"
     }
     else {
@@ -923,23 +915,19 @@ const deleteGame = asyncHandler(async (req, res) => {
     }
 
     if (game?.featuredImageUrl) {
-        let imageS3Key = game.featuredImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
-        await deleteFileFromDOS3key(imageS3Key);
+        await deleteFileFromDO(game?.featuredImageUrl);
     }
 
     if (game?.featuredVideoUrl) {
-        let videoS3Key = game.featuredVideoUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
-        await deleteFileFromDOS3key(videoS3Key);
+        await deleteFileFromDO(game?.featuredVideoUrl);
     }
 
     if (game?.recommendedImageUrl) {
-        let imageS3Key = game.recommendedImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
-        await deleteFileFromDOS3key(imageS3Key);
+        await deleteFileFromDO(game?.recommendedImageUrl);
     }
 
     if (game?.gameDataUrl) {
-        let gameDataS3Key = game.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
-        await deleteFileFromDOS3key(gameDataS3Key);
+        await deleteFileFromDO(game?.gameDataUrl);
     }
 
 
@@ -968,9 +956,8 @@ const allowDownload = asyncHandler(async (req, res) => {
 
     let uploadedGameUrl = req.file ? req.file.location : null;
 
-    // we are keeping url constant irrespective of file size,because for larger files digital ocean returns different url
-    const relativePath = uploadedGameUrl.split("files/")[1];
-    uploadedGameUrl = `https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/files/${relativePath}`
+
+    uploadedGameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.file.key}`
 
     //Extract uuid
     const matchedId = uploadedGameUrl.match(/files\/(\d+)\//);
@@ -1022,8 +1009,7 @@ const denyDownload = asyncHandler(async (req, res) => {
 
     // delete gameData.json file
     if (game?.gameDataUrl) {
-        let gameDataS3Key = game?.gameDataUrl.replace(`https://${process.env.DIGITALOCEAN_BUCKET_NAME}.${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/`, "");
-        await deleteFileFromDOS3key(gameDataS3Key);
+        await deleteFileFromDO(game?.gameDataUrl);
     }
 
     game.gameZipUrl = null;
@@ -1048,10 +1034,10 @@ const allowFeatured = asyncHandler(async (req, res) => {
     let uploadedVideoUrl = req.files["videoFile"] ? req.files["videoFile"][0].location : null;
 
     if (uploadedImageUrl) {
-        featuredImageUrl = uploadedImageUrl;
+        featuredImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["imageFile"][0].key}`;
     }
     if (uploadedVideoUrl) {
-        featuredVideoUrl = uploadedVideoUrl;
+        featuredVideoUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["videoFile"][0].key}`;
     }
 
     // change the value of isFeatured to true
@@ -1085,17 +1071,14 @@ const denyFeatured = asyncHandler(async (req, res) => {
     // delete video and image
 
     if (game?.featuredVideoUrl && game?.featuredVideoUrl.includes("/feat/")) {
-        let videoS3Key = game.featuredVideoUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
-        await deleteFileFromDOS3key(videoS3Key);
+        await deleteFileFromDO(game?.featuredVideoUrl);
         game.featuredVideoUrl = null;
     }
 
     if (game?.featuredImageUrl && game.featuredImageUrl.includes("/feat/")) {
-        let imageS3Key = game.featuredImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
-        await deleteFileFromDOS3key(imageS3Key);
+        await deleteFileFromDO(game?.featuredImageUrl);
         game.featuredImageUrl = null;
     }
-
 
     // change the value of isFeatured to false;
     game.isFeatured = false;
@@ -1115,7 +1098,7 @@ const allowRecommended = asyncHandler(async (req, res) => {
     let uploadedImageUrl = req.file ? req.file.location : null;
 
     if (uploadedImageUrl) {
-        recommendedImageUrl = uploadedImageUrl;
+        recommendedImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.file.key}`;
     }
 
 
@@ -1146,8 +1129,7 @@ const denyRecommended = asyncHandler(async (req, res) => {
     }
 
     if (game?.recommendedImageUrl && game.recommendedImageUrl.includes("/recd/")) {
-        let imageS3Key = game.recommendedImageUrl.replace(`https://${process.env.DIGITALOCEAN_REGION}.digitaloceanspaces.com/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "");
-        await deleteFileFromDOS3key(imageS3Key);
+        await deleteFileFromDO(game?.recommendedImageUrl);
         game.recommendedImageUrl = null;
     }
 

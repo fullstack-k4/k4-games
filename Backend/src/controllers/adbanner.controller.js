@@ -2,8 +2,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Adbanner } from "../models/adbanner.model.js";
-import { deleteFileFromDOS3key } from "../utils/do.js";
 import { isValidObjectId } from "mongoose";
+import { deleteFileFromDO } from "../utils/do.js"
+
 
 
 const create = asyncHandler(async (req, res) => {
@@ -14,11 +15,13 @@ const create = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Please Fill in all fields");
     }
 
-    let uploadedImageUrl = req.file ? req.file.location : null;
-
     let imageUrl = req.body.imageUrl || null;
 
+    let uploadedImageUrl = req.file ? req.file.location : null;
+
+
     if (uploadedImageUrl) {
+        uploadedImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.file.key}`
         imageUrl = uploadedImageUrl;
     }
 
@@ -66,8 +69,7 @@ const deleteById = asyncHandler(async (req, res) => {
     }
 
     if (imageUrl && adbanner.imageSource === "self") {
-        imageUrl = imageUrl.replace(`${process.env.DIGITALOCEAN_ENDPOINT}/${process.env.DIGITALOCEAN_BUCKET_NAME}/`, "")
-        await deleteFileFromDOS3key(imageUrl);
+        await deleteFileFromDO(imageUrl);
     }
 
     return res.status(200).json(new ApiResponse(200, deletedadbanner, "Adbanner deleted successfully"));

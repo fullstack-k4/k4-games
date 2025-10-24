@@ -7,28 +7,26 @@ import { deleteFileFromDO } from "../utils/do.js"
 
 
 
-const createPopUp=asyncHandler(async(req,res)=>{
-    const {link}=req.body;
+const createPopUp = asyncHandler(async (req, res) => {
+    const { link } = req.body;
 
-    if(!link){
-        throw new ApiError(400,"Please Fill in all fileds");
+    let imageUrl = req.body.imageUrl || ""
+
+    if (!link) {
+        throw new ApiError(400, "Please Fill in all fileds");
     }
 
-    let uploadedImageUrl=req.file ? req.file.location : null;
+    let uploadedImageUrl = req.file ? req.file.location : null;
 
-    let bool;
-
-    let imageUrl=req.body.imageUrl || ""
-
-    if(uploadedImageUrl){
-        imageUrl=uploadedImageUrl
-        bool=true;
+    if (uploadedImageUrl) {
+        uploadedImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.file.key}`
+        imageUrl = uploadedImageUrl
     }
 
     const popup = await Popup.create({
         link,
         imageUrl,
-        imageSource: bool ? "self" : "link"
+        imageSource: uploadedImageUrl ? "self" : "link"
     })
 
     if (!popup) {
@@ -40,9 +38,9 @@ const createPopUp=asyncHandler(async(req,res)=>{
 
 const getAllPopUp = asyncHandler(async (req, res) => {
 
-       let popup = await Popup.find({})
-            .sort({ createdAt: -1 })
-            .select("-__v -updatedAt -imageSource -createdAt");
+    let popup = await Popup.find({})
+        .sort({ createdAt: -1 })
+        .select("-__v -updatedAt -imageSource -createdAt");
     if (!popup) {
         return res.status(404, "No PopupFound");
     }
@@ -92,7 +90,6 @@ const deletePopup = asyncHandler(async (req, res) => {
     }
 
     if (imageUrl && popup.imageSource === "self") {
-        imageUrl=imageUrl.replace(`${process.env.DIGITALOCEAN_ENDPOINT}/${process.env.DIGITALOCEAN_BUCKET_NAME}/`,"")
         await deleteFileFromDO(imageUrl);
     }
 
@@ -102,5 +99,5 @@ const deletePopup = asyncHandler(async (req, res) => {
 
 
 
-export  {createPopUp,getAllPopUp,getPopUpById,deletePopup};
+export { createPopUp, getAllPopUp, getPopUpById, deletePopup };
 

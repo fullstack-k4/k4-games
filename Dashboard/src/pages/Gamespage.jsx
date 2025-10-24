@@ -411,8 +411,11 @@ const Gamespage = () => {
                     {/* Game Name */}
                     <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
                       {game.gameName}
-                      {game.gameSource === "self" && <div className="text-sm font-normal text-red-500 dark:text-gray-400">
+                      {game.gameSource === "self" && <div className="text-sm font-normal text-green-500">
                         ({game.gameUrl?.split("/")[4]})
+                      </div>}
+                      {game.thumbnailSource === "self" && game.gameSource === "link" && <div className="text-sm font-normal text-blue-500">
+                        ({game.imageUrl?.split("/")[4]})
                       </div>}
                     </td>
 
@@ -429,7 +432,7 @@ const Gamespage = () => {
                     {/* Game Image */}
                     <td className="p-4 relative">
                       {/* Image with animation */}
-                      <a href={`https://play.k4.games/play/${game?.slug}/`} target="_blank">
+                      <a href={`https://k4.games/play/${game?.slug}/`} target="_blank">
                         <motion.img
                           src={game.imageUrl}
                           alt={game.gameName}
@@ -620,7 +623,6 @@ const Gamespage = () => {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-
                     </td>
                   </tr>
                 ))

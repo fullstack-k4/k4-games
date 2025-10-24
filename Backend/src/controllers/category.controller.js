@@ -18,11 +18,13 @@ const createCategory = asyncHandler(async (req, res) => {
     let iconImageUrl = req.files["icon"] ? req.files["icon"][0].location : null;
 
     if (uploadedImageUrl) {
+        uploadedImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["image"][0].key}`
         imageUrl = uploadedImageUrl;
         imageSource = "self"
     }
 
     if (iconImageUrl) {
+        iconImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["icon"][0].key}`
         iconUrl = iconImageUrl
         iconSource = "self"
     }
@@ -228,22 +230,24 @@ const editCategory = asyncHandler(async (req, res) => {
     }
 
     if (uploadedImageUrl) {
+        uploadedImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["image"][0].key}`
         imageUrl = uploadedImageUrl;
     }
 
 
     if (uploadediconImageUrl) {
+        uploadediconImageUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["icon"][0].key}`
         iconUrl = uploadediconImageUrl;
     }
 
-    if (!imageUrl.includes("digitalocean") && category.imageUrl.includes("digitalocean") && !uploadedImageUrl) {
+    if (!imageUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && category.imageUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && !uploadedImageUrl) {
         // which means image is edited via url and previous image was uploaded on digital ocean
         // delete previous image
 
         await deleteFileFromDO(category.imageUrl);
     }
 
-    if (!iconUrl.includes("digitalocean") && category.iconUrl.includes("digitalocean") && !uploadediconImageUrl) {
+    if (!iconUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && category.iconUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`) && !uploadediconImageUrl) {
         // which means icon is edited via url and previous icon was uploaded on digital ocean
         // delete previous icon
 
@@ -260,14 +264,14 @@ const editCategory = asyncHandler(async (req, res) => {
     category.gradientColor2 = gradientColor2;
     category.order = order;
 
-    if (imageUrl.includes("digitalocean")) {
+    if (imageUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`)) {
         category.imageSource = "self"
     }
     else {
         category.imageSource = "link"
     }
 
-    if (iconUrl.includes("digitalocean")) {
+    if (iconUrl.includes(`${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}`)) {
         category.iconSource = "self"
     }
     else {

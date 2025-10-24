@@ -47,6 +47,11 @@ const extractUniqueId = async (req, res, next) => {
         uniqueId = parts[parts.indexOf("files") + 1]
     }
 
+    if (game.backgroundVideoUrl) {
+        const parts = game.backgroundVideoUrl.split("/");
+        uniqueId = parts[parts.indexOf("files") + 1]
+    }
+
     if (uniqueId) {
         req.existingUniqueId = uniqueId; //Attach to request Object
     }

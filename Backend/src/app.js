@@ -7,9 +7,9 @@ const app = express();
 
 const allowedOrigins = [
   process.env.CORS_ORIGIN_1,
-  process.env.CORS_ORIGIN_2
+  process.env.CORS_ORIGIN_2,
+  process.env.CORS_ORIGIN_3
 ]
-
 
 
 const corsOptions = {
@@ -38,7 +38,10 @@ app.get("/", (req, res) => {
   res.send("Api Running");
 })
 
-
+app.post("/save-score", (req, res) => {
+  const { score } = req.body;
+  console.log(score);
+})
 
 
 
@@ -54,7 +57,7 @@ import reportRouter from "./routes/report.routes.js"
 import pageRouter from "./routes/page.routes.js"
 import voteRouter from "./routes/vote.routes.js"
 import adBannerRouter from "./routes/adbanner.routes.js"
-
+import gameScoreRouter from "./routes/gamescore.routes.js"
 
 
 
@@ -70,6 +73,7 @@ app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/pages", pageRouter);
 app.use("/api/v1/vote", voteRouter);
 app.use("/api/v1/adbanner", adBannerRouter);
+app.use("/api/v1/gamescore", gameScoreRouter);
 
 
 
