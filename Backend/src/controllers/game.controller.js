@@ -132,6 +132,7 @@ const uploadGame = asyncHandler(async (req, res) => {
             gameUrl,
             downloadable,
             isrotate: isrotate === "true",
+            slug,
         };
 
         gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
@@ -180,6 +181,7 @@ const editGame = asyncHandler(async (req, res) => {
     const previousSplashColor = game?.splashColor;
     const previousOrientation = game?.isrotate;
     const previousPrimaryCategory = game?.primaryCategory;
+    const previousSlug = game?.slug;
 
 
 
@@ -289,7 +291,8 @@ const editGame = asyncHandler(async (req, res) => {
             || previousDescription !== description ||
             previousSplashColor !== splashColor ||
             previousOrientation !== isrotate ||
-            previousPrimaryCategory !== primaryCategory
+            previousPrimaryCategory !== primaryCategory ||
+            previousSlug !== slug
         )) {
             // delete previous gameData.json File 
             await deleteFileFromDO(game?.gameDataUrl);
@@ -310,7 +313,8 @@ const editGame = asyncHandler(async (req, res) => {
                 imageUrl,
                 gameUrl,
                 downloadable: true,
-                isrotate
+                isrotate,
+                slug
             };
 
             gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
@@ -338,7 +342,8 @@ const editGame = asyncHandler(async (req, res) => {
                 imageUrl,
                 gameUrl,
                 downloadable: true,
-                isrotate
+                isrotate,
+                slug
             };
 
             gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
@@ -973,7 +978,8 @@ const allowDownload = asyncHandler(async (req, res) => {
         imageUrl: game?.imageUrl,
         gameUrl: game?.gameUrl,
         downloadable: true,
-        isrotate: game?.isrotate
+        isrotate: game?.isrotate,
+        slug: game?.slug
     }
 
     // upload gameData.json file to digital ocean
