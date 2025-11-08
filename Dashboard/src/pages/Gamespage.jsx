@@ -17,6 +17,7 @@ import { denyFeatured } from "@/store/Slices/gameSlice";
 import { denyRecommended } from "@/store/Slices/gameSlice";
 import { sendGameNotificationtoAllUsers } from "@/store/Slices/authSlice";
 import { formatPlaysCount } from "@/utils/format";
+import { sendGameWebPushNotification } from "@/store/Slices/webpushnotificationSlice";
 
 
 const Gamespage = () => {
@@ -246,6 +247,30 @@ const Gamespage = () => {
       if (response.meta.requestStatus === "fulfilled") {
         setNotificationModalOpen(false)
       }
+    }
+
+    if (type === "webpushnotificationall") {
+
+      const cleanDescription = game?.description
+        ?.replace(/[^a-zA-Z0-9\s.,!?]/g, "") // removes special characters
+        ?.slice(0, 80) // limit to 80 characters 
+        ?.trim();
+
+
+
+      const response = await dispatch(sendGameWebPushNotification({
+        data: {
+          title: game?.gameName,
+          body: cleanDescription,
+          gameSlug: game?.slug,
+          icon: game?.imageUrl
+        }
+      }))
+
+      if (response.meta.requestStatus === "fulfilled") {
+        setNotificationModalOpen(false)
+      }
+
     }
   };
 
@@ -668,7 +693,10 @@ const Gamespage = () => {
             </AlertDialogHeader>
             <div className="flex flex-col gap-4 mt-4">
               <Button onClick={() => notifyUsers('all')} className="w-full cursor-pointer">
-                Notify All Users
+                Notify All Users (App)
+              </Button>
+              <Button onClick={() => notifyUsers('webpushnotificationall')} className="w-full cursor-pointer">
+                Notify All Users (Web Push Notification)
               </Button>
             </div>
             <AlertDialogFooter>

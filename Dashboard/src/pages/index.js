@@ -25,7 +25,11 @@ import { Pages } from "./Pages"
 import { CreatePage } from "./CreatePage"
 import { Editpage } from "./Editpage"
 import { AdBannerpage } from "./AdBannerpage"
+import { AdBannerwebpage } from "./AdBannerwebpage"
 import { CreateBannerpage } from "./CreateBannerpage"
+import { CreateBannerwebpage } from "./CreateBannerwebpage"
+import {NotifyAllWebPush} from "./NotifyAllWebPush"
+import { NotifyAdWebPushAllpage } from "./NotifyAdWebPushAllpage"
 
 
 
@@ -36,5 +40,6 @@ export {
     Popuppage, CreatePopuppage, MoreApppage, CreateApppage, UserFormpage,
     Reportpage, EditCategorypage, AllowFeaturedpage, AllowRecommendedpage,
     Chooseadnotificationpage, Choosenotificationpage, NotifyAdAllpage,
-    NotifyAllpage, Pages, CreatePage, Editpage, AdBannerpage, CreateBannerpage
+    NotifyAllpage, Pages, CreatePage, Editpage, AdBannerpage, CreateBannerpage,
+    AdBannerwebpage, CreateBannerwebpage, NotifyAllWebPush,NotifyAdWebPushAllpage
 }

@@ -100,6 +100,7 @@ const EditGamepage = () => {
             setValue("likesCount", gameData?.likesCount);
             setValue("dislikesCount", gameData?.dislikesCount);
             setValue("status", gameData?.status);
+            setValue("notes", gameData?.notes);
             if (gameData?.status === "scheduled" && gameData?.scheduledAt) {
                 const date = new Date(gameData.scheduledAt);
 
@@ -306,6 +307,18 @@ const EditGamepage = () => {
                             {errors.description && (
                                 <p className="text-red-500 text-sm">{errors.description.message}</p>
                             )}
+                        </div>
+
+                        {/* Notes */}
+                        <div>
+                            <Label htmlFor="notes" className="text-purple-500 font-bold" >Notes</Label>
+                            <textarea
+                                id="notes"
+                                {...register("notes")}
+                                className="w-full p-2 border rounded-md   focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                rows={4}
+                            />
+                            {errors.notes && <p className="text-red-500 text-sm">{errors.notes.message}</p>}
                         </div>
 
                         {/* Instructions */}

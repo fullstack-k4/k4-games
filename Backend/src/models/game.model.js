@@ -12,6 +12,10 @@ const gameSchema = new Schema({
         required: true,
         trim: true,
     },
+    notes: {
+        type: String,
+        trim: true
+    },
     category: {
         type: [String],
         required: true,

@@ -9,6 +9,8 @@ import formSliceReducer from "./Slices/formSlice.js";
 import reportSliceReducer from "./Slices/reportSlice.js"
 import pageSliceReducer from "./Slices/pageSlice.js"
 import adBannerSliceReducer from "./Slices/addbannerSlice.js"
+import adBannerwebSliceReducer from "./Slices/addbannerwebSlice.js"
+import webpushnotificationSliceReducer from "./Slices/webpushnotificationSlice.js"
 
 const store = configureStore({
     reducer: {
@@ -21,7 +23,9 @@ const store = configureStore({
         form: formSliceReducer,
         report: reportSliceReducer,
         page: pageSliceReducer,
-        adbanner: adBannerSliceReducer
+        adbanner: adBannerSliceReducer,
+        adbannerweb: adBannerwebSliceReducer,
+        webpushnotification: webpushnotificationSliceReducer
     }
 })
 

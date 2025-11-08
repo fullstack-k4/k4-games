@@ -9,7 +9,7 @@ export const modifyfilename = (original) => {
     baseName = baseName.replace(/[^a-zA-Z0-9-]/g, '');
 
     // Trim to 20 characters and remove trailing hyphen if any
-    baseName = baseName.substring(0, 20).replace(/-+$/, '');
+    baseName = baseName.substring(0, 35).replace(/-+$/, '');
 
     // Convert to lowercase
     baseName = baseName.toLowerCase();

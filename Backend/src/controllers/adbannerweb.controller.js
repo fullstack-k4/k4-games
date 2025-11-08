@@ -1,14 +1,14 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import { Adbanner } from "../models/adbanner.model.js";
+import { Adbannerweb } from "../models/adbannerweb.model.js";
 import { isValidObjectId } from "mongoose";
 import { deleteFileFromDO } from "../utils/do.js"
 
 
 
 const create = asyncHandler(async (req, res) => {
-    const { link, position, type, adsenseId } = req.body;
+    const { link, position, type } = req.body;
 
 
     if (!position || !type) {
@@ -26,24 +26,22 @@ const create = asyncHandler(async (req, res) => {
     }
 
 
-    const adbanner = await Adbanner.create({
+    const adbannerweb = await Adbannerweb.create({
         link,
         position,
         type,
         imageUrl,
-        adsenseId,
         ...(type !== 'adsense' && {
             imageSource: uploadedImageUrl ? 'self' : 'link',
         }),
     });
 
 
-
-    if (!adbanner) {
+    if (!adbannerweb) {
         throw new ApiError(500, "Failed to create popup");
     }
 
-    return res.status(201).json(new ApiResponse(201, adbanner, "Ad Banner Created Successfully"));
+    return res.status(201).json(new ApiResponse(201, adbannerweb, "Ad Banner Web Created Successfully"));
 
 })
 
@@ -54,39 +52,39 @@ const deleteById = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid Id")
     }
 
-    const adbanner = await Adbanner.findById(id);
+    const adbannerweb = await Adbannerweb.findById(id);
 
-    if (!adbanner) {
-        throw new ApiError(400, "AdBanner not found");
+    if (!adbannerweb) {
+        throw new ApiError(400, "AdBanner Web not found");
     }
 
-    let imageUrl = adbanner.imageUrl;
+    let imageUrl = adbannerweb.imageUrl;
 
-    const deletedadbanner = await Adbanner.findByIdAndDelete(id);
+    const deletedadbannerweb = await Adbannerweb.findByIdAndDelete(id);
 
-    if (!deletedadbanner) {
-        throw new ApiError(400, "Failed to delete ad banner");
+    if (!deletedadbannerweb) {
+        throw new ApiError(400, "Failed to delete ad banner wev");
     }
 
-    if (imageUrl && adbanner.imageSource === "self") {
+    if (imageUrl && adbannerweb.imageSource === "self") {
         await deleteFileFromDO(imageUrl);
     }
 
-    return res.status(200).json(new ApiResponse(200, deletedadbanner, "Adbanner deleted successfully"));
+    return res.status(200).json(new ApiResponse(200, deletedadbannerweb, "Adbanner Web deleted successfully"));
 })
 
 // For Dashboard
 const getAll = asyncHandler(async (_, res) => {
 
-    const adbanners = await Adbanner.find({}).sort({ createdAt: -1 });
+    const adbannersweb = await Adbannerweb.find({}).sort({ createdAt: -1 });
 
-    return res.status(200).json(new ApiResponse(200, adbanners, "All Ad Banners Fetched Successfully"));
+    return res.status(200).json(new ApiResponse(200, adbannersweb, "All Ad Banners Web Fetched Successfully"));
 
 })
 
-// For App
-const getAllAdBanners = asyncHandler(async (_, res) => {
-    const adbanners = await Adbanner.aggregate([
+// For Website
+const getAllAdBannersWeb = asyncHandler(async (_, res) => {
+    const adbannersweb = await Adbannerweb.aggregate([
         { $sort: { createdAt: -1 } },
 
         {
@@ -107,16 +105,13 @@ const getAllAdBanners = asyncHandler(async (_, res) => {
                 },
                 position: "$doc.position",
                 type: "$doc.type",
-                adsenseId: {
-                    $cond: [{ $eq: ["$doc.type", "adsense"] }, "$doc.adsenseId", "$$REMOVE"]
-                }
             }
         }
     ]);
 
     return res
         .status(200)
-        .json(new ApiResponse(200, adbanners, "Latest AdBanner per Position Fetched Successfully"));
+        .json(new ApiResponse(200, adbannersweb, "Latest AdBanner Web per Position Fetched Successfully"));
 });
 
 
@@ -125,4 +120,15 @@ const getAllAdBanners = asyncHandler(async (_, res) => {
 
 
 
-export { create, deleteById, getAll, getAllAdBanners };
+export { create, deleteById, getAll, getAllAdBannersWeb };
+
+
+
+
+
+
+
+
+
+
+

@@ -15,7 +15,7 @@ const uploadGame = asyncHandler(async (req, res) => {
         splashColor, isrotate, slug,
         primaryCategory, instruction, gamePlayVideo,
         isDesktop, isAppOnly, isPremium,
-        isHiddenWeb, topTenCount, likesCount, dislikesCount, status, scheduledAt, notify } = req.body;
+        isHiddenWeb, topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes } = req.body;
 
     const downloadable = req.body.downloadable === "true";
 
@@ -106,6 +106,7 @@ const uploadGame = asyncHandler(async (req, res) => {
         status,
         scheduledAt: status === "scheduled" ? new Date(scheduledAt) : null,
         notify,
+        notes
     };
 
     if (downloadable) {
@@ -151,7 +152,7 @@ const editGame = asyncHandler(async (req, res) => {
         splashColor, slug, primaryCategory,
         instruction, gamePlayVideo, isDesktop,
         isAppOnly, isPremium, isHiddenWeb,
-        topTenCount, likesCount, dislikesCount, status, scheduledAt, notify } = req.body;
+        topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -410,6 +411,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.likesCount = likesCount
     game.dislikesCount = dislikesCount
     game.notify = notify
+    game.notes = notes
 
     if (status) {
         game.status = status;

@@ -7,16 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createAdBanner } from "../store/Slices/addbannerSlice.js"
+import { createAdBannerweb } from "@/store/Slices/addbannerwebSlice";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-const CreateBannerpage = () => {
+const CreateBannerwebpage = () => {
     const { register, handleSubmit, setValue, reset, watch, formState: { errors }, unregister } = useForm();
     const [tab, setTab] = useState("image");
     const [imageType, setImageType] = useState("url");
     const dispatch = useDispatch();
-    const loading = useSelector((state) => state.adbanner.loading);
+    const loading = useSelector((state) => state.adbannerweb.loading);
     const navigate = useNavigate();
 
     const watchedImageType = watch("imageType", "url");
@@ -32,7 +32,7 @@ const CreateBannerpage = () => {
             unregister("link");
             unregister("imageType");
         } else {
-            unregister("adsenseId");
+            unregister("code");
         }
     }, [tab, unregister]);
 
@@ -42,26 +42,25 @@ const CreateBannerpage = () => {
             type: tab,
         };
 
-        const response = await dispatch(createAdBanner(payload));
+        const response = await dispatch(createAdBannerweb(payload));
         if (response.meta.requestStatus === "fulfilled") {
-            navigate("/adbanners");
+            navigate("/adbannersweb");
         }
     };
 
-    const positions = ["Home_Top", "Home_Bottom", "Home_Sticky", "Game_Sticky", "Game_Category", "Bottom_Sticky", "Pop_Up", "Game_Exit", "Home_Mid"];
+    const positions = ["Play_Bottom_Sticky", "Game_Top", "Game_Bottom_Sticky", "Game_Middle", "Home_Bottom_Sticky", "Home_Middle", "Home_Footer", "Game_Category_Sticky", "Game_Footer"];
 
 
     return (
         <Container className="flex justify-center items-center min-h-screen">
             <div className="w-full max-w-2xl relative p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg space-y-6">
-                {/* Go Back to Popup Page link */}
                 <div className="absolute top-4 left-4">
-                    <Link to="/adbanners" className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+                    <Link to="/adbannersweb" className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
                         <ArrowLeft className="w-5 h-5 mr-1" />
-                        Android App Ads Page
+                        Website Ads Page
                     </Link>
                 </div>
-                <h2 className="text-2xl font-bold text-center">Create Android App Ads</h2>
+                <h2 className="text-2xl font-bold text-center">Create Website Ads</h2>
 
                 {/* Tabs */}
                 <div className="flex justify-center space-x-4">
@@ -85,15 +84,13 @@ const CreateBannerpage = () => {
                             <SelectContent>
                                 {positions.map((pos) => (
                                     <SelectItem key={pos} value={pos}>
-                                        {pos.replace(/_/g, " ")} 
+                                        {pos.replace(/_/g, " ")}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                         {errors.position && <p className="text-red-500 text-sm">{errors.position.message}</p>}
                     </div>
-
-
 
 
                     {tab === "image" && (
@@ -149,16 +146,6 @@ const CreateBannerpage = () => {
                         </>
                     )}
 
-                    {tab === "adsense" && (
-                        <div>
-                            <Label>Adsense ID</Label>
-                            <Input
-                                {...register("adsenseId", { required: "Adsense ID is required" })}
-                                placeholder="Enter Adsense ID"
-                            />
-                            {errors.adsenseId && <p className="text-red-500 text-sm">{errors.adsenseId.message}</p>}
-                        </div>
-                    )}
 
                     {/* Submit */}
                     {loading ? (
@@ -174,4 +161,4 @@ const CreateBannerpage = () => {
     );
 };
 
-export { CreateBannerpage };
+export { CreateBannerwebpage };

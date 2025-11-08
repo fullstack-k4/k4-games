@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 
-const adbannerSchema = new Schema({
+const adbannerwebSchema = new Schema({
     imageUrl: {
         type: String,
         default: null,
@@ -24,12 +24,10 @@ const adbannerSchema = new Schema({
         enum: ["self", "link"],
         default: null
     },
-    adsenseId: {
-        type: String,
-        default: null
-    }
 }, { timestamps: true })
 
 
 
-export const Adbanner = mongoose.model("Adbanner", adbannerSchema);
+export const Adbannerweb = mongoose.model("Adbannerweb", adbannerwebSchema);
+
+

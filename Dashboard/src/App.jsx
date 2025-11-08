@@ -8,7 +8,8 @@ import {
   CreateApppage, UserFormpage, Reportpage, EditCategorypage,
   AllowFeaturedpage, AllowRecommendedpage, Chooseadnotificationpage,
   Choosenotificationpage, NotifyAllpage, NotifyAdAllpage, Pages,
-  CreatePage, Editpage, AdBannerpage, CreateBannerpage
+  CreatePage, Editpage, AdBannerpage, CreateBannerpage,AdBannerwebpage,
+  CreateBannerwebpage,NotifyAllWebPush,NotifyAdWebPushAllpage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
@@ -45,10 +46,13 @@ const App = () => {
           <Route path="/notification/choose" element={<Choosenotificationpage />} />
           <Route path="/advertisement/notification/choose" element={<Chooseadnotificationpage />} />
           <Route path="/notification/all" element={<NotifyAllpage />} />
+          <Route path="/notification/webpushall" element={<NotifyAllWebPush />} />
           <Route path="/advertisement/notification/all" element={<NotifyAdAllpage />} />
+          <Route path="/advertisement/notification/webpushall" element={<NotifyAdWebPushAllpage />} />
           <Route path="/pages" element={<Pages />} />
           <Route path="/create-page" element={<CreatePage />} />
           <Route path="/adbanners" element={<AdBannerpage />} />
+          <Route path="/adbannersweb" element={<AdBannerwebpage/>}/>
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -153,6 +157,14 @@ const App = () => {
           element={
             <AuthLayout authentication={true} admin={true}>
               <CreateBannerpage />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/create-adbannerweb"
+          element={
+            <AuthLayout authentication={true} admin={true}>
+              <CreateBannerwebpage />
             </AuthLayout>
           }
         />

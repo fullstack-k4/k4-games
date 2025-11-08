@@ -42,10 +42,7 @@ const CreateCategorypage = () => {
 
 
 
-
-
   // for custom loader
-
   useEffect(() => {
     const id = setTimeout(() => {
       setloader(false)

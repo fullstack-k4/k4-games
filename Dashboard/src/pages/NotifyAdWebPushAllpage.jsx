@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSelector, useDispatch } from "react-redux"
-import { sendAdvertisementNotificationToAllUsers } from "@/store/Slices/authSlice"
+import { sendAdvertisementWebPushNotification } from "@/store/Slices/webpushnotificationSlice"
 import { SpecialLoadingButton } from "./sub-components/"
 import { useNavigate } from "react-router-dom"
 
-const NotifyAdAllpage = () => {
+const NotifyAdWebPushAllpage = () => {
     const dispatch = useDispatch();
-    const loading = useSelector((state) => state.auth.loading);
+    const loading = useSelector((state) => state.webpushnotification.loading);
     const navigate = useNavigate();
     const {
         register,
@@ -22,7 +22,7 @@ const NotifyAdAllpage = () => {
 
     const onSubmit = async (data) => {
 
-        const response = await dispatch(sendAdvertisementNotificationToAllUsers({ data }));
+        const response = await dispatch(sendAdvertisementWebPushNotification({ data }));
 
         if (response.meta.requestStatus === "fulfilled") {
             reset();
@@ -36,7 +36,7 @@ const NotifyAdAllpage = () => {
         <div className="max-w-xl mx-auto p-6 ">
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-xl">Notify All Users</CardTitle>
+                    <CardTitle className="text-xl">Notify All Users (Web Push) </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -63,19 +63,19 @@ const NotifyAdAllpage = () => {
                         </div>
 
                         <div>
-                            <Label htmlFor="imageUrl" className="mb-2">Image URL (Optional)</Label>
+                            <Label htmlFor="image" className="mb-2">Image URL (Optional)</Label>
                             <Input
-                                id="imageUrl"
+                                id="image"
                                 placeholder="Enter image URL (optional)"
-                                {...register("imageUrl")}
+                                {...register("image")}
                             />
                         </div>
                         <div>
-                            <Label htmlFor="link" className="mb-2">Link</Label>
+                            <Label htmlFor="url" className="mb-2">Link</Label>
                             <Input
-                                id="link"
+                                id="url"
                                 placeholder="Enter advertisement link"
-                                {...register("link")}
+                                {...register("url")}
                             />
                         </div>
                         {/* Submit Button */}
@@ -93,4 +93,4 @@ const NotifyAdAllpage = () => {
     )
 }
 
-export { NotifyAdAllpage }
+export { NotifyAdWebPushAllpage }

@@ -19,6 +19,17 @@ const Chooseadnotificationpage = () => {
           <Button onClick={() => navigate("/advertisement/notification/all")}>Notify All</Button>
         </CardContent>
       </Card>
+      <Card className="rounded-2xl shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-xl">Notify All Users (Web Push)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Send a web push notification to all users
+          </p>
+          <Button onClick={() => navigate("/advertisement/notification/webpushall")}>Notify All</Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

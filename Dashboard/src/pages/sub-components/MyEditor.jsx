@@ -11,7 +11,7 @@ const MyEditor = ({ value, onChange }) => {
             value={value}
             init={{
                 height: 300,
-                menubar: false,
+                menubar: true,
                 plugins: [
                     "image",
                     "media",
@@ -35,3 +35,7 @@ const MyEditor = ({ value, onChange }) => {
 };
 
 export { MyEditor };
+
+
+
+

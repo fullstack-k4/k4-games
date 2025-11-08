@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import webpush from "web-push"
 
 
 const app = express();
@@ -10,6 +11,14 @@ const allowedOrigins = [
   process.env.CORS_ORIGIN_2,
   process.env.CORS_ORIGIN_3
 ]
+
+const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_EMAIL } = process.env
+
+webpush.setVapidDetails(
+  VAPID_EMAIL,
+  VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY
+)
 
 
 const corsOptions = {
@@ -57,7 +66,9 @@ import reportRouter from "./routes/report.routes.js"
 import pageRouter from "./routes/page.routes.js"
 import voteRouter from "./routes/vote.routes.js"
 import adBannerRouter from "./routes/adbanner.routes.js"
+import adBannerWebRouter from "./routes/adbannerweb.routes.js"
 import gameScoreRouter from "./routes/gamescore.routes.js"
+import webpushSubscriptionRouter from "./routes/webpushsubscription.routes.js"
 
 
 
@@ -73,7 +84,9 @@ app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/pages", pageRouter);
 app.use("/api/v1/vote", voteRouter);
 app.use("/api/v1/adbanner", adBannerRouter);
+app.use("/api/v1/adbannerweb", adBannerWebRouter)
 app.use("/api/v1/gamescore", gameScoreRouter);
+app.use("/api/v1/webpushsubscription", webpushSubscriptionRouter);
 
 
 

@@ -119,9 +119,10 @@ export const editGame = createAsyncThunk(
             formData.append("dislikesCount", data.dislikesCount);
             formData.append("status", data.status);
             formData.append("notify", data.notify);
+            formData.append("notes", data.notes);
 
-            if(data.scheduledAt){
-                formData.append("scheduledAt",data.scheduledAt);
+            if (data.scheduledAt) {
+                formData.append("scheduledAt", data.scheduledAt);
             }
 
             if (data.image) {
@@ -185,6 +186,10 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
         formData.append("backgroundVideoUrl", data.videoUrl)
     }
 
+    if (data.notes) {
+        formData.append("notes", data.notes);
+    }
+
     data.category.forEach((cat) => {
         formData.append("category[]", cat);
     });
@@ -204,6 +209,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("dislikesCount", data.dislikesCount);
     formData.append("status", data.status);
     formData.append("notify", data.notify);
+
 
     if (data.scheduledAt) {
         formData.append("scheduledAt", data.scheduledAt);

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import {
   Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,
   MessageSquare, LayoutGrid, BookText, Bug, Bell, BookOpenText,
-  Megaphone
+  Megaphone, Plus, ChevronUp
 } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
@@ -15,6 +15,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const admin = useSelector((state) => state.auth.admin);
+  const [isAdsOpen, setIsAdsOpen] = useState(false);
+
 
   const handleLogout = async () => {
     const response = await dispatch(userLogout())
@@ -42,8 +44,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {/* Navigation Links */}
       <nav className="flex-1 mt-4 overflow-y-scroll scrollbar-hide mb-5">
         <ul className="space-y-2">
-
-
           {admin && <li>
             <NavLink
               to="/"
@@ -175,17 +175,61 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="/adbanners"
-                className={({ isActive }) =>
-                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-                }
+              <div
+                className="flex items-center justify-between p-2 rounded hover:bg-gray-800 cursor-pointer"
+                onClick={() => setIsAdsOpen(!isAdsOpen)}
               >
-                <Megaphone className="w-5 h-5" />
-                {isOpen && <span>Ad Banners</span>}
-              </NavLink>
-            </li>
+                <div className="flex items-center space-x-2">
+                  <Megaphone className="w-5 h-5" />
+                  {isOpen && <span>Ads</span>}
+                </div>
 
+                {/* Plus or Chevron icon */}
+                {isOpen && (
+                  <button
+                    className="p-1 focus:outline-none"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering parent click
+                      setIsAdsOpen(!isAdsOpen);
+                    }}
+                  >
+                    {isAdsOpen ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Submenu items */}
+              {isAdsOpen && isOpen && (
+                <ul className="ml-6 mt-1 space-y-1 transition-all duration-200">
+                  <li>
+                    <NavLink
+                      to="/adbanners"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""
+                        }`
+                      }
+                    >
+                      <span>Android</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/adbannersweb"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""
+                        }`
+                      }
+                    >
+                      <span>Website</span>
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
+            </li>
           </>}
         </ul>
       </nav>
