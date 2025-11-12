@@ -6,8 +6,7 @@ import mongoose, { isValidObjectId } from "mongoose";
 import { extractAndUpload } from "../utils/extractAndUpload.js";
 import { deleteFileFromDO, deleteFolderFromS3, uploadJsonToS3 } from "../utils/do.js";
 import { Category } from "../models/category.model.js";
-import { Vote } from "../models/vote.model.js";
-
+import { Vote } from "../models/vote.model.js"
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
@@ -15,7 +14,7 @@ const uploadGame = asyncHandler(async (req, res) => {
         splashColor, isrotate, slug,
         primaryCategory, instruction, gamePlayVideo,
         isDesktop, isAppOnly, isPremium,
-        isHiddenWeb, topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes } = req.body;
+        isHiddenWeb, isListed, topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes } = req.body;
 
     const downloadable = req.body.downloadable === "true";
 
@@ -100,6 +99,7 @@ const uploadGame = asyncHandler(async (req, res) => {
         isAppOnly,
         isPremium,
         isHiddenWeb,
+        isListed,
         topTenCount,
         likesCount,
         dislikesCount,
@@ -151,7 +151,7 @@ const editGame = asyncHandler(async (req, res) => {
     const { gameName, description, category,
         splashColor, slug, primaryCategory,
         instruction, gamePlayVideo, isDesktop,
-        isAppOnly, isPremium, isHiddenWeb,
+        isAppOnly, isPremium, isHiddenWeb, isListed,
         topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes } = req.body;
 
     const isrotate = req.body.isrotate === "true"
@@ -407,6 +407,7 @@ const editGame = asyncHandler(async (req, res) => {
     game.downloadable = downloadable
     game.gameZipUrl = gameZipUrl
     game.isHiddenWeb = isHiddenWeb
+    game.isListed = isListed
     game.topTenCount = topTenCount
     game.likesCount = likesCount
     game.dislikesCount = dislikesCount
@@ -440,6 +441,12 @@ const getAllGame = asyncHandler(async (req, res) => {
     pipeline.push({
         $match: {
             status: "published"
+        }
+    })
+
+    pipeline.push({
+        $match: {
+            isListed: false
         }
     })
 
@@ -633,6 +640,12 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
         })
     }
 
+    if (filterBy === "listed") {
+        pipeline.push({
+            $match: { isListed: true }
+        })
+    }
+
 
     if (query) {
         pipeline.push({
@@ -680,7 +693,7 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
 const getTop10Games = asyncHandler(async (req, res) => {
     const { deviceType } = req.query;
 
-    const filter = { status: "published" };
+    const filter = { status: "published", isListed: false };
 
     if (deviceType && deviceType === "mobile") {
         filter.isDesktop = false;
@@ -689,6 +702,7 @@ const getTop10Games = asyncHandler(async (req, res) => {
     const top10games = await Game.find(filter).sort({ topTenCount: -1 }).limit(10);
     return res.status(200).json(new ApiResponse(200, top10games, "Top 10 Games Fetched Successfully"));
 })
+
 
 // GET:TOP 10 GAMES WEB
 const getTop10GamesWeb = asyncHandler(async (req, res) => {
@@ -743,7 +757,7 @@ const getPopularGames = asyncHandler(async (req, res) => {
 const getFeaturedGames = asyncHandler(async (req, res) => {
     const { deviceType } = req.query;
 
-    const filter = { isFeatured: true, status: "published" };
+    const filter = { isFeatured: true, status: "published", isListed: false };
 
     if (deviceType && deviceType === "mobile") {
         filter.isDesktop = false;
@@ -781,7 +795,7 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
 const getRecommendedGames = asyncHandler(async (req, res) => {
     const { deviceType } = req.query;
 
-    const filter = { isRecommended: true, status: "published" };
+    const filter = { isRecommended: true, status: "published", isListed: false };
 
     if (deviceType && deviceType === "mobile") {
         filter.isDesktop = false;

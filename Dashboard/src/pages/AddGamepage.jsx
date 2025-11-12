@@ -597,13 +597,15 @@ const AddGamepage = () => {
                   setValue("isDesktop", false);
                   setValue("isAppOnly", false);
                   setValue("isHiddenWeb", false);
-
+                  setValue("isListed", false);
                   if (value === "isDesktop") {
                     setValue("isDesktop", true);
                   } else if (value === "isAppOnly") {
                     setValue("isAppOnly", true);
                   } else if (value === "isHiddenWeb") {
                     setValue("isHiddenWeb", true);
+                  } else if (value === "isListed") {
+                    setValue("isListed", true);
                   } else if (value === "unselect") {
                     setValue("visibilityOption", "",);
                   }
@@ -616,6 +618,7 @@ const AddGamepage = () => {
                   <SelectItem value="isHiddenWeb">Show Game Only in App</SelectItem>
                   <SelectItem value="isDesktop">Desktop Only</SelectItem>
                   <SelectItem value="isAppOnly">App Promotion</SelectItem>
+                  <SelectItem value="isListed">List</SelectItem>
                   <SelectItem value="unselect">Unselect</SelectItem>
                 </SelectContent>
               </Select>

@@ -114,6 +114,7 @@ export const editGame = createAsyncThunk(
             formData.append("isAppOnly", data.isAppOnly);
             formData.append("isPremium", data.isPremium);
             formData.append("isHiddenWeb", data.isHiddenWeb);
+            formData.append("isListed", data.isListed);
             formData.append("topTenCount", data.topTenCount);
             formData.append("likesCount", data.likesCount);
             formData.append("dislikesCount", data.dislikesCount);
@@ -204,6 +205,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("isAppOnly", data.isAppOnly);
     formData.append("isPremium", data.isPremium);
     formData.append("isHiddenWeb", data.isHiddenWeb);
+    formData.append("isListed", data.isListed);
     formData.append("topTenCount", data.topTenCount);
     formData.append("likesCount", data.likesCount);
     formData.append("dislikesCount", data.dislikesCount);

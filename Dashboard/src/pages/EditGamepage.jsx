@@ -96,6 +96,7 @@ const EditGamepage = () => {
             setValue("isDesktop", gameData?.isDesktop);
             setValue("isAppOnly", gameData?.isAppOnly);
             setValue("isHiddenWeb", gameData?.isHiddenWeb);
+            setValue("isListed", gameData?.isListed);
             setValue("topTenCount", gameData?.topTenCount);
             setValue("likesCount", gameData?.likesCount);
             setValue("dislikesCount", gameData?.dislikesCount);
@@ -122,7 +123,10 @@ const EditGamepage = () => {
                 setValue("visibilityOption", "isAppOnly");
             } else if (gameData.isHiddenWeb) {
                 setValue("visibilityOption", "isHiddenWeb");
-            } else {
+            } else if (gameData.isListed) {
+                setValue("visibilityOption", "isListed")
+            }
+            else {
                 setValue("visibilityOption", "");
             }
         }
@@ -582,6 +586,7 @@ const EditGamepage = () => {
                                     setValue("isDesktop", false);
                                     setValue("isAppOnly", false);
                                     setValue("isHiddenWeb", false);
+                                    setValue("isListed", false);
 
                                     if (value === "isDesktop") {
                                         setValue("isDesktop", true, { shouldDirty: true });
@@ -589,6 +594,8 @@ const EditGamepage = () => {
                                         setValue("isAppOnly", true, { shouldDirty: true });
                                     } else if (value === "isHiddenWeb") {
                                         setValue("isHiddenWeb", true, { shouldDirty: true });
+                                    } else if (value === "isListed") {
+                                        setValue("isListed", true, { shouldDirty: true });
                                     } else if (value === "unselect") {
                                         setValue("visibilityOption", "", { shouldDirty: true });
                                     }
@@ -601,6 +608,7 @@ const EditGamepage = () => {
                                     <SelectItem value="isHiddenWeb">Show Game Only in App</SelectItem>
                                     <SelectItem value="isDesktop">Desktop Only</SelectItem>
                                     <SelectItem value="isAppOnly">App Promotion</SelectItem>
+                                    <SelectItem value="isListed">List</SelectItem>
                                     <SelectItem value="unselect">Unselect</SelectItem>
                                 </SelectContent>
                             </Select>

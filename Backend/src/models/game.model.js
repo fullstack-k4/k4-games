@@ -58,6 +58,12 @@ const gameSchema = new Schema({
     isPremium: {
         type: Boolean
     },
+    isDesktop: {
+        type: Boolean
+    },
+    isListed: {
+        type: Boolean
+    },
     recommendedImageUrl: {
         type: String,
         default: null,
@@ -125,9 +131,6 @@ const gameSchema = new Schema({
     dislikesCount: {
         type: Number,
         default: 0
-    },
-    isDesktop: {
-        type: Boolean
     },
     gameDataUrl: {
         type: String,

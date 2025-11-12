@@ -304,6 +304,11 @@ const Gamespage = () => {
       _id: 6,
       name: "Show Only in App",
       value: "showonlyinapp"
+    },
+    {
+      _id: 7,
+      name: "Listed",
+      value: "listed"
     }
   ]
 
@@ -692,9 +697,11 @@ const Gamespage = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="flex flex-col gap-4 mt-4">
-              <Button onClick={() => notifyUsers('all')} className="w-full cursor-pointer">
-                Notify All Users (App)
-              </Button>
+              {!selectedGameForNotification?.isListed && (
+                <Button onClick={() => notifyUsers('all')} className="w-full cursor-pointer">
+                  Notify All Users (App)
+                </Button>
+              )}
               <Button onClick={() => notifyUsers('webpushnotificationall')} className="w-full cursor-pointer">
                 Notify All Users (Web Push Notification)
               </Button>
