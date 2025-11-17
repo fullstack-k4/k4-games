@@ -434,7 +434,7 @@ const editGame = asyncHandler(async (req, res) => {
 // GET:ALL GAMES (FOR APP)
 const getAllGame = asyncHandler(async (req, res) => {
 
-    const { page = 1, limit = 10, query, category, sortBy, deviceType } = req.query;
+    const { page = 1, limit = 10, query, category, sortBy, deviceType, filterBy } = req.query;
 
     const pipeline = [];
 
@@ -449,6 +449,14 @@ const getAllGame = asyncHandler(async (req, res) => {
             isListed: false
         }
     })
+
+    if (filterBy === "downloadable") {
+        pipeline.push({
+            $match:{
+                downloadable:true
+            }
+        })
+    }
 
 
     if (deviceType && deviceType === "mobile") {
