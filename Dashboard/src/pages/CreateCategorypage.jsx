@@ -283,7 +283,7 @@ const CreateCategorypage = () => {
 
             {/* Is SideBar CheckBox */}
             <div className="flex items-center space-x-2">
-              <Label htmlFor="isDesktop" className="text-base">Display on Sidebar?</Label>
+              <Label htmlFor="isSidebar" className="text-base">Display on Sidebar?</Label>
               <input
                 type="checkbox"
                 id="isSidebar"

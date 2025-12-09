@@ -59,7 +59,6 @@ import userRouter from "./routes/user.routes.js"
 import gameRouter from "./routes/game.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import dashboardRouter from "./routes/dashboard.routes.js"
-import popupRouter from "./routes/popup.routes.js"
 import moreAppRouter from "./routes/moreapp.routes.js"
 import formRouter from "./routes/form.routes.js"
 import reportRouter from "./routes/report.routes.js"
@@ -77,7 +76,6 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/games", gameRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
-app.use("/api/v1/popup", popupRouter);
 app.use("/api/v1/moreapp", moreAppRouter);
 app.use("/api/v1/form", formRouter);
 app.use("/api/v1/report", reportRouter);

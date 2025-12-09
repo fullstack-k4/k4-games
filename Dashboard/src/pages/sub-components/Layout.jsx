@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,
-  MessageSquare, LayoutGrid, BookText, Bug, Bell, BookOpenText,
+  LayoutGrid, BookText, Bug, Bell, BookOpenText,
   Megaphone, Plus, ChevronUp
 } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
@@ -97,17 +97,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
 
           {admin && <>
-            <li>
-              <NavLink
-                to="/popups"
-                className={({ isActive }) =>
-                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
-                }
-              >
-                <MessageSquare className="w-5 h-5" />
-                {isOpen && <span>Popups</span>}
-              </NavLink>
-            </li>
+
             <li>
               <NavLink
                 to="/moreapps"

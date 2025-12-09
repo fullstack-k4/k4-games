@@ -4,12 +4,11 @@ import {
   Loginpage, Homepage, Userpage, Gamespage,
   AddGamepage, EditGamepage, CreateUserpage,
   Categorypage, CreateCategorypage, Uploadgamezippage,
-  Popuppage, CreatePopuppage, MoreApppage,
-  CreateApppage, UserFormpage, Reportpage, EditCategorypage,
+  MoreApppage, CreateApppage, UserFormpage, Reportpage, EditCategorypage,
   AllowFeaturedpage, AllowRecommendedpage, Chooseadnotificationpage,
   Choosenotificationpage, NotifyAllpage, NotifyAdAllpage, Pages,
-  CreatePage, Editpage, AdBannerpage, CreateBannerpage,AdBannerwebpage,
-  CreateBannerwebpage,NotifyAllWebPush,NotifyAdWebPushAllpage
+  CreatePage, Editpage, AdBannerpage, CreateBannerpage, AdBannerwebpage,
+  CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
@@ -39,7 +38,6 @@ const App = () => {
           <Route path="/users" element={<Userpage />} />
           <Route path="/games" element={<Gamespage />} />
           <Route path="/categories" element={<Categorypage />} />
-          <Route path="/popups" element={<Popuppage />} />
           <Route path="/moreapps" element={<MoreApppage />} />
           <Route path="/userforms" element={<UserFormpage />} />
           <Route path="/reports" element={<Reportpage />} />
@@ -52,7 +50,7 @@ const App = () => {
           <Route path="/pages" element={<Pages />} />
           <Route path="/create-page" element={<CreatePage />} />
           <Route path="/adbanners" element={<AdBannerpage />} />
-          <Route path="/adbannersweb" element={<AdBannerwebpage/>}/>
+          <Route path="/adbannersweb" element={<AdBannerwebpage />} />
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -104,14 +102,7 @@ const App = () => {
             </AuthLayout>
           }
         />
-        <Route
-          path="/create-popup"
-          element={
-            <AuthLayout authentication={true} admin={true}>
-              <CreatePopuppage />
-            </AuthLayout>
-          }
-        />
+
         <Route
           path="/create-app"
           element={

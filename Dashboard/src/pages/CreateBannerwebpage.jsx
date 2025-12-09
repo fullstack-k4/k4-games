@@ -48,7 +48,7 @@ const CreateBannerwebpage = () => {
         }
     };
 
-    const positions = ["Play_Bottom_Sticky", "Game_Top", "Game_Bottom_Sticky", "Game_Middle", "Home_Bottom_Sticky", "Home_Middle", "Home_Footer", "Game_Category_Sticky", "Game_Footer"];
+    const positions = ["Play_Bottom_Sticky", "Game_Top", "Game_Bottom_Sticky", "Game_Middle", "Home_Bottom_Sticky", "Home_Middle", "Home_Footer", "Game_Category_Sticky", "Game_Footer", "Pop_Up"];
 
 
     return (

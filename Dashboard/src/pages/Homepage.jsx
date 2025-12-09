@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Gamepad2, DownloadCloud, UploadCloud, Link, Bug, MessageSquare, LayoutGrid, BookText } from "lucide-react"
+import { Gamepad2, DownloadCloud, UploadCloud, Link, Bug, LayoutGrid, BookText } from "lucide-react"
 import { useSelector, useDispatch } from 'react-redux'
 import { Loader } from './sub-components'
 import { getAllDashboardData } from '@/store/Slices/dashboardSlice'
@@ -14,7 +14,6 @@ const Homepage = () => {
   const totalAllowedDownloads = useSelector((state) => state.dashboard?.dashboardData?.totalAllowedDownloads);
   const totalNumberOfSelfUploadedGames = useSelector((state) => state.dashboard?.dashboardData?.totalNumberOfSelfUploadedGames);
   const totalNumberofUploadedGamesByLink = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofUploadedGamesByLink);
-  const totalNumberofPopups = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofPopups);
   const totalNumberofForms = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofForms);
   const totalNumberofReports = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofReports);
   const totalNumberofMoreApps = useSelector((state) => state.dashboard?.dashboardData?.totalNumberofMoreApps);
@@ -38,9 +37,8 @@ const Homepage = () => {
     { id: 3, name: "Total Self Uploaded Games", value: totalNumberOfSelfUploadedGames, icon: <UploadCloud className="w-6 h-6 text-blue-500" /> },
     { id: 4, name: "Total Game Uploaded By Link", value: totalNumberofUploadedGamesByLink, icon: <Link className="w-6 h-6 text-blue-500" /> },
     { id: 5, name: "Total Apps", value: totalNumberofMoreApps, icon: <LayoutGrid className="w-6 h-6 text-blue-500" /> },
-    { id: 6, name: "Total Popups", value: totalNumberofPopups, icon: <MessageSquare className="w-6 h-6 text-blue-500" /> },
-    { id: 7, name: "Total Forms", value: totalNumberofForms, icon: <BookText className="w-6 h-6 text-blue-500" /> },
-    { id: 8, name: "Total Reports", value: totalNumberofReports, icon: <Bug className="w-6 h-6 text-blue-500" /> },
+    { id: 6, name: "Total Forms", value: totalNumberofForms, icon: <BookText className="w-6 h-6 text-blue-500" /> },
+    { id: 7, name: "Total Reports", value: totalNumberofReports, icon: <Bug className="w-6 h-6 text-blue-500" /> },
   ]
 
   return (
@@ -76,11 +74,7 @@ const Homepage = () => {
                 </span>
               </CardContent>
             </Card>
-
           ))}
-
-
-
 
         </div>
       </div>

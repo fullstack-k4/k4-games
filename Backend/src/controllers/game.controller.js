@@ -452,8 +452,8 @@ const getAllGame = asyncHandler(async (req, res) => {
 
     if (filterBy === "downloadable") {
         pipeline.push({
-            $match:{
-                downloadable:true
+            $match: {
+                downloadable: true
             }
         })
     }
