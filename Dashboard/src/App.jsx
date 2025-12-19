@@ -8,7 +8,9 @@ import {
   AllowFeaturedpage, AllowRecommendedpage, Chooseadnotificationpage,
   Choosenotificationpage, NotifyAllpage, NotifyAdAllpage, Pages,
   CreatePage, Editpage, AdBannerpage, CreateBannerpage, AdBannerwebpage,
-  CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage
+  CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage, Knifethrowgamespage,
+  UploadKnifeThrowGamespage, KnifeAppHomeScreenNotificationpage, KnifeAppNewScreenNotificationpage,
+  KnifeAppSavedScreenNotificationpage, KnifeAppAdNotificationpage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
@@ -51,6 +53,11 @@ const App = () => {
           <Route path="/create-page" element={<CreatePage />} />
           <Route path="/adbanners" element={<AdBannerpage />} />
           <Route path="/adbannersweb" element={<AdBannerwebpage />} />
+          <Route path="/knifethrowgames" element={<Knifethrowgamespage />} />
+          <Route path="/knifethrowgamesnotification/home" element={<KnifeAppHomeScreenNotificationpage />} />
+          <Route path="/knifethrowgamesnotification/newgames" element={<KnifeAppNewScreenNotificationpage />} />
+          <Route path="/knifethrowgamesnotification/saved" element={<KnifeAppSavedScreenNotificationpage />} />
+          <Route path="/knifethrowgamesnotification/ad" element={<KnifeAppAdNotificationpage />} />
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -156,6 +163,14 @@ const App = () => {
           element={
             <AuthLayout authentication={true} admin={true}>
               <CreateBannerwebpage />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/knifethrow/upload-game"
+          element={
+            <AuthLayout authentication={true} admin={true}>
+              <UploadKnifeThrowGamespage />
             </AuthLayout>
           }
         />

@@ -198,13 +198,13 @@ const EditGamepage = () => {
 
 
             <Container>
-                <div className="max-w-lg mx-auto p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg space-y-6 relative">
+                <div className="max-w-lg mx-auto p-6 bg-white  shadow-xl rounded-lg space-y-6 relative">
 
                     {/* Link to Games Page */}
                     <div className="absolute top-0 left-0 p-4">
                         <Link
                             to="/games"
-                            className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
+                            className="flex items-center text-blue-600  hover:underline"
                         >
                             <ArrowLeft className="w-5 h-5 mr-1" />
                             Games Page
@@ -305,7 +305,7 @@ const EditGamepage = () => {
                             <Label>Description</Label>
                             <textarea
                                 {...register("description", { required: "Description is required" })}
-                                className="w-full p-2 border rounded-md dark:bg-gray-800 dark:text-white"
+                                className="w-full p-2 border rounded-md "
                                 rows={4}
                             />
                             {errors.description && (
@@ -319,7 +319,7 @@ const EditGamepage = () => {
                             <textarea
                                 id="notes"
                                 {...register("notes")}
-                                className="w-full p-2 border rounded-md   focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                className="w-full p-2 border rounded-md   focus:outline-none focus:ring-2 focus:ring-blue-500 "
                                 rows={4}
                             />
                             {errors.notes && <p className="text-red-500 text-sm">{errors.notes.message}</p>}
@@ -732,18 +732,18 @@ const EditGamepage = () => {
 
                 {showCategoryPopup && (
                     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center px-4">
-                        <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-6xl relative max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700">
+                        <div className="bg-white  p-6 rounded-xl w-full max-w-6xl relative max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 ">
 
                             {/* Close Button */}
                             <button
-                                className="absolute top-4 right-6 text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white text-3xl"
+                                className="absolute top-4 right-6 text-gray-600 hover:text-black  text-3xl"
                                 onClick={() => setShowCategoryPopup(false)}
                             >
                                 ✕
                             </button>
 
                             {/* Title */}
-                            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+                            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
                                 Select Categories
                             </h2>
 
@@ -752,7 +752,7 @@ const EditGamepage = () => {
                                 placeholder="Search categories"
                                 value={categorySearch}
                                 onChange={(e) => setCategorySearch(e.target.value)}
-                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 mb-4"
+                                className="w-full border-gray-300   mb-4"
                             />
 
                             {/* Alphabet Filter Row */}
@@ -766,7 +766,7 @@ const EditGamepage = () => {
                                         }}
                                         className={`w-9 h-9 flex items-center justify-center rounded-md text-sm font-medium ${selectedAlphabet === char
                                             ? "bg-blue-600 text-white"
-                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300  "
                                             }`}
                                     >
                                         {char}
@@ -782,7 +782,7 @@ const EditGamepage = () => {
                                         return (
                                             <label
                                                 key={category._id}
-                                                className="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md hover:shadow-sm transition"
+                                                className="flex items-center space-x-2 p-2 bg-gray-100  rounded-md hover:shadow-sm transition"
                                             >
                                                 <input
                                                     type="checkbox"
@@ -796,7 +796,7 @@ const EditGamepage = () => {
                                                     }}
                                                     className="accent-blue-600"
                                                 />
-                                                <span className=" text-sm text-gray-800 dark:text-white">{category.name}</span>
+                                                <span className=" text-sm text-gray-800 ">{category.name}</span>
                                             </label>
                                         );
                                     })}
@@ -804,7 +804,7 @@ const EditGamepage = () => {
                             </div>
 
                             {/* Footer Action */}
-                            <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
+                            <div className="flex justify-end pt-6 border-t border-gray-200  mt-6">
                                 <Button
                                     onClick={() => setShowCategoryPopup(false)}
                                     className="bg-blue-600 hover:bg-blue-700 text-white"

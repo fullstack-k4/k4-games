@@ -125,7 +125,7 @@ const Categorypage = () => {
             <div className="p-6 space-y-6">
                 {/* Header & Search */}
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 dark:text-white text-center sm:text-left">
+                    <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900  text-center sm:text-left">
                         Category Management
                     </h1>
                     <div className="relative w-full sm:w-96">
@@ -135,7 +135,7 @@ const Categorypage = () => {
                             placeholder="Search categories..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 pr-3 py-2 w-full rounded-lg border dark:border-gray-700 dark:bg-gray-800 text-gray-900 dark:text-gray-200"
+                            className="pl-10 pr-3 py-2 w-full rounded-lg border   text-gray-900 "
                         />
                     </div>
                     <Link to="/create-category">
@@ -166,7 +166,7 @@ const Categorypage = () => {
 
                 {/* Table */}
 
-                <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div className="overflow-x-auto bg-white  rounded-lg shadow-lg">
                     <table className="min-w-full">
                         <thead className="bg-gray-900 text-white">
                             <tr>
@@ -185,18 +185,18 @@ const Categorypage = () => {
                                 </tr>
                             ) : categoriesDashboard?.docs?.length > 0 ? (
                                 categoriesDashboard.docs.map((category, index) => (
-                                    <tr key={category._id} className="border-b dark:border-gray-700">
+                                    <tr key={category._id} className="border-b ">
                                         <td className="p-4 font-medium">
                                             {totalCategories - ((currentPage - 1) * categoriesPerPage + index)}
                                         </td>
 
                                         {/* Category Name */}
-                                        <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                                        <td className="p-4 font-bold text-gray-900 ">
                                             {category?.name}
                                         </td>
 
                                         {/* Order */}
-                                        <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                                        <td className="p-4 font-bold text-gray-900 ">
                                             {category?.order}
                                         </td>
 
@@ -267,7 +267,7 @@ const Categorypage = () => {
                                 onClick={() => paginate(page)}
                                 className={`px-4 py-2 font-semibold rounded-lg ${currentPage === page
                                     ? "bg-blue-600 text-white"
-                                    : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                                    : "bg-gray-200  text-gray-900 "
                                     }`}
                             >
                                 {page}

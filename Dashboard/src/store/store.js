@@ -11,6 +11,7 @@ import pageSliceReducer from "./Slices/pageSlice.js"
 import adBannerSliceReducer from "./Slices/addbannerSlice.js"
 import adBannerwebSliceReducer from "./Slices/addbannerwebSlice.js"
 import webpushnotificationSliceReducer from "./Slices/webpushnotificationSlice.js"
+import knifethrowgamesSliceReducer from "./Slices/knifethrowgamesSlice.js"
 
 const store = configureStore({
     reducer: {
@@ -25,7 +26,8 @@ const store = configureStore({
         page: pageSliceReducer,
         adbanner: adBannerSliceReducer,
         adbannerweb: adBannerwebSliceReducer,
-        webpushnotification: webpushnotificationSliceReducer
+        webpushnotification: webpushnotificationSliceReducer,
+        knifethrowgames: knifethrowgamesSliceReducer
     }
 })
 

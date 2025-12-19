@@ -12,7 +12,7 @@ const router = Router();
 
 router.route("/create").post(verifyJWT, verifyAdmin, categoryImageUploader, createCategory);
 router.route("/getall").get(checkApiKey, getAllCategory);
-router.route("/getallweb").get(checkApiKey, getAllCategoryWeb);
+router.route("/getallweb").get(getAllCategoryWeb);
 router.route("/getalllist").get(checkApiKey, getAllCategoriesList)
 router.route("/getalldashboard").get(checkApiKey, getAllCategoryDashboard);
 router.route("/getalldashboardpopup").get(checkApiKey, getAllCategoriesDashboardPopup);

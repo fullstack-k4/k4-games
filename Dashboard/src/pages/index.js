@@ -28,6 +28,13 @@ import { CreateBannerpage } from "./CreateBannerpage"
 import { CreateBannerwebpage } from "./CreateBannerwebpage"
 import { NotifyAllWebPush } from "./NotifyAllWebPush"
 import { NotifyAdWebPushAllpage } from "./NotifyAdWebPushAllpage"
+import { Knifethrowgamespage } from "./Knifethrowgamespage"
+import { UploadKnifeThrowGamespage } from "./UploadKnifeThrowGamespage"
+import { KnifeAppHomeScreenNotificationpage } from "./KnifeAppHomeScreenNotificationpage"
+import { KnifeAppNewScreenNotificationpage } from "./KnifeAppNewScreenNotificationpage"
+import { KnifeAppSavedScreenNotificationpage } from "./KnifeAppSavedScreenNotificationpage"
+import { KnifeAppAdNotificationpage } from "./KnifeAppAdNotificationpage"
+
 
 
 
@@ -39,5 +46,8 @@ export {
     Reportpage, EditCategorypage, AllowFeaturedpage, AllowRecommendedpage,
     Chooseadnotificationpage, Choosenotificationpage, NotifyAdAllpage,
     NotifyAllpage, Pages, CreatePage, Editpage, AdBannerpage, CreateBannerpage,
-    AdBannerwebpage, CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage
+    AdBannerwebpage, CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage,
+    Knifethrowgamespage, UploadKnifeThrowGamespage,
+    KnifeAppHomeScreenNotificationpage, KnifeAppNewScreenNotificationpage, KnifeAppSavedScreenNotificationpage,
+    KnifeAppAdNotificationpage
 }

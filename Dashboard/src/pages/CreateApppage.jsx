@@ -89,10 +89,10 @@ const CreateApppage = () => {
   return (
     loader ? <Loader /> : (
         <Container className="flex justify-center items-center min-h-screen">
-        <div className="w-full max-w-lg p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg space-y-6 relative">
+        <div className="w-full max-w-lg p-6 bg-white  shadow-xl rounded-lg space-y-6 relative">
           {/* Go Back to More App Page link */}
           <div className="absolute top-4 left-4">
-            <Link to="/moreapps" className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+            <Link to="/moreapps" className="flex items-center text-blue-600  hover:underline">
               <ArrowLeft className="w-5 h-5 mr-1" />
               More Apps Page
             </Link>

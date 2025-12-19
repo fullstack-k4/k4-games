@@ -61,7 +61,7 @@ const Homepage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
           {dashboardData.map((data) => (
-            <Card key={data.id} className="bg-white dark:bg-gray-800 shadow-md">
+            <Card key={data.id} className="bg-white  shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   {data.icon}

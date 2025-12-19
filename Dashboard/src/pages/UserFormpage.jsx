@@ -146,7 +146,7 @@ const UserFormpage = () => {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 dark:text-white text-center sm:text-left">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900  text-center sm:text-left">
             Form Management
           </h1>
 
@@ -161,7 +161,7 @@ const UserFormpage = () => {
 
         {/* Table */}
 
-        <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <div className="overflow-x-auto bg-white  rounded-lg shadow-lg">
           <table className="min-w-full">
             <thead className="bg-gray-900 text-white">
               <tr>
@@ -181,27 +181,27 @@ const UserFormpage = () => {
                 </tr>
               ) : forms?.docs?.length > 0 ? (
                 forms.docs.map((form, index) => (
-                  <tr key={form._id} className="border-b dark:border-gray-700">
+                  <tr key={form._id} className="border-b ">
                     <td className="p-4 font-medium ">
                       {totalForms - ((currentPage - 1) * formsPerPage + index)}
                     </td>
 
                     {/* name */}
-                    <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                    <td className="p-4 font-bold text-gray-900 ">
                       {form.name}
                     </td>
 
                     {/* email */}
-                    <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                    <td className="p-4 font-bold text-gray-900 ">
                       {form.email}
                     </td>
                     {/* phone number */}
-                    <td className="p-4 font-bold text-gray-900 dark:text-gray-100">
+                    <td className="p-4 font-bold text-gray-900 ">
                       {form.phoneNumber}
                     </td>
 
                     {/*  description */}
-                    <td className="p-4 text-gray-700 dark:text-gray-300">
+                    <td className="p-4 text-gray-700 ">
                       {form.description.split(" ").slice(0, 4).join(" ")}...
                     </td>
                     
@@ -257,7 +257,7 @@ const UserFormpage = () => {
                 onClick={() => paginate(page)}
                 className={`px-4 py-2 font-semibold rounded-lg ${currentPage === page
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                  : "bg-gray-200  text-gray-900 "
                   }`}
                 whileHover={{ scale: 1.1 }}
               >

@@ -18,7 +18,7 @@ const router = Router();
 router.route("/upload").post(verifyJWT, gameImageUploader, uploadGame);
 router.route("/edit/:gameId").patch(verifyJWT, extractUniqueId, gameImageUploader, editGame);
 router.route("/getall").get(checkApiKey, getAllGame);
-router.route("/getallweb").get(checkApiKey, getAllGameWeb);
+router.route("/getallweb").get( getAllGameWeb);
 router.route("/getalldashboard").get(checkApiKey, getAllGameDashboard);
 router.route("/get").get(checkApiKey, getGameById);
 router.route("/getbyslug").get(checkApiKey, getGameBySlug);

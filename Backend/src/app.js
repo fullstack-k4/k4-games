@@ -68,6 +68,7 @@ import adBannerRouter from "./routes/adbanner.routes.js"
 import adBannerWebRouter from "./routes/adbannerweb.routes.js"
 import gameScoreRouter from "./routes/gamescore.routes.js"
 import webpushSubscriptionRouter from "./routes/webpushsubscription.routes.js"
+import knifeThrowGameRouter from "./routes/knifethrowgames.routes.js"
 
 
 
@@ -85,6 +86,7 @@ app.use("/api/v1/adbanner", adBannerRouter);
 app.use("/api/v1/adbannerweb", adBannerWebRouter)
 app.use("/api/v1/gamescore", gameScoreRouter);
 app.use("/api/v1/webpushsubscription", webpushSubscriptionRouter);
+app.use("/api/v1/knifethrowgame", knifeThrowGameRouter)
 
 
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import {
   Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,
   LayoutGrid, BookText, Bug, Bell, BookOpenText,
-  Megaphone, Plus, ChevronUp
+  Megaphone, Plus, ChevronUp, Gamepad
 } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
@@ -219,6 +219,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   </li>
                 </ul>
               )}
+            </li>
+            <li>
+              <NavLink
+                to="/knifethrowgames"
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""}`
+                }
+              >
+                <Gamepad className="w-5 h-5" />
+                {isOpen && <span>Knife Throw Games</span>}
+              </NavLink>
             </li>
           </>}
         </ul>

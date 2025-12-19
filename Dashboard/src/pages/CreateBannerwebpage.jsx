@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 const CreateBannerwebpage = () => {
-    const { register, handleSubmit, setValue, reset, watch, formState: { errors }, unregister } = useForm();
+    const { register, handleSubmit, setValue, watch, formState: { errors }, unregister } = useForm();
     const [tab, setTab] = useState("image");
     const [imageType, setImageType] = useState("url");
     const dispatch = useDispatch();
@@ -48,14 +48,14 @@ const CreateBannerwebpage = () => {
         }
     };
 
-    const positions = ["Play_Bottom_Sticky", "Game_Top", "Game_Bottom_Sticky", "Game_Middle", "Home_Bottom_Sticky", "Home_Middle", "Home_Footer", "Game_Category_Sticky", "Game_Footer", "Pop_Up"];
+    const positions = ["Play_Bottom_Sticky", "Game_Top", "Game_Top_Fallback", "Game_Bottom_Sticky", "Game_Middle", "Home_Bottom_Sticky", "Home_Middle", "Home_Footer", "Game_Category_Sticky", "Game_Footer", "Pop_Up"];
 
 
     return (
         <Container className="flex justify-center items-center min-h-screen">
-            <div className="w-full max-w-2xl relative p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg space-y-6">
+            <div className="w-full max-w-2xl relative p-6 bg-white  shadow-xl rounded-lg space-y-6">
                 <div className="absolute top-4 left-4">
-                    <Link to="/adbannersweb" className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+                    <Link to="/adbannersweb" className="flex items-center text-blue-600  hover:underline">
                         <ArrowLeft className="w-5 h-5 mr-1" />
                         Website Ads Page
                     </Link>
