@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import {
   Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,
   LayoutGrid, BookText, Bug, Bell, BookOpenText,
-  Megaphone, Plus, ChevronUp, Gamepad
+  Megaphone, Plus, ChevronUp, Gamepad,Download 
 } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
@@ -16,6 +16,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate()
   const admin = useSelector((state) => state.auth.admin);
   const [isAdsOpen, setIsAdsOpen] = useState(false);
+  const [isofflinegamesappOpen, setIsofflinegamesappOpen] = useState(false);
 
 
   const handleLogout = async () => {
@@ -230,6 +231,53 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <Gamepad className="w-5 h-5" />
                 {isOpen && <span>Knife Throw Games</span>}
               </NavLink>
+            </li>
+            <li>
+              <div
+                className="flex items-center justify-between p-2 rounded hover:bg-gray-800 cursor-pointer"
+                onClick={() => setIsofflinegamesappOpen(!isofflinegamesappOpen)}
+              >
+                <div className="flex items-center space-x-2">
+                  <Download  className="w-5 h-5" />
+                  {isOpen && <span>Offline Games App</span>}
+                </div>
+
+                {/* Plus or Chevron icon */}
+                {isOpen && (
+                  <button
+                    className="p-1 focus:outline-none"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsofflinegamesappOpen(!isofflinegamesappOpen);
+                    }}
+                  >
+                    {isofflinegamesappOpen ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Submenu items */}
+              {isofflinegamesappOpen && isOpen && (
+                <ul className="ml-6 mt-1 space-y-1 transition-all duration-200">
+                  <li>
+                    <NavLink
+                      to="/offlinegamesapp/games"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""
+                        }`
+                      }
+                    >
+                      <Gamepad className="w-5 h-5" />
+                      <span>Games</span>
+                    </NavLink>
+                  </li>
+
+                </ul>
+              )}
             </li>
           </>}
         </ul>

@@ -34,6 +34,9 @@ import { KnifeAppHomeScreenNotificationpage } from "./KnifeAppHomeScreenNotifica
 import { KnifeAppNewScreenNotificationpage } from "./KnifeAppNewScreenNotificationpage"
 import { KnifeAppSavedScreenNotificationpage } from "./KnifeAppSavedScreenNotificationpage"
 import { KnifeAppAdNotificationpage } from "./KnifeAppAdNotificationpage"
+import { OfflineGamesAppGamespage } from "./OfflineGamesAppGamespage"
+import { OfflineGamesAppUploadGamepage } from "./OfflineGamesAppUploadGamepage"
+import { OfflineGamesAppEditGamepage } from "./OfflineGamesAppEditGamepage"
 
 
 
@@ -49,5 +52,5 @@ export {
     AdBannerwebpage, CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage,
     Knifethrowgamespage, UploadKnifeThrowGamespage,
     KnifeAppHomeScreenNotificationpage, KnifeAppNewScreenNotificationpage, KnifeAppSavedScreenNotificationpage,
-    KnifeAppAdNotificationpage
+    KnifeAppAdNotificationpage, OfflineGamesAppGamespage,OfflineGamesAppUploadGamepage,OfflineGamesAppEditGamepage
 }

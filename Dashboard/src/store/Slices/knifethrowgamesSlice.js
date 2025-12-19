@@ -22,12 +22,12 @@ const initialState = {
 
 export const getAllGames = createAsyncThunk(
     'getAllGames',
-    async ({ page, limit,query }) => {
+    async ({ page, limit, query }) => {
         try {
             const url = new URL(`${BASE_URL}/knifethrowgame/getall`)
             if (page) url.searchParams.set("page", page);
             if (limit) url.searchParams.set("limit", limit);
-            if (query) url.searchParams.set("query",query);
+            if (query) url.searchParams.set("query", query);
 
             url.searchParams.set("sortBy", "newest")
 
@@ -49,7 +49,6 @@ export const deleteGame = createAsyncThunk(
     'deleteGame',
     async ({ gameId }) => {
         try {
-            console.log(gameId)
             const response = await axiosInstance.delete(`/knifethrowgame/delete/${gameId}`);
             toast.success("Game Deleted Succesfully");
             return gameId;

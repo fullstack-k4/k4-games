@@ -10,7 +10,8 @@ import {
   CreatePage, Editpage, AdBannerpage, CreateBannerpage, AdBannerwebpage,
   CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage, Knifethrowgamespage,
   UploadKnifeThrowGamespage, KnifeAppHomeScreenNotificationpage, KnifeAppNewScreenNotificationpage,
-  KnifeAppSavedScreenNotificationpage, KnifeAppAdNotificationpage
+  KnifeAppSavedScreenNotificationpage, KnifeAppAdNotificationpage, OfflineGamesAppGamespage,
+  OfflineGamesAppUploadGamepage,OfflineGamesAppEditGamepage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
@@ -58,6 +59,7 @@ const App = () => {
           <Route path="/knifethrowgamesnotification/newgames" element={<KnifeAppNewScreenNotificationpage />} />
           <Route path="/knifethrowgamesnotification/saved" element={<KnifeAppSavedScreenNotificationpage />} />
           <Route path="/knifethrowgamesnotification/ad" element={<KnifeAppAdNotificationpage />} />
+          <Route path="/offlinegamesapp/games" element={<OfflineGamesAppGamespage/>} />
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -173,6 +175,22 @@ const App = () => {
               <UploadKnifeThrowGamespage />
             </AuthLayout>
           }
+        />
+        <Route
+        path="/offlinegamesapp/upload-game"
+        element={
+          <AuthLayout authentication={true} admin={true}>
+            <OfflineGamesAppUploadGamepage/>
+          </AuthLayout>
+        }
+        />
+        <Route
+        path="/offlinegamesapp/edit-game/:gameId"
+        element={
+          <AuthLayout authentication={true} admin={true}>
+            <OfflineGamesAppEditGamepage/>
+          </AuthLayout>
+        }
         />
       </Routes>
       <Toaster position="bottom-right" richColors />

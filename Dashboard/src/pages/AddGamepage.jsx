@@ -26,6 +26,7 @@ const AddGamepage = () => {
       isDesktop: false,
       isAppOnly: false,
       isHiddenWeb: false,
+      isListed: false,
       isPremium: "false",
       topTenCount: 0,
       likesCount: 0,
@@ -626,8 +627,6 @@ const AddGamepage = () => {
 
 
 
-
-
             {/* VIP GAME? */}
             <div className="flex flex-col space-y-2">
               <div className="flex items-center space-x-4">
@@ -702,6 +701,8 @@ const AddGamepage = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            
 
             {/* Scheduled At */}
             {status === "scheduled" && (

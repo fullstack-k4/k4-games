@@ -166,6 +166,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("description", trimmedgameDescription);
 
 
+
     if (data.image) {
         formData.append("image", data.image[0]);
     }
@@ -402,7 +403,7 @@ const gameSlice = createSlice({
         })
         builder.addCase(deleteGame.rejected, (state) => {
             state.deleted = false;
-            state.deleting = true;
+            state.deleting = false;
         })
         builder.addCase(editGame.pending, (state) => {
             state.editing = true;

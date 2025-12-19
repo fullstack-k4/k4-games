@@ -11,7 +11,7 @@ import { extractCategoryUniqueId } from "../middlewares/extractUniqueId.js";
 const router = Router();
 
 router.route("/create").post(verifyJWT, verifyAdmin, categoryImageUploader, createCategory);
-router.route("/getall").get(checkApiKey, getAllCategory);
+router.route("/getall").get(getAllCategory);
 router.route("/getallweb").get(getAllCategoryWeb);
 router.route("/getalllist").get(checkApiKey, getAllCategoriesList)
 router.route("/getalldashboard").get(checkApiKey, getAllCategoryDashboard);
