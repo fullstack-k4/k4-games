@@ -144,6 +144,9 @@ export const editGame = createAsyncThunk(
             if (data.videoUrl) {
                 formData.append("backgroundVideoUrl", data.videoUrl);
             }
+            if(data.featuredorder){
+                formData.append("featuredorder",data.featuredorder);
+            }
             data.category.forEach((cat) => {
                 formData.append("category[]", cat);
             });
@@ -214,6 +217,7 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     formData.append("notify", data.notify);
 
 
+
     if (data.scheduledAt) {
         formData.append("scheduledAt", data.scheduledAt);
     }
@@ -278,6 +282,10 @@ export const allowFeatured = createAsyncThunk("allowFeatured",
             }
             if (data.videoUrl) {
                 formData.append("featuredVideoUrl", data.videoUrl);
+            }
+
+            if (data.featuredorder) {
+                formData.append("featuredorder", data.featuredorder);
             }
             const response = await axiosInstance.patch(`games/allowfeatured/${gameId}`, formData);
             toast.success("Featured Status Toggled Successfully");

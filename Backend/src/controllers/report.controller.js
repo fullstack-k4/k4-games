@@ -8,9 +8,8 @@ import { Report } from "../models/report.model.js";
 const createReport = asyncHandler(async (req, res) => {
   const { gameId, gameName, imageUrl, gameUrl, reportDescription, reportType } = req.body;
 
-  console.log(req.body);
 
-  if ([gameId, gameName, imageUrl, gameUrl,reportType].some(
+  if ([gameId, gameName, imageUrl, gameUrl, reportType].some(
     (field) => typeof field === "string" && field.trim() === "" || field == null
   )) {
     throw new ApiError(400, "Please fill in all fields");
@@ -23,11 +22,11 @@ const createReport = asyncHandler(async (req, res) => {
     gameName,
     imageUrl,
     gameUrl,
-    reportDescription:reportDescription ? reportDescription : "Not Provided" ,
+    reportDescription: reportDescription ? reportDescription : "Not Provided",
     reportType
   })
-  if(!report){
-    throw new ApiError(500,"Error while submitting report")
+  if (!report) {
+    throw new ApiError(500, "Error while submitting report")
   }
   return res.status(201).json(new ApiResponse(201, report, "Report Submitted Successfully"));
 })

@@ -1,29 +1,34 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getall, makeGamesNull, deleteGame } from "@/store/Slices/offlinegamesappgamesSlice";
-import { Trash, Plus, Search, Pencil } from "lucide-react";
+import { getall, makeGamesNull, deleteGame, getGameCategories } from "@/store/Slices/offlinegamesappgamesSlice";
+import { Trash, Plus, Search, Pencil, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loader } from "./sub-components/";
 import { Button } from "@/components/ui/button";
+import { sendGameNotificationtoAllUsers } from "@/store/Slices/offlinegamesappgamesSlice";
 
 
 
 const OfflineGamesAppGamespage = () => {
     const dispatch = useDispatch();
-    const { games, loading } = useSelector((state) => state.offlinegamesappgame);
+    const { games, loading, deleting, deleted, categories } = useSelector((state) => state.offlinegamesappgame);
     const totalGames = useSelector((state) => state.offlinegamesappgame.games?.totalGames);
-    const { deleting, deleted } = useSelector((state) => state.offlinegamesappgame);
-
     const [open, setOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
     const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
+    const [selectedCategory,setSelectedCategory] = useState("");
     const [selectedGame, setSelectedGame] = useState(null);
     const [loader, setloader] = useState(true);
+    const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+    const [selectedGameForNotification, setSelectedGameForNotification] = useState(null);
+
+
     const debouncedQuery = useDebounce(searchQuery, 500);
     const gamesPerPage = 10;
 
@@ -37,6 +42,15 @@ const OfflineGamesAppGamespage = () => {
 
 
 
+    // Fetch Categories on mount
+
+    useEffect(() => {
+        dispatch(getGameCategories());
+    }, [deleted])
+
+
+
+
 
     // 🔹 Fetch games when `currentPage` changes
     useEffect(() => {
@@ -45,10 +59,11 @@ const OfflineGamesAppGamespage = () => {
             page: currentPage,
             limit: gamesPerPage,
             query: debouncedQuery,
+            category:selectedCategory
         })).then(() => {
             setloader(false);
         });
-    }, [dispatch, currentPage, deleted, debouncedQuery]);
+    }, [dispatch, currentPage, deleted, debouncedQuery,selectedCategory]);
 
     // 🔹 Cleanup on unmount
     useEffect(() => {
@@ -120,6 +135,47 @@ const OfflineGamesAppGamespage = () => {
 
 
 
+    // notification handler
+    const notifyUsers = async (type) => {
+        const game = selectedGameForNotification;
+        const maxLength = 100;
+        const trimmedDescription =
+            game?.description?.length > maxLength
+                ? game?.description.slice(0, maxLength) + "..."
+                : game?.description || "Tap To View";
+
+        const data = {
+            title: game?.gameName || "New Game Check it Out",
+            body: trimmedDescription,
+            imageUrl: game?.imageUrl,
+            mediaData: {
+                _id: game?._id,
+                gameName: game?.gameName,
+                description: game?.description,
+                splashColor: game?.splashColor,
+                imageUrl: game?.imageUrl,
+                gameUrl: game?.gameUrl,
+                isrotate: game?.isrotate,
+                createdAt: game?.createdAt,
+                updatedAt: game?.updatedAt,
+                slug: game?.slug,
+                gameDataUrl: game?.gameDataUrl,
+                gameZipUrl: game?.gameZipUrl,
+                gamePublishId: game?.gamePublishId
+            }
+        }
+
+        if (type === "all") {
+            const response = await dispatch(sendGameNotificationtoAllUsers({ data }));
+            if (response.meta.requestStatus === "fulfilled") {
+                setNotificationModalOpen(false)
+            }
+        }
+    };
+
+
+
+
     return (
         loader ? <Loader /> : (
             <div className="p-6 space-y-6">
@@ -146,6 +202,46 @@ const OfflineGamesAppGamespage = () => {
                 </div>
 
 
+                {/* Notification Buttons */}
+                <div className="mt-6 flex flex-wrap gap-3 justify-center sm:justify-start">
+                    <Link to="/offlinegamesnotification/home">
+                        <button className="px-4 py-2 rounded-lg bg-black text-white font-semibold  transition">
+                            Home Screen Notification
+                        </button>
+                    </Link>
+
+
+                    <Link to="/offlinegamesnotification/favouritescreen">
+                        <button className="px-4 py-2 rounded-lg bg-black text-white font-semibold shadow  transition">
+                            Favourite Screen Notification
+                        </button>
+                    </Link>
+
+                    <Link to="/offlinegamesnotification/ad">
+                        <button className="px-4 py-2 rounded-lg bg-black text-white font-semibold shadow  transition">
+                            Ad Notification
+                        </button>
+                    </Link>
+                </div>
+
+                <div className="flex flex-row gap-1">
+                    {/* Category Dropdown */}
+                    <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {categories?.map((category) => (
+                                <SelectItem key={category._id} value={category._id}>
+                                    {category._id} ({category.count})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+
                 {/* Table */}
                 <div className="overflow-x-auto bg-white  rounded-lg shadow-lg">
                     <table className="min-w-full">
@@ -155,6 +251,7 @@ const OfflineGamesAppGamespage = () => {
                                 <th className="p-4 text-left text-md font-semibold">Game Name</th>
                                 <th className="p-4 text-left text-md font-semibold">Description</th>
                                 <th className="p-4 text-left text-md font-semibold">Image</th>
+                                <th className="p-4 text-left text-md font-semibold">Notify</th>
                                 <th className="p-4 text-left text-md font-semibold">Actions</th>
                             </tr>
                         </thead>
@@ -198,6 +295,19 @@ const OfflineGamesAppGamespage = () => {
                                                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                                             />
                                         </td>
+
+                                        {/* notify */}
+                                        <td className="p-4 font-bold text-gray-900">
+                                            <Bell
+                                                className="ml-4 cursor-pointer"
+                                                size={20}
+                                                onClick={() => {
+                                                    setSelectedGameForNotification(game);
+                                                    setNotificationModalOpen(true);
+                                                }}
+                                            />
+                                        </td>
+
 
 
 
@@ -262,7 +372,25 @@ const OfflineGamesAppGamespage = () => {
                 </div>
 
 
-
+                {/* notification dialog */}
+                <AlertDialog open={notificationModalOpen} onOpenChange={setNotificationModalOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Send Notification</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Choose who to notify for <strong>{selectedGameForNotification?.gameName}</strong>
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="flex flex-col gap-4 mt-4">
+                            <Button onClick={() => notifyUsers('all')} className="w-full cursor-pointer">
+                                Notify All Users (Offline Games App)
+                            </Button>
+                        </div>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel className="border-none cursor-pointer" onClick={() => setNotificationModalOpen(false)}>Close</AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div >
         )
 

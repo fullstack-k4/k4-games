@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllGames, makeGamesNull, deleteGame, getGameCategories } from "@/store/Slices/gameSlice";
-import { Pencil, Trash, Plus, Search, Bell, MonitorCheck, BellOff } from "lucide-react";
+import { Pencil, Trash, Plus, Search, Bell, MonitorCheck, BellOff, Play, BadgeDollarSign, BookCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { denyRecommended } from "@/store/Slices/gameSlice";
 import { sendGameNotificationtoAllUsers } from "@/store/Slices/authSlice";
 import { formatPlaysCount } from "@/utils/format";
 import { sendGameWebPushNotification } from "@/store/Slices/webpushnotificationSlice";
+
 
 
 const Gamespage = () => {
@@ -109,7 +110,7 @@ const Gamespage = () => {
     setSelectedGame(game);
   }
 
-  const handleDelete = async (game) => {
+  const handleDelete = async () => {
     if (selectedGame) {
       let response = await dispatch(deleteGame({ gameId: selectedGame?._id }));
 
@@ -479,6 +480,24 @@ const Gamespage = () => {
                           title="Desktop supported"
                         />
                       )}
+                      {game.isHiddenWeb && (
+                        <Play
+                          className="absolute top-1 right-1 w-4 h-4 text-green-600 bg-white border border-gray-300 rounded-full p-0.5 shadow"
+                          title="app only"
+                        />
+                      )}
+                      {game.isAppOnly && (
+                        <BadgeDollarSign
+                          className="absolute top-1 right-1 w-4 h-4 text-green-600 bg-white border border-gray-300 rounded-full p-0.5 shadow"
+                          title="app promotion"
+                        />
+                      )}
+                      {game.isListed && (
+                        <BookCheck
+                          className="absolute top-1 right-1 w-4 h-4 text-green-600 bg-white border border-gray-300 rounded-full p-0.5 shadow"
+                          title="Listed"
+                        />
+                      )}
                     </td>
 
                     {/* Game Source */}
@@ -593,7 +612,7 @@ const Gamespage = () => {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleRecommendedConfirm} >OK</AlertDialogAction>
+                            <AlertDialogAction onClick={handleRecommendedConfirm}>OK</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -697,21 +716,20 @@ const Gamespage = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="flex flex-col gap-4 mt-4">
-              {!selectedGameForNotification?.isListed && (
+              {!selectedGameForNotification?.isListed && !selectedGameForNotification?.isDesktop && (
                 <Button onClick={() => notifyUsers('all')} className="w-full cursor-pointer">
                   Notify All Users (App)
                 </Button>
               )}
-              <Button onClick={() => notifyUsers('webpushnotificationall')} className="w-full cursor-pointer">
+              {!selectedGameForNotification?.isHiddenWeb && <Button onClick={() => notifyUsers('webpushnotificationall')} className="w-full cursor-pointer">
                 Notify All Users (Web Push Notification)
-              </Button>
+              </Button>}
             </div>
             <AlertDialogFooter>
               <AlertDialogCancel className="border-none cursor-pointer" onClick={() => setNotificationModalOpen(false)}>Close</AlertDialogCancel>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
       </div >
     )
 

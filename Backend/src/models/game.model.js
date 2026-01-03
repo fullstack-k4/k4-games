@@ -45,24 +45,27 @@ const gameSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    featuredorder: {
+        type: Number
+    },
     isRecommended: {
         type: Boolean,
         default: false,
     },
     isAppOnly: {
-        type: Boolean
+        type: Boolean  // this is for promotion (game is playable in website big screens only not playable in small screens)
     },
     isHiddenWeb: {
-        type: Boolean
+        type: Boolean  // shows game only in app
     },
     isPremium: {
         type: Boolean
     },
     isDesktop: {
-        type: Boolean
+        type: Boolean // desktop only games
     },
     isListed: {
-        type: Boolean
+        type: Boolean // for game promotion not playable on our website 
     },
     recommendedImageUrl: {
         type: String,

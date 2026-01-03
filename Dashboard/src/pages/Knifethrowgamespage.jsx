@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllGames, makeGamesNull, deleteGame } from "@/store/Slices/knifethrowgamesSlice";
-import { Trash, Plus, Search, Bell } from "lucide-react";
+import { Trash, Plus, Search, Bell, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "@/components/ui/alert-dialog";
@@ -288,6 +288,11 @@ const Knifethrowgamespage = () => {
 
                                         {/* Actions */}
                                         <td className="p-4 space-x-3">
+                                            <Link to={`/knifethrow/edit-game/${game?._id}`}>
+                                                <button className="text-blue-500 hover:scale-110 transition">
+                                                    <Pencil size={20} />
+                                                </button>
+                                            </Link>
                                             <AlertDialog open={open} onOpenChange={setOpen} >
                                                 <AlertDialogTrigger asChild>
                                                     <button className="text-red-500 hover:scale-110 transition" onClick={() => handleDeleteButttonClick(game)}>

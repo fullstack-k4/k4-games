@@ -7,6 +7,8 @@ import { extractAndUpload } from "../utils/extractAndUpload.js";
 import { deleteFileFromDO, deleteFolderFromS3, uploadJsonToS3 } from "../utils/do.js";
 import { Category } from "../models/category.model.js";
 import { Vote } from "../models/vote.model.js"
+import { v4 as uuidv4 } from "uuid";
+
 
 // UPLOAD GAME
 const uploadGame = asyncHandler(async (req, res) => {
@@ -37,6 +39,7 @@ const uploadGame = asyncHandler(async (req, res) => {
 
     let extractedFiles = [];
     let uploadedGameUrl = req.files["gameZip"] ? req.files["gameZip"][0].location : null;
+    console.log(uploadedGameUrl);
 
     if (uploadedGameUrl) {
         uploadedGameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${req.files["gameZip"][0].key}`
@@ -48,11 +51,9 @@ const uploadGame = asyncHandler(async (req, res) => {
         const originalFileName = req.files["gameZip"][0].originalname.toLowerCase() // Convert to lowercase
             .replace(/\s+/g, "-") // Replace spaces with "-"
             .replace(/\.zip$/i, ""); // Remove .zip extension if present;
-        extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName);
+        extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName, "files");
         const indexHtmlFileLink = extractedFiles.filter((file) => file.fileName === "index.html");
-        let gameLink = indexHtmlFileLink[0].url;
-        const relativePath = gameLink.split(".com/")[1];
-        gameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${relativePath}`;
+        gameUrl = indexHtmlFileLink[0].url;
         gameSource = "self";
     }
 
@@ -136,7 +137,7 @@ const uploadGame = asyncHandler(async (req, res) => {
             slug,
         };
 
-        gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+        gameDataUrl = await uploadJsonToS3(matchedUId, gameJson, "files");
     }
 
 
@@ -152,7 +153,7 @@ const editGame = asyncHandler(async (req, res) => {
         splashColor, slug, primaryCategory,
         instruction, gamePlayVideo, isDesktop,
         isAppOnly, isPremium, isHiddenWeb, isListed,
-        topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes } = req.body;
+        topTenCount, likesCount, dislikesCount, status, scheduledAt, notify, notes, featuredorder } = req.body;
 
     const isrotate = req.body.isrotate === "true"
     let imageUrl = req.body.imageUrl || "";
@@ -200,15 +201,13 @@ const editGame = asyncHandler(async (req, res) => {
         const originalFileName = req.files["gameZip"][0].originalname.toLowerCase() // Convert to lowercase
             .replace(/\s+/g, "-") // Replace spaces with "-"
             .replace(/\.zip$/i, ""); // Remove .zip extension if present;
-        extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName);
+        extractedFiles = await extractAndUpload(uploadedGameUrl, uploadUuid, originalFileName, "files");
         const indexHtmlFileLink = extractedFiles.filter((file) => file.fileName === "index.html");
-        let gameLink = indexHtmlFileLink[0].url;
-        const relativePath = gameLink.split(".com/")[1];
-        gameUrl = `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${relativePath}`;
+        gameUrl = indexHtmlFileLink[0].url;
 
         //Delete previous game folder
         if (game.gameSource === "self") {
-            await deleteFolderFromS3(previousGameUrl);
+            await deleteFolderFromS3(previousGameUrl, "files/");
         }
 
         // Delete previous game zip
@@ -222,7 +221,7 @@ const editGame = asyncHandler(async (req, res) => {
         // delete previous game from cloud
 
         // Delete previous  game folder
-        await deleteFolderFromS3(previousGameUrl);
+        await deleteFolderFromS3(previousGameUrl, "files/");
 
         // Delete previous game zip 
 
@@ -318,7 +317,7 @@ const editGame = asyncHandler(async (req, res) => {
                 slug
             };
 
-            gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+            gameDataUrl = await uploadJsonToS3(matchedUId, gameJson, "files");
         }
 
         // this condition is because if new zip is uploaded or new image is uploaded and download is allowed it is must to upload new gameData.json file
@@ -347,7 +346,7 @@ const editGame = asyncHandler(async (req, res) => {
                 slug
             };
 
-            gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+            gameDataUrl = await uploadJsonToS3(matchedUId, gameJson, "files");
 
 
         }
@@ -413,6 +412,9 @@ const editGame = asyncHandler(async (req, res) => {
     game.dislikesCount = dislikesCount
     game.notify = notify
     game.notes = notes
+    if (featuredorder) {
+        game.featuredorder = featuredorder;
+    }
 
     if (status) {
         game.status = status;
@@ -683,7 +685,7 @@ const getAllGameDashboard = asyncHandler(async (req, res) => {
 
 
     if (filterBy === "featured") {
-        pipeline.push({ $sort: { topTenCount: -1 } });
+        pipeline.push({ $sort: { featuredorder: 1 } });
     }
 
     const options = {
@@ -771,7 +773,7 @@ const getFeaturedGames = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const featuredGames = await Game.find(filter).sort({ topTenCount: -1 }).limit(7);
+    const featuredGames = await Game.find(filter).sort({ featuredorder: 1 }).limit(7);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 })
 
@@ -793,7 +795,7 @@ const getFeaturedGamesWeb = asyncHandler(async (req, res) => {
         filter.isDesktop = false;
     }
 
-    const featuredGames = await Game.find(filter).sort({ topTenCount: -1 }).limit(7);
+    const featuredGames = await Game.find(filter).sort({ featuredorder: 1 }).limit(7);
     return res.status(200).json(new ApiResponse(200, featuredGames, "Featured Games Fetched Successfully"));
 
 })
@@ -925,7 +927,7 @@ const deleteGame = asyncHandler(async (req, res) => {
 
     if (game?.gameSource === "self") {
         // delete game folder
-        await deleteFolderFromS3(game.gameUrl);
+        await deleteFolderFromS3(game.gameUrl, "files/");
     }
 
     // delete zip file
@@ -1007,7 +1009,7 @@ const allowDownload = asyncHandler(async (req, res) => {
     }
 
     // upload gameData.json file to digital ocean
-    let gameDataUrl = await uploadJsonToS3(matchedUId, gameJson);
+    let gameDataUrl = await uploadJsonToS3(matchedUId, gameJson, "files");
 
     if (uploadedGameUrl) {
         game.gameZipUrl = uploadedGameUrl;
@@ -1059,6 +1061,7 @@ const allowFeatured = asyncHandler(async (req, res) => {
     let game = req.game;
     let featuredVideoUrl = req.body.featuredVideoUrl || "";
     let featuredImageUrl = req.body.featuredImageUrl || "";
+    let featuredorder = req.body.featuredorder;
 
     let uploadedImageUrl = req.files["imageFile"] ? req.files["imageFile"][0].location : null;
     let uploadedVideoUrl = req.files["videoFile"] ? req.files["videoFile"][0].location : null;
@@ -1074,9 +1077,11 @@ const allowFeatured = asyncHandler(async (req, res) => {
 
     game.isFeatured = true;
 
+
     // add the uploaded image and video to the game
     game.featuredVideoUrl = featuredVideoUrl;
     game.featuredImageUrl = featuredImageUrl;
+    game.featuredorder = featuredorder;
 
     await game.save();
 

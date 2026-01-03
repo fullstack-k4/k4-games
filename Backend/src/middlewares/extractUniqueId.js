@@ -2,6 +2,7 @@ import { isValidObjectId } from "mongoose";
 import { Game } from "../models/game.model.js";
 import { Category } from "../models/category.model.js";
 import { v4 as uuidv4 } from "uuid";
+import { offlinegamesappGame } from "../models/offlinegamesappgame.model.js";
 
 
 
@@ -61,6 +62,44 @@ const extractUniqueId = async (req, res, next) => {
     next(); //Continue to Multer and controller
 }
 
+
+
+const extractOfflineGameUniqueId = async (req, res, next) => {
+    const { gameId } = req.params;
+
+    if (!isValidObjectId(gameId)) {
+        return res.status(400).json({ message: "Invalid game Id" });
+    }
+
+    const game = await offlinegamesappGame.findById(gameId);
+
+    if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+    }
+
+    let uniqueId;
+
+    if (game.gameUrl) {
+        const parts = game.gameUrl.split("/");
+        uniqueId = parts[parts.indexOf("games") + 1];
+    }
+
+    if (game.imageUrl) {
+        const parts = game.imageUrl.split("/");
+        uniqueId = parts[parts.indexOf("games") + 1]
+    }
+
+    if (uniqueId) {
+        req.existingUniqueId = uniqueId; //Attach to request Object
+    }
+
+    req.game = game //Attach game to request object
+
+    next(); //Continue to Multer and controller
+}
+
+
+
 const extractCategoryUniqueId = async (req, res, next) => {
     const { categoryId } = req.params;
     if (!isValidObjectId(categoryId)) {
@@ -98,4 +137,4 @@ const extractCategoryUniqueId = async (req, res, next) => {
 }
 
 
-export { extractUniqueId, extractCategoryUniqueId };
+export { extractUniqueId, extractCategoryUniqueId ,extractOfflineGameUniqueId};

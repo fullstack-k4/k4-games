@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm, useFormState, Controller} from "react-hook-form";
+import { useForm, useFormState, Controller } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     Select,
@@ -11,11 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Container, SpecialLoadingButton, Loader} from "./sub-components/";
+import { Container, SpecialLoadingButton, Loader } from "./sub-components/";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { Badge } from "@/components/ui/badge";
 import { getById, update, makeGameNull } from "@/store/Slices/offlinegamesappgamesSlice";
+import { getAllCategoriesList } from "@/store/Slices/offlinegamesappcategorySlice";
+
 
 
 const OfflineGamesAppEditGamepage = () => {
@@ -30,7 +33,8 @@ const OfflineGamesAppEditGamepage = () => {
         formState: { errors },
     } = useForm();
     const [loader, setloader] = useState(true);
-
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const { categoriesList } = useSelector((state) => state.offlinegamesappcategory);
 
 
 
@@ -60,27 +64,47 @@ const OfflineGamesAppEditGamepage = () => {
         if (gameData) {
             setValue("gameName", gameData.gameName);
             setValue("description", gameData.description);
-            setValue("imageUrl", gameData.imageUrl || "");
-            setValue("gameUrl", gameData.gameUrl || "");
             setValue("splashColor", gameData.splashColor);
             setValue("isrotate", String(gameData.isrotate));
             setValue("slug", gameData.slug);
-            setValue("gameDataUrl", gameData.gameDataUrl)
-            setValue("gameZipUrl", gameData.gameZipUrl)
             setValue("points", gameData.points)
+            setValue("gamePublishId", gameData?.gamePublishId);
+            setSelectedCategories(gameData.category || []);
         }
     }, [gameData, setValue]);
+
+    useEffect(() => {
+        dispatch(getAllCategoriesList({}))
+    }, [])
+
 
 
 
     const onSubmit = async (data) => {
 
-        const response = await dispatch(update({ gameId, data }));
+
+        const response = await dispatch(update({ gameId, data: { ...data, category: selectedCategories } }));
 
         if (response.meta.requestStatus === "fulfilled") {
             navigate("/offlinegamesapp/games")
         }
 
+    };
+
+
+    const handleCategorySelect = (category) => {
+        if (!selectedCategories.includes(category)) {
+            setSelectedCategories([...selectedCategories, category]);
+            setValue("category", [...selectedCategories, category]);
+            setValue("categories", selectedCategories, { shouldDirty: true }); // Update hidden field
+        }
+    };
+
+    const removeCategory = (category) => {
+        const updatedCategories = selectedCategories.filter((c) => c !== category);
+        setSelectedCategories(updatedCategories);
+        setValue("category", updatedCategories);
+        setValue("categories", updatedCategories, { shouldDirty: true }); // Update hidden field
     };
 
 
@@ -129,8 +153,31 @@ const OfflineGamesAppEditGamepage = () => {
 
                         </div>
 
+                        <div>
+                            <Label>Category</Label>
+                            <Select onValueChange={handleCategorySelect}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categoriesList && categoriesList.map((category) => (
+                                        <SelectItem key={category?._id} value={category?.name}>
+                                            {category?.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {selectedCategories.map((category) => (
+                                    <Badge key={category} className="flex items-center gap-1">
+                                        {category} <X className="cursor-pointer" size={12} onClick={() => removeCategory(category)} />
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
 
-
+                        {/* hidden fields */}
+                        <input type="hidden" {...register("categories")} />
 
 
 
@@ -150,28 +197,39 @@ const OfflineGamesAppEditGamepage = () => {
 
 
 
-
-
-
-
-
-
                         {/* Image */}
                         <div>
                             <Label>Image</Label>
 
                             <div className="mt-2">
                                 <Input
-                                    {...register("imageUrl", {
-                                        required: "Image URL is required",
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                                    {...register("image", {
+                                        validate: {
+                                            isImageFile: (fileList) => {
+                                                if (!fileList || fileList.length === 0) return true;
+                                                return (
+                                                    fileList[0].type.startsWith("image/") ||
+                                                    "Only image files are allowed"
+                                                );
+                                            },
+                                            isUnder1MB: (fileList) => {
+                                                if (!fileList || fileList.length === 0) return true;
+                                                return (
+                                                    fileList[0].size <= 1 * 1024 * 1024 ||
+                                                    "File size must be under 1MB"
+                                                );
+                                            },
+                                        },
                                     })}
-                                    placeholder="Enter Image URL"
                                 />
-
-                                {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
                             </div>
-                        </div>
+                            <span className="text-red-500 block break-all max-w-full">
+                                {gameData?.imageUrl}
+                            </span>
 
+                        </div>
 
 
                         {/* Game  */}
@@ -180,34 +238,29 @@ const OfflineGamesAppEditGamepage = () => {
 
                             <div className="mt-2">
                                 <Input
-                                    {...register("gameUrl", {
-                                        required: "Game URL is required",
-                                        pattern: {
-                                            value: /^(https?:\/\/.*)/,
-                                            message: "Enter a valid URL"
-                                        }
+                                    type="file"
+                                    accept=".zip"
+                                    {...register("gameZip", {
+                                        validate: {
+                                            isZipFile: (fileList) => {
+                                                if (!fileList || fileList.length === 0) return true;
+                                                const file = fileList[0];
+                                                return (
+                                                    file.type === "application/zip" ||
+                                                    file.name.endsWith(".zip") ||
+                                                    "Only ZIP files are allowed"
+                                                );
+                                            },
+                                        },
                                     })}
-                                    placeholder="Enter Game URL"
                                 />
-                                {errors.gameUrl && <p className="text-red-500 text-sm">{errors.gameUrl.message}</p>}
-
                             </div>
+                            <span className="text-red-500 block break-all max-w-full">
+                                {gameData?.gameUrl}
+                            </span>
                         </div>
 
-                        {/* Game Zip Url */}
 
-                        <div>
-                            <Label>Game Zip Url</Label>
-                            <Input {...register("gameZipUrl", { required: "Game Zip Url is required" })} />
-                            {errors.gameZipUrl && <p className="text-red-500 text-sm">{errors.gameZipUrl.message}</p>}
-                        </div>
-
-                        {/* Game Data Url */}
-                        <div>
-                            <Label>Game Data Url</Label>
-                            <Input {...register("gameDataUrl", { required: "Game Data Url is required" })} />
-                            {errors.gameDataUrl && <p className="text-red-500 text-sm">{errors.gameDataUrl.message}</p>}
-                        </div>
 
                         {/* Points */}
 
@@ -219,7 +272,13 @@ const OfflineGamesAppEditGamepage = () => {
 
 
 
+                        {/* Game Publish Id */}
 
+                        <div>
+                            <Label>Game Publish Id</Label>
+                            <Input {...register("gamePublishId")} />
+                            {errors.gamePublishId && <p className="text-red-500 text-sm">{errors.gamePublishId.message}</p>}
+                        </div>
 
 
 

@@ -37,7 +37,12 @@ import { KnifeAppAdNotificationpage } from "./KnifeAppAdNotificationpage"
 import { OfflineGamesAppGamespage } from "./OfflineGamesAppGamespage"
 import { OfflineGamesAppUploadGamepage } from "./OfflineGamesAppUploadGamepage"
 import { OfflineGamesAppEditGamepage } from "./OfflineGamesAppEditGamepage"
-
+import { OfflineGamesAppHomeScreenNotificationpage } from "./OfflineGamesAppHomeScreenNotificationpage"
+import { OfflineGamesAppAdNotificationpage } from "./OfflineGamesAppAdNotificationpage"
+import { OfflineGamesFavouriteScreenNotificationpage } from "./OfflineGamesFavouriteScreenNotificationpage"
+import { KnifeAppEditGamepage } from "./KnifeAppEditGamepage"
+import { OfflineGamesAppCategoriesPage } from "./OfflineGamesAppCategoriesPage"
+import { OfflineGamesAppCreateCategorypage } from "./OfflineGamesAppCreateCategorypage"
 
 
 
@@ -52,5 +57,8 @@ export {
     AdBannerwebpage, CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage,
     Knifethrowgamespage, UploadKnifeThrowGamespage,
     KnifeAppHomeScreenNotificationpage, KnifeAppNewScreenNotificationpage, KnifeAppSavedScreenNotificationpage,
-    KnifeAppAdNotificationpage, OfflineGamesAppGamespage,OfflineGamesAppUploadGamepage,OfflineGamesAppEditGamepage
+    KnifeAppAdNotificationpage, OfflineGamesAppGamespage, OfflineGamesAppUploadGamepage, OfflineGamesAppEditGamepage,
+    OfflineGamesAppHomeScreenNotificationpage, OfflineGamesAppAdNotificationpage,
+    OfflineGamesFavouriteScreenNotificationpage, KnifeAppEditGamepage, OfflineGamesAppCategoriesPage,
+    OfflineGamesAppCreateCategorypage
 }

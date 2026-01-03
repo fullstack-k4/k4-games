@@ -38,7 +38,6 @@ const create = asyncHandler(async (req, res) => {
     });
 
 
-
     if (!adbanner) {
         throw new ApiError(500, "Failed to create popup");
     }

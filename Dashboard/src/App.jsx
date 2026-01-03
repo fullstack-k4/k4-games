@@ -11,7 +11,9 @@ import {
   CreateBannerwebpage, NotifyAllWebPush, NotifyAdWebPushAllpage, Knifethrowgamespage,
   UploadKnifeThrowGamespage, KnifeAppHomeScreenNotificationpage, KnifeAppNewScreenNotificationpage,
   KnifeAppSavedScreenNotificationpage, KnifeAppAdNotificationpage, OfflineGamesAppGamespage,
-  OfflineGamesAppUploadGamepage,OfflineGamesAppEditGamepage
+  OfflineGamesAppUploadGamepage, OfflineGamesAppEditGamepage, OfflineGamesAppHomeScreenNotificationpage,
+  OfflineGamesAppAdNotificationpage, OfflineGamesFavouriteScreenNotificationpage, KnifeAppEditGamepage,
+  OfflineGamesAppCategoriesPage, OfflineGamesAppCreateCategorypage
 } from "./pages";
 import { AuthLayout, Layout } from "./pages/sub-components";
 import { useDispatch } from "react-redux";
@@ -59,7 +61,11 @@ const App = () => {
           <Route path="/knifethrowgamesnotification/newgames" element={<KnifeAppNewScreenNotificationpage />} />
           <Route path="/knifethrowgamesnotification/saved" element={<KnifeAppSavedScreenNotificationpage />} />
           <Route path="/knifethrowgamesnotification/ad" element={<KnifeAppAdNotificationpage />} />
-          <Route path="/offlinegamesapp/games" element={<OfflineGamesAppGamespage/>} />
+          <Route path="/offlinegamesapp/games" element={<OfflineGamesAppGamespage />} />
+          <Route path="/offlinegamesnotification/home" element={<OfflineGamesAppHomeScreenNotificationpage />} />
+          <Route path="/offlinegamesnotification/ad" element={<OfflineGamesAppAdNotificationpage />} />
+          <Route path="/offlinegamesnotification/favouritescreen" element={<OfflineGamesFavouriteScreenNotificationpage />} />
+          <Route path="/offlinegamesapp/categories" element={<OfflineGamesAppCategoriesPage />} />
         </Route>
 
         {/* Route (No Sidebar) */}
@@ -177,18 +183,34 @@ const App = () => {
           }
         />
         <Route
-        path="/offlinegamesapp/upload-game"
-        element={
-          <AuthLayout authentication={true} admin={true}>
-            <OfflineGamesAppUploadGamepage/>
-          </AuthLayout>
-        }
+          path="/knifethrow/edit-game/:gameId"
+          element={
+            <AuthLayout authentication={true} admin={true}>
+              <KnifeAppEditGamepage />
+            </AuthLayout>
+          }
         />
         <Route
-        path="/offlinegamesapp/edit-game/:gameId"
+          path="/offlinegamesapp/upload-game"
+          element={
+            <AuthLayout authentication={true} admin={true}>
+              <OfflineGamesAppUploadGamepage />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/offlinegamesapp/edit-game/:gameId"
+          element={
+            <AuthLayout authentication={true} admin={true}>
+              <OfflineGamesAppEditGamepage />
+            </AuthLayout>
+          }
+        />
+        <Route
+        path="/offlinegamesapp/create-category"
         element={
           <AuthLayout authentication={true} admin={true}>
-            <OfflineGamesAppEditGamepage/>
+            <OfflineGamesAppCreateCategorypage/>
           </AuthLayout>
         }
         />

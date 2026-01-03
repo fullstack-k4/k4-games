@@ -20,6 +20,7 @@ export const uploader = multer({
       if (!req.uploadUuid) {
         req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
       }
+      console.log(req.uploadUuid);
 
       const originalName = file.originalname;
 
@@ -40,6 +41,46 @@ export const uploader = multer({
     },
   }),
 });
+
+
+export const offlinegameuploader = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: function (req, file, cb) {
+      cb(null, file.mimetype);
+    },
+    acl: function (req, file, cb) {
+      if (
+        file.mimetype === "application/zip" ||
+        file.mimetype === "application/x-zip-compressed"
+      ) {
+        cb(null, "private");
+      } else {
+        cb(null, "public-read");
+      }
+    },
+    key: function (req, file, cb) {
+      if (!req.uploadUuid) {
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
+      }
+
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
+      let finalFileName;
+
+      if (file.mimetype === "application/zip" || file.mimetype === "application/x-zip-compressed") {
+        finalFileName = `offlinegamesapp/game_zips/${req.uploadUuid}/${baseName}.zip`
+      } else {
+        finalFileName = `offlinegamesapp/games/${req.uploadUuid}/${baseName}${extension}`;
+      }
+
+      cb(null, finalFileName);
+    }
+  })
+})
 
 
 
@@ -89,6 +130,29 @@ export const CategoryUploader = multer({
 
       const folder = fieldFolderMap[file.fieldname]
       const fileName = `gamecategory/${req.uploadUuid}/${folder}/${baseName}${extension}`;
+      cb(null, fileName);
+    },
+  }),
+});
+
+
+export const OfflineGamesCategoryUploader = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: "public-read",
+    key: function (req, file, cb) {
+
+      if (!req.uploadUuid) {
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/-/g, "").substring(0, 8);
+      }
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
+      const fileName = `offlinegamesapp/category/${req.uploadUuid}/${baseName}${extension}`;
+
       cb(null, fileName);
     },
   }),
@@ -225,11 +289,42 @@ export const recommendeduploader = multer({
 });
 
 
+export const privatefileuploader = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    contentType: function (req, file, cb) {
+      cb(null, file.mimetype);
+    },
+    acl: "private",
+    key: function (req, file, cb) {
+      if (!req.uploadUuid) {
+        req.uploadUuid = req.existingUniqueId || uuidv4().replace(/\D/g, "").substring(0, 5);
+      }
+
+      const originalName = file.originalname;
+
+      const { extension, baseName } = modifyfilename(originalName);
+
+      const finalFileName = `gamezips/${req.uploadUuid}/${baseName}${extension}`;
+      cb(null, finalFileName);
+
+    }
+  })
+
+});
+
+
 
 export const gameImageUploader = uploader.fields([
   { name: "gameZip", maxCount: 1 },
   { name: "image", maxCount: 1 },
   { name: "video", maxCount: 1 }
+])
+
+export const offlinegameImageUploader = offlinegameuploader.fields([
+  { name: "gameZip", maxCount: 1 },
+  { name: "image", maxCount: 1 },
 ])
 
 export const featuredImageVideoUploader = featureduploader.fields([
@@ -249,4 +344,6 @@ export const adBannerImageUploader = AdbannerUploader.single("image");
 export const moreappImageUploader = MoreAppUploader.single("image");
 export const userAttachmentUploader = AttachmentUploader.single("attachment");
 export const recommendedImageUploader = recommendeduploader.single("image");
+export const privatefileUploader = privatefileuploader.single("zip");
+export const offlinegamescategoryimageuploader = OfflineGamesCategoryUploader.single("image")
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import {
   Home, Users, Gamepad2, LogIn, Menu, ChartColumnStacked,
   LayoutGrid, BookText, Bug, Bell, BookOpenText,
-  Megaphone, Plus, ChevronUp, Gamepad,Download 
+  Megaphone, Plus, ChevronUp, Gamepad, Download
 } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { userLogout } from "@/store/Slices/authSlice"
@@ -238,7 +238,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 onClick={() => setIsofflinegamesappOpen(!isofflinegamesappOpen)}
               >
                 <div className="flex items-center space-x-2">
-                  <Download  className="w-5 h-5" />
+                  <Download className="w-5 h-5" />
                   {isOpen && <span>Offline Games App</span>}
                 </div>
 
@@ -273,6 +273,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     >
                       <Gamepad className="w-5 h-5" />
                       <span>Games</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/offlinegamesapp/categories"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-2 p-2 rounded hover:bg-gray-800 ${isActive ? "bg-gray-700" : ""
+                        }`
+                      }
+                    >
+                      <Gamepad className="w-5 h-5" />
+                      <span>Categories</span>
                     </NavLink>
                   </li>
 

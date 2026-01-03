@@ -9,9 +9,10 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { useSearchParams,Link } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import {Trash,Pencil} from "lucide-react"
+import { Trash, Pencil } from "lucide-react"
+import { toReadableDate } from "@/utils/format";
 
 
 const Reportpage = () => {
@@ -26,6 +27,9 @@ const Reportpage = () => {
   const [loader, setloader] = useState(true);
   const [selectedReportType, setSelectedReportType] = useState("");
   const reportsPerPage = 10;
+  const [openDesc, setOpenDesc] = useState(false);
+  const [fullDescription, setFullDescription] = useState("");
+
 
 
   // 🔹 Sync URL with state
@@ -49,7 +53,7 @@ const Reportpage = () => {
   }
 
 
-  const handleDelete = async (report) => {
+  const handleDelete = async () => {
     if (selectedReport) {
       let response = await dispatch(deleteReport({ id: selectedReport?._id }));
 
@@ -132,31 +136,31 @@ const Reportpage = () => {
 
 
 
-   const getJsonData = (data) => {
-      return data.map((d) => ({
-        gameName: d.gameName,
-        description: d.reportDescription,
-        reportType:d.reportType,
-        gameUrl:d.gameUrl
-      }));
-    };
-  
-  
-    const handleDownload = () => {
-      // Convert JSON data to a worksheet
-      const ws = XLSX.utils.json_to_sheet(getJsonData(reports.docs));
-  
-      // Create a new workbook and append the worksheet
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  
-      // Write the workbook and convert it to a Blob
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-  
-      // Trigger the download using FileSaver
-      saveAs(data, "Reports.xlsx");
-    };
+  const getJsonData = (data) => {
+    return data.map((d) => ({
+      gameName: d.gameName,
+      description: d.reportDescription,
+      reportType: d.reportType,
+      gameUrl: d.gameUrl
+    }));
+  };
+
+
+  const handleDownload = () => {
+    // Convert JSON data to a worksheet
+    const ws = XLSX.utils.json_to_sheet(getJsonData(reports.docs));
+
+    // Create a new workbook and append the worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Write the workbook and convert it to a Blob
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    // Trigger the download using FileSaver
+    saveAs(data, "Reports.xlsx");
+  };
 
 
   return (
@@ -169,7 +173,7 @@ const Reportpage = () => {
           </h1>
 
           {/* Download Excel Button */}
-          <Button disabled={reports.docs.length===0} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition" onClick={handleDownload}>Download Excel</Button>
+          <Button disabled={reports.docs.length === 0} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition" onClick={handleDownload}>Download Excel</Button>
         </div>
 
 
@@ -202,6 +206,7 @@ const Reportpage = () => {
                 <th className="p-4 text-left text-lg font-semibold">Name</th>
                 <th className="p-4 text-left text-lg font-semibold">Thumbnail</th>
                 <th className="p-4 text-left text-lg font-semibold">Report Type</th>
+                <th className="p-4 text-left text-lg font-semibold">Date</th>
                 <th className="p-4 text-left text-lg font-semibold">Description</th>
                 <th className="p-4 text-left text-lg font-semibold">Actions</th>
               </tr>
@@ -225,13 +230,15 @@ const Reportpage = () => {
 
                     {/* thumbnail */}
                     <td className="p-4">
-                      <motion.img
-                        src={report.imageUrl}
-                        alt={report.gameName}
-                        className="w-16 h-16 rounded-lg shadow-md"
-                        animate={{ y: [0, -5, 0] }}
-                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                      />
+                      <a href={`${report?.gameUrl}/`} target="_blank">
+                        <motion.img
+                          src={report.imageUrl}
+                          alt={report.gameName}
+                          className="w-16 h-16 rounded-lg shadow-md"
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        />
+                      </a>
                     </td>
 
                     {/* report type */}
@@ -241,10 +248,40 @@ const Reportpage = () => {
                       </Badge>
                     </td>
 
-                    {/*  description */}
-                    <td className="p-4 text-gray-700 ">
-                      {report.reportDescription.split(" ").slice(0, 4).join(" ")}...
+                    <td>
+                      {toReadableDate(report?.createdAt)}
                     </td>
+
+
+                    <td className="p-4 text-gray-700">
+                      {(() => {
+                        const words = report.reportDescription?.split(" ") || [];
+                        const isLong = words.length > 4;
+
+                        return (
+                          <>
+                            <span>
+                              {isLong ? words.slice(0, 4).join(" ") + "..." : report.reportDescription}
+                            </span>
+
+                            {isLong && (
+                              <button
+                                onClick={() => {
+                                  setFullDescription(report.reportDescription);
+                                  setOpenDesc(true);
+                                }}
+                                className="ml-2 text-blue-600 font-semibold hover:underline"
+                              >
+                                View full
+                              </button>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </td>
+
+
+
                     {/* Actions */}
                     <td className="p-4 space-x-3">
                       <Link to={`/edit/${report?.gameId}`}>
@@ -307,6 +344,21 @@ const Reportpage = () => {
             )
           )}
         </div>
+
+        <AlertDialog open={openDesc} onOpenChange={setOpenDesc}>
+          <AlertDialogContent className="max-w-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Report Description</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-700 mt-2">
+                {fullDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
       </div >
     ))
 }

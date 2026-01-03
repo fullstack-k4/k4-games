@@ -13,6 +13,7 @@ import adBannerwebSliceReducer from "./Slices/addbannerwebSlice.js"
 import webpushnotificationSliceReducer from "./Slices/webpushnotificationSlice.js"
 import knifethrowgamesSliceReducer from "./Slices/knifethrowgamesSlice.js"
 import offlinegamesappgamesSliceReducer from "./Slices/offlinegamesappgamesSlice.js"
+import offlinegamesappcategorySliceReducer from "./Slices/offlinegamesappcategorySlice.js"
 
 const store = configureStore({
     reducer: {
@@ -29,7 +30,8 @@ const store = configureStore({
         adbannerweb: adBannerwebSliceReducer,
         webpushnotification: webpushnotificationSliceReducer,
         knifethrowgames: knifethrowgamesSliceReducer,
-        offlinegamesappgame: offlinegamesappgamesSliceReducer
+        offlinegamesappgame: offlinegamesappgamesSliceReducer,
+        offlinegamesappcategory: offlinegamesappcategorySliceReducer
     }
 })
 

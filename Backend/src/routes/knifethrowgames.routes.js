@@ -4,7 +4,8 @@ import { verifyJWT, checkApiKey, verifyAdmin } from "../middlewares/auth.middlew
 import {
     uploadGame, getAllGame, deleteGame,
     sendNotificationToAllUsers, sendAdvertisementtoAllUsers,
-    sendGameNotificationtoAllUsers, sendNewGamesNotificationToAllUsers, sendSavedGamesNotificationToAllUsers
+    sendGameNotificationtoAllUsers, sendNewGamesNotificationToAllUsers,
+    sendSavedGamesNotificationToAllUsers, update, getById
 } from "../controllers/knifethrowgames.controller.js";
 
 const router = Router();
@@ -13,6 +14,8 @@ const router = Router();
 router.route("/upload").post(verifyJWT, uploadGame);
 router.route("/delete/:gameId").delete(verifyJWT, deleteGame);
 router.route("/getall").get(checkApiKey, getAllGame);
+router.route("/get/:gameId").get(getById);
+router.route("/update/:gameId").patch(verifyJWT, verifyAdmin, update);
 router.route("/sendnotification/all").post(verifyJWT, verifyAdmin, sendNotificationToAllUsers);
 router.route("/sendnewgamesnotification/all").post(verifyJWT, verifyAdmin, sendNewGamesNotificationToAllUsers);
 router.route("/sendsavedgamesnotification/all").post(verifyJWT, verifyAdmin, sendSavedGamesNotificationToAllUsers);

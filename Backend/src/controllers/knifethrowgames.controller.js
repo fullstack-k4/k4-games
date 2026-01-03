@@ -98,6 +98,56 @@ const getAllGame = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, game, "All Games Fetched Successfully"));
 })
 
+const getById = asyncHandler(async (req, res) => {
+    const { gameId } = req.params;
+
+    if (!isValidObjectId(gameId)) {
+        throw new ApiError(400, "Invalid Game Id");
+    }
+
+    const game = await Knifethrowgame.findById(gameId);
+
+    if (!game) {
+        throw new ApiError(404, "Game Not Found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, game, "Game Fetched Successfully"));
+})
+
+const update = asyncHandler(async (req, res) => {
+
+    const { gameId } = req.params;
+
+    const { gameName, description, slug,
+        imageUrl, gameUrl, splashColor,
+        isrotate } = req.body;
+
+    if (!gameName || !description || !splashColor || !imageUrl || !slug || !gameUrl) {
+        throw new ApiError(400, "Please Fill in all fields")
+    }
+
+    if (!isValidObjectId(gameId)) {
+        throw new ApiError(400, "Invalid game Id");
+    }
+
+    const game = await Knifethrowgame.findById(gameId);
+
+
+    game.gameName = gameName;
+    game.description = description;
+    game.slug = slug;
+    game.imageUrl = imageUrl;
+    game.gameUrl = gameUrl;
+    game.splashColor = splashColor;
+    game.isrotate = isrotate
+
+
+    await game.save();
+
+
+    return res.status(200).json(new ApiResponse(200, game, "Game Updated Successfully"))
+})
+
 
 // --------- Notification Apis for knife throw app ---------
 
@@ -328,5 +378,5 @@ const sendGameNotificationtoAllUsers = asyncHandler(async (req, res) => {
 export {
     uploadGame, deleteGame, getAllGame, sendNotificationToAllUsers,
     sendAdvertisementtoAllUsers, sendGameNotificationtoAllUsers, sendNewGamesNotificationToAllUsers,
-    sendSavedGamesNotificationToAllUsers
+    sendSavedGamesNotificationToAllUsers, update, getById
 }

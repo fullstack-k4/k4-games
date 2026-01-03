@@ -6,10 +6,14 @@ import { Container, SpecialLoadingButton, Loader } from "./sub-components/"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSelector, useDispatch } from "react-redux";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { generateSlug } from "@/utils/generateSlug";
 import { uploadGame } from "@/store/Slices/offlinegamesappgamesSlice";
+import { Badge } from "@/components/ui/badge";
+import { getAllCategoriesList } from "@/store/Slices/offlinegamesappcategorySlice";
+import { toast } from "sonner";
+
 
 
 
@@ -18,6 +22,9 @@ const OfflineGamesAppUploadGamepage = () => {
     });
 
     const [loader, setloader] = useState(true);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const { categoriesList } = useSelector((state) => state.offlinegamesappcategory);
+
     const dispatch = useDispatch();
     const loading = useSelector((state) => state.offlinegamesappgame.loading);
     const navigate = useNavigate();
@@ -46,14 +53,39 @@ const OfflineGamesAppUploadGamepage = () => {
         }
     }, [])
 
+    useEffect(() => {
+        dispatch(getAllCategoriesList({}))
+    }, [])
+
 
 
 
     const onSubmit = async (data) => {
+
+        if (!Array.isArray(data.category) || data.category.length === 0) {
+            toast.error("Category is required");
+            return;
+        }
+
         const response = await dispatch(uploadGame(data));
         if (response.meta.requestStatus === "fulfilled") {
             navigate("/offlinegamesapp/games");
         }
+
+    };
+
+
+    const handleCategorySelect = (category) => {
+        if (!selectedCategories.includes(category)) {
+            setSelectedCategories([...selectedCategories, category]);
+            setValue("category", [...selectedCategories, category]);
+        }
+    };
+
+    const removeCategory = (category) => {
+        const updatedCategories = selectedCategories.filter((c) => c !== category);
+        setSelectedCategories(updatedCategories);
+        setValue("category", updatedCategories);
     };
 
 
@@ -94,6 +126,30 @@ const OfflineGamesAppUploadGamepage = () => {
                         </div>
 
 
+                        <div>
+                            <Label>Category</Label>
+                            <Select onValueChange={handleCategorySelect}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categoriesList && categoriesList.map((category) => (
+                                        <SelectItem key={category?._id} value={category?.name}>
+                                            {category?.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {selectedCategories.map((category) => (
+                                    <Badge key={category} className="flex items-center gap-1">
+                                        {category} <X className="cursor-pointer" size={12} onClick={() => removeCategory(category)} />
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+
+
 
 
                         {/* Description */}
@@ -115,13 +171,19 @@ const OfflineGamesAppUploadGamepage = () => {
 
                             <div className="mt-2">
                                 <Input
-                                    {...register("imageUrl", {
-                                        required: "Image URL is required",
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                                    {...register("image", {
+                                        required: "Image file is required",
+                                        validate: {
+                                            isImageFile: (fileList) =>
+                                                fileList?.[0]?.type.startsWith("image/") || "Only image files are allowed",
+                                            isUnder1MB: (fileList) =>
+                                                fileList?.[0]?.size <= 1 * 1024 * 1024 || "File size must be under 1MB"
+                                        }
                                     })}
-                                    placeholder="Enter Image URL"
                                 />
-
-                                {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
+                                {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
                             </div>
                         </div>
 
@@ -132,33 +194,24 @@ const OfflineGamesAppUploadGamepage = () => {
 
                             <div className="mt-2">
                                 <Input
-                                    {...register("gameUrl", {
-                                        required: "Game URL is required",
-                                        pattern: {
-                                            value: /^(https?:\/\/.*)/,
-                                            message: "Enter a valid URL"
+                                    type="file"
+                                    accept=".zip"
+                                    {...register("gameZip", {
+                                        required: "Game file is required",
+                                        validate: {
+                                            isZipFile: (fileList) => {
+                                                const file = fileList?.[0];
+                                                return file
+                                                    ? file.type === "application/zip" || file.name.endsWith(".zip") || "Only ZIP files are allowed"
+                                                    : "Game file is required";
+                                            }
                                         }
                                     })}
-                                    placeholder="Enter Game URL"
                                 />
-                                {errors.gameUrl && <p className="text-red-500 text-sm">{errors.gameUrl.message}</p>}
+                                {errors.gameZip && <p className="text-red-500 text-sm">{errors.gameZip.message}</p>}
                             </div>
                         </div>
 
-                        {/* Game Zip Url */}
-
-                        <div>
-                            <Label>Game Zip Url</Label>
-                            <Input {...register("gameZipUrl", { required: "Game Zip Url is required" })} />
-                            {errors.gameZipUrl && <p className="text-red-500 text-sm">{errors.gameZipUrl.message}</p>}
-                        </div>
-
-                        {/* Game Data Url */}
-                        <div>
-                            <Label>Game Data Url</Label>
-                            <Input {...register("gameDataUrl", { required: "Game Data Url is required" })} />
-                            {errors.gameDataUrl && <p className="text-red-500 text-sm">{errors.gameDataUrl.message}</p>}
-                        </div>
 
                         {/* Points */}
 
@@ -166,6 +219,13 @@ const OfflineGamesAppUploadGamepage = () => {
                             <Label>Points</Label>
                             <Input {...register("points", { required: "Point is required" })} />
                             {errors.points && <p className="text-red-500 text-sm">{errors.points.message}</p>}
+                        </div>
+
+                        {/* Game Publish Id */}
+                        <div>
+                            <Label>Game Publish Id</Label>
+                            <Input {...register("gamePublishId")} />
+                            {errors.gamePublishId && <p className="text-red-500 text-sm">{errors.gamePublishId.message}</p>}
                         </div>
 
 

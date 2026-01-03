@@ -3,7 +3,7 @@ import { verifyJWT, verifyAdmin, checkApiKey } from "../middlewares/auth.middlew
 import {
     createCategory, getAllCategory, deleteCategory, getById, editCategory,
     getAllCategoryDashboard, getAllCategoriesDashboardPopup, getAllCategoryWeb,
-    getAllCategoriesList, checkSlugAvailability
+    getAllCategoriesList, checkSlugAvailability,
 } from "../controllers/category.controller.js";
 import { categoryImageUploader } from "../middlewares/multer.middleware.js";
 import { extractCategoryUniqueId } from "../middlewares/extractUniqueId.js";

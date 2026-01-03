@@ -170,6 +170,24 @@ const AllowFeaturedpage = () => {
                             </div>
                         </div>
 
+                        {/* Order */}
+                        <div>
+                            <Label>Order</Label>
+                            <Input
+                                type="number"
+                                {...register("featuredorder", {
+                                    required: "Order is required",
+                                    valueAsNumber: true,
+                                    min: {
+                                        value: 0,
+                                        message: "Order must be 0 or higher",
+                                    },
+                                })}
+                                placeholder="Enter display order"
+                            />
+                            {errors.featuredorder && <p className="text-red-500 text-sm">{errors.featuredorder.message}</p>}
+                        </div>
+
                         {/* Submit Button */}
                         {loading ? (
                             <SpecialLoadingButton content={"Uploading"} />

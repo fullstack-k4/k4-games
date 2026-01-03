@@ -29,6 +29,7 @@ const EditGamepage = () => {
         register,
         handleSubmit,
         setValue,
+        getValues,
         watch,
         control,
         formState: { errors },
@@ -102,6 +103,9 @@ const EditGamepage = () => {
             setValue("dislikesCount", gameData?.dislikesCount);
             setValue("status", gameData?.status);
             setValue("notes", gameData?.notes);
+            if (gameData?.featuredorder) {
+                setValue("featuredorder", gameData.featuredorder);
+            }
             if (gameData?.status === "scheduled" && gameData?.scheduledAt) {
                 const date = new Date(gameData.scheduledAt);
 
@@ -131,6 +135,7 @@ const EditGamepage = () => {
             }
         }
     }, [gameData, setValue]);
+
 
     const handleCategorySelect = (category) => {
         if (!selectedCategories.includes(category)) {
@@ -189,6 +194,9 @@ const EditGamepage = () => {
 
         return () => clearTimeout(delayDebounce);
     }, [slug, checkSlugAvailability]);
+
+
+
 
 
 
@@ -312,6 +320,24 @@ const EditGamepage = () => {
                                 <p className="text-red-500 text-sm">{errors.description.message}</p>
                             )}
                         </div>
+
+                        {/* Order */}
+                        {gameData?.isFeatured && <div>
+                            <Label className ="text-red-500"> Featured Game Order</Label>
+                            <Input
+                                type="number"
+                                {...register("featuredorder", {
+                                    required: "Order is required",
+                                    valueAsNumber: true,
+                                    min: {
+                                        value: 0,
+                                        message: "Order must be 0 or higher",
+                                    },
+                                })}
+                                placeholder="Enter display order"
+                            />
+                            {errors.featuredorder && <p className="text-red-500 text-sm">{errors.featuredorder.message}</p>}
+                        </div>}
 
                         {/* Notes */}
                         <div>
@@ -494,6 +520,7 @@ const EditGamepage = () => {
                             </div>
                         </div>
 
+                       
 
 
 

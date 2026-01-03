@@ -16,6 +16,7 @@ const initialState = {
     uploaded: null,
     deleted: false,
     deleting: false,
+    game: null,
 }
 
 
@@ -41,7 +42,6 @@ export const getAllGames = createAsyncThunk(
 
     }
 )
-
 
 
 
@@ -74,6 +74,35 @@ export const uploadGame = createAsyncThunk("uploadGame", async (data) => {
     }
 
 })
+
+export const getById = createAsyncThunk(
+    "getById",
+    async ({ gameId }) => {
+        try {
+            const response = await axiosInstance.get(`/knifethrowgame/get/${gameId}`);
+            return response.data.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+    }
+)
+
+export const update = createAsyncThunk(
+    "update",
+    async ({ gameId, data }) => {
+        try {
+            const response = await axiosInstance.patch(`/knifethrowgame/update/${gameId}`, data);
+            toast.success("Game Edited Successfully");
+            return response.data.data;
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.error);
+            throw error;
+        }
+
+    }
+)
 
 export const sendNotificationToAllUsers = createAsyncThunk(
     'sendNotificationToAllUsers',
@@ -156,6 +185,9 @@ const gameSlice = createSlice({
     reducers: {
         makeGamesNull: (state) => {
             state.games.docs = [];
+        },
+        makeGameNull: (state) => {
+            state.game = null;
         },
         updateUploadState: (state) => {
             state.uploading = false;
@@ -247,10 +279,29 @@ const gameSlice = createSlice({
         builder.addCase(sendSavedGamesNotificationToAllUsers.rejected, (state) => {
             state.notificationloading = false;
         })
+        builder.addCase(getById.pending,(state)=>{
+            state.loading = true;
+        })
+        builder.addCase(getById.fulfilled,(state,action)=>{
+            state.loading = false;
+            state.game = action.payload;
+        })
+        builder.addCase(getById.rejected,(state)=>{
+            state.loading = false;
+        })
+        builder.addCase(update.pending,(state)=>{
+            state.loading = true;
+        })
+        builder.addCase(update.fulfilled,(state)=>{
+            state.loading = false;
+        })
+        builder.addCase(update.rejected,(state)=>{
+            state.loading = false;
+        })
     }
 })
 
-export const { makeGamesNull, makeGameNull, updateUploadState } = gameSlice.actions;
+export const { makeGamesNull, makeGameNull, updateUploadState} = gameSlice.actions;
 
 
 export default gameSlice.reducer;

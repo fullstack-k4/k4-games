@@ -10,3 +10,13 @@ export const formatPlaysCount = (count) => {
 
     return (count / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
 };
+
+
+export const toReadableDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+}

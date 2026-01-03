@@ -1,7 +1,12 @@
 import { DeleteObjectCommand, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../config/dos3.js";
 import fs from "fs";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
 import mime from "mime-types";
+
+
 
 
 
@@ -48,30 +53,32 @@ const deleteFileFromDOS3key = async (s3Key) => {
   }
 }
 
-const uploadFileToS3 = async (filePath, s3Key) => {
-  try {
-    const fileStream = fs.createReadStream(filePath);
-
-    const uploadParams = {
+const uploadFileToS3 = async (
+  filePath,
+  s3Key,
+  acl = "public-read"
+) => {
+  const upload = new Upload({
+    client: s3,
+    params: {
       Bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
       Key: s3Key,
-      Body: fileStream,
-      ACL: "public-read",
-      ContentType: mime.lookup(filePath) || "application/octet-stream", // Automatically set MIME type
-    };
+      Body: fs.createReadStream(filePath),
+      ACL: acl,
+      ContentType: mime.lookup(filePath) || "application/octet-stream",
+    },
+    queueSize: 4,
+    partSize: 5 * 1024 * 1024,
+    leavePartsOnError: false,
+  });
 
-    await s3.send(new PutObjectCommand(uploadParams));
-    return { Location: `${process.env.DIGITALOCEAN_ENDPOINT}/${s3Key}` };
-  } catch (error) {
-    console.error("Error uploading file to S3:", error);
-    throw error;
-  }
-}
+  await upload.done();
+};
 
-const deleteFolderFromS3 = async (folderS3Key) => {
+const deleteFolderFromS3 = async (folderS3Key, filepath) => {
   try {
     const bucketName = process.env.DIGITALOCEAN_BUCKET_NAME;
-    folderS3Key = folderS3Key.substring(folderS3Key.indexOf("files/"))
+    folderS3Key = folderS3Key.substring(folderS3Key.indexOf(`${filepath}`))
 
     if (folderS3Key.endsWith("index.html")) {
       folderS3Key = folderS3Key.slice(0, -"index.html".length);
@@ -112,14 +119,14 @@ const deleteFolderFromS3 = async (folderS3Key) => {
 }
 
 
-const uploadJsonToS3 = async (matchedId, gameJson) => {
+const uploadJsonToS3 = async (matchedId, gameJson, filepath) => {
 
   try {
     const jsonContent = Buffer.from(JSON.stringify(gameJson, null, 2), "utf-8");
 
     const uploadParams = {
       Bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
-      Key: `files/${matchedId}/gameData.json`,
+      Key: `${filepath}/${matchedId}/gameData.json`,
       Body: jsonContent,
       ACL: "public-read",
       ContentType: "application/json"
@@ -127,7 +134,7 @@ const uploadJsonToS3 = async (matchedId, gameJson) => {
 
     await s3.send(new PutObjectCommand(uploadParams));
 
-    return `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/files/${matchedId}/gameData.json`
+    return `${process.env.DIGITALOCEAN_BUCKET_STARTER_URL}/${filepath}/${matchedId}/gameData.json`
   } catch (error) {
     console.error("Error uploading file to S3:", error);
     throw error;
@@ -136,5 +143,18 @@ const uploadJsonToS3 = async (matchedId, gameJson) => {
 }
 
 
+async function generateSignedUrl(key) {
+  const command = new GetObjectCommand({
+    Bucket: process.env.DIGITALOCEAN_BUCKET_NAME,
+    Key: key,
+  });
 
-export { deleteFileFromDO, uploadFileToS3, deleteFolderFromS3, deleteFileFromDOS3key, uploadJsonToS3 };
+  return await getSignedUrl(s3, command, {
+    expiresIn: 60 * 2
+  });
+
+}
+
+
+
+export { deleteFileFromDO, uploadFileToS3, deleteFolderFromS3, deleteFileFromDOS3key, uploadJsonToS3, generateSignedUrl };
